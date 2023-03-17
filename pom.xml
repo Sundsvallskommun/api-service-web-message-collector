@@ -10,7 +10,7 @@
 	<groupId>se.sundsvall</groupId>
 	<artifactId>api-service-web-message-collector</artifactId>
 	<version>1.0</version>
-	<name>api-service-web-message-collector</name>
+	<name>web-message-collector</name>
 	<properties>
 		<!-- Pipeline properties -->
 		<docker.image.name>ms-web-message-collector</docker.image.name>
