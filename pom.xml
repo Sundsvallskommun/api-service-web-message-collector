@@ -8,11 +8,12 @@
 		<relativePath /> <!-- lookup parent from repository -->
 	</parent>
 	<groupId>se.sundsvall</groupId>
-	<artifactId>api-service-message-collector</artifactId>
+	<artifactId>api-service-web-message-collector</artifactId>
 	<version>1.0</version>
-	<name>api-service-message-collector</name>
+	<name>api-service-web-message-collector</name>
 	<properties>
 		<!-- Pipeline properties -->
+		<docker.image.name>ms-web-message-collector</docker.image.name>
 		<exposed.app.port>8080</exposed.app.port>
 		<published.container.port.sandbox>9079</published.container.port.sandbox>
 		<published.container.port.test>9079</published.container.port.test>
