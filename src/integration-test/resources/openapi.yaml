@@ -1,6 +1,6 @@
 openapi: 3.0.1
 info:
-  title: web-message-collector
+  title: api-web-message-collector
   contact: {}
   license:
     name: MIT License
@@ -21,6 +21,12 @@ paths:
       description: Returns a list of messages found
       operationId: getMessages
       responses:
+        "200":
+          description: Successful Operation
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/MessageDTO'
         "400":
           description: Bad request
           content:
@@ -35,12 +41,6 @@ paths:
             application/problem+json:
               schema:
                 $ref: '#/components/schemas/Problem'
-        "200":
-          description: Successful Operation
-          content:
-            '*/*':
-              schema:
-                $ref: '#/components/schemas/MessageDTO'
         "500":
           description: Internal Server error
           content:
@@ -100,6 +100,66 @@ paths:
       x-wso2-mutual-ssl: Optional
 components:
   schemas:
+    MessageDTO:
+      type: object
+      properties:
+        id:
+          type: string
+          description: The webMessageCollector Id for the message
+          example: "1"
+        postedByManager:
+          type: boolean
+          description: 'If the message was utbound from a manager or inbound from
+            a customer '
+          example: true
+        familyId:
+          type: string
+          description: What E-service the message was found in
+          example: "501"
+        externalCaseId:
+          type: string
+          description: 'The external caseID '
+          example: caa230c6-abb4-4592-ad9a-34e263c2787b
+        message:
+          type: string
+          description: 'The message '
+          example: Hello World
+        messageId:
+          type: string
+          description: The unique messageId from openE for the message
+          example: "12"
+        sent:
+          type: string
+          description: 'Time and date the message was sent '
+          example: 2023-02-23 17:26:23
+        poster:
+          $ref: '#/components/schemas/PosterDTO'
+    PosterDTO:
+      type: object
+      properties:
+        username:
+          type: string
+          description: Username for the poster
+          example: te01st
+        firstName:
+          type: string
+          description: 'Firstname of the poster '
+          example: Test
+        lastName:
+          type: string
+          description: 'If the message was utbound from a manager or inbound from
+            a customer '
+          example: Testorsson
+        email:
+          type: string
+          description: Email for the poster
+          example: test@sundsvall.se
+        userId:
+          type: string
+          description: 'If the message was utbound from a manager or inbound from
+            a customer '
+          example: "177"
+      description: 'The poster of the message '
     Problem:
       type: object
       properties:
@@ -352,64 +412,4 @@ components:
           type: string
         message:
           type: string
-    MessageDTO:
-      type: object
-      properties:
-        id:
-          type: string
-          description: The webMessageCollector Id for the message
-          example: "1"
-        postedByManager:
-          type: boolean
-          description: 'If the message was utbound from a manager or inbound from
-            a customer '
-          example: true
-        familyId:
-          type: string
-          description: What E-service the message was found in
-          example: "501"
-        externalCaseId:
-          type: string
-          description: 'The external caseID '
-          example: caa230c6-abb4-4592-ad9a-34e263c2787b
-        message:
-          type: string
-          description: 'The message '
-          example: Hello World
-        messageId:
-          type: string
-          description: The unique messageId from openE for the message
-          example: "12"
-        sent:
-          type: string
-          description: 'Time and date the message was sent '
-          example: 2023-02-23 17:26:23
-        poster:
-          $ref: '#/components/schemas/PosterDTO'
-    PosterDTO:
-      type: object
-      properties:
-        username:
-          type: string
-          description: Username for the poster
-          example: te01st
-        firstName:
-          type: string
-          description: 'Firstname of the poster '
-          example: Test
-        lastName:
-          type: string
-          description: 'If the message was utbound from a manager or inbound from
-            a customer '
-          example: Testorsson
-        email:
-          type: string
-          description: Email for the poster
-          example: test@sundsvall.se
-        userId:
-          type: string
-          description: 'If the message was utbound from a manager or inbound from
-            a customer '
-          example: "177"
-      description: 'The poster of the message '
   securitySchemes: {}
