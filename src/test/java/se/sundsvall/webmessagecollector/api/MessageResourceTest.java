@@ -55,7 +55,7 @@ class MessageResourceTest {
         
         assertThat(result).isNotNull();
         assertThat(result.getBody()).isNotNull();
-        assertThat(result.getBody().size()).isEqualTo(1);
+        assertThat(result.getBody()).hasSize(1);
         var body = result.getBody().get(0);
         assertThat(body).hasNoNullFieldsOrProperties();
         

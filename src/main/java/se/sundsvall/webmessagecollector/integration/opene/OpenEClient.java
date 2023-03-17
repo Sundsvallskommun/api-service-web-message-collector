@@ -9,6 +9,7 @@ import org.apache.hc.client5.http.auth.AuthScope;
 import org.apache.hc.client5.http.auth.UsernamePasswordCredentials;
 import org.apache.hc.client5.http.classic.methods.HttpGet;
 import org.apache.hc.client5.http.impl.auth.BasicCredentialsProvider;
+import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
 import org.apache.hc.client5.http.impl.classic.HttpClients;
 import org.apache.hc.core5.http.io.entity.EntityUtils;
 import org.springframework.stereotype.Component;
@@ -19,9 +20,13 @@ import org.springframework.web.util.UriComponentsBuilder;
 class OpenEClient {
     private final OpenEIntegrationProperties properties;
     
+    private final CloseableHttpClient response;
     
     OpenEClient(OpenEIntegrationProperties properties) {
         this.properties = properties;
+        this.response = HttpClients.custom()
+            .setDefaultCredentialsProvider(getCredentials())
+            .build();
     }
     
     byte[] getMessages(String familyId, String fromDate, String toDate) throws IOException {
@@ -32,16 +37,13 @@ class OpenEClient {
     
     private byte[] getBytes(URI url) throws IOException {
         
-        var response = HttpClients.custom()
-            .setDefaultCredentialsProvider(getCredentials())
-            .build();
-            
-            var result = response.execute(new HttpGet(url));
-            
-            if (result.getCode() == 200) {
-                return EntityUtils.toByteArray(result.getEntity());
-            }
-            throw new RuntimeException(result.toString());
+        
+        var result = response.execute(new HttpGet(url));
+        
+        if (result.getCode() == 200) {
+            return EntityUtils.toByteArray(result.getEntity());
+        }
+        throw new RuntimeException(result.toString());
         
     }
     

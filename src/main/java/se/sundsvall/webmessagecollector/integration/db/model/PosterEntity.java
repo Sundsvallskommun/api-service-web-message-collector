@@ -3,6 +3,7 @@ package se.sundsvall.webmessagecollector.integration.db.model;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 
+import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -11,7 +12,7 @@ import lombok.NoArgsConstructor;
 
 @Entity
 @Getter
-@NoArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
 @Builder(setterPrefix = "with")
 public class PosterEntity {
