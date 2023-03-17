@@ -1,0 +1,18 @@
+[
+  {
+    "id":"1",
+    "postedByManager": false,
+    "familyId": "123",
+    "externalCaseId": "223",
+    "message": "Hello World",
+    "messageId": "1",
+    "sent": "2023-02-23T17:26:23.458389",
+    "poster": {
+      "username": "test",
+      "firstName": "Test",
+      "lastName": "Testorsson",
+      "email": "test@sundsvall.se",
+      "userId": "testId"
+    }
+  }
+]
