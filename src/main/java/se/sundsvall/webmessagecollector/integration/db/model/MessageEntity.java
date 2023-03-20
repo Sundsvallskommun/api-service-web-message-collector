@@ -8,6 +8,7 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.ManyToOne;
+import javax.persistence.OneToOne;
 
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -32,6 +33,9 @@ public class MessageEntity {
     private String message;
     private String messageId;
     private LocalDateTime sent;
-    @ManyToOne(cascade = CascadeType.ALL)
-    private PosterEntity posterEntity;
+    private String username;
+    private String firstName;
+    private String lastName;
+    private String email;
+    private String userId;
 }

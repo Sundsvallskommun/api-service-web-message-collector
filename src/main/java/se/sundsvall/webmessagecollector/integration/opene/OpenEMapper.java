@@ -14,7 +14,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 import se.sundsvall.webmessagecollector.integration.db.model.MessageEntity;
-import se.sundsvall.webmessagecollector.integration.db.model.PosterEntity;
 import se.sundsvall.webmessagecollector.integration.opene.model.Messages;
 
 
@@ -49,14 +48,13 @@ class OpenEMapper {
                     .withExternalCaseId(String.valueOf(externalMessage.getFlowInstanceID()))
                     .withMessage(externalMessage.getMessage())
                     .withSent(LocalDateTime.parse(externalMessage.getAdded(), formatter))
-                    .withPosterEntity(PosterEntity.builder()
-                        .withEmail(externalMessage.getPoster().getEmail())
-                        .withFirstName(externalMessage.getPoster().getFirstname())
-                        .withLastName(externalMessage.getPoster().getLastname())
-                        .withUsername(externalMessage.getPoster().getUsername())
-                        .withUserId(String.valueOf(externalMessage.getPoster().getUserID()))
-                        .build())
+                    .withEmail(externalMessage.getPoster().getEmail())
+                    .withFirstName(externalMessage.getPoster().getFirstname())
+                    .withLastName(externalMessage.getPoster().getLastname())
+                    .withUsername(externalMessage.getPoster().getUsername())
+                    .withUserId(String.valueOf(externalMessage.getPoster().getUserID()))
                     .build())
+                
                 .toList();
         } catch (JsonProcessingException e) {
             LOG.info("Something went wrong parsing messages", e);

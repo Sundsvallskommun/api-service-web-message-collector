@@ -22,6 +22,14 @@ public class MessageDTO {
     private String messageId;
     @Schema(description = "Time and date the message was sent ", example = "2023-02-23 17:26:23")
     private String sent;
-    @Schema(description = "The poster of the message ")
-    private PosterDTO poster;
+    @Schema(description = "Username for the poster", example = "te01st")
+    private String username;
+    @Schema(description = "Firstname of the poster ", example = "Test")
+    private String firstName;
+    @Schema(description = "If the message was utbound from a manager or inbound from a customer ", example = "Testorsson")
+    private String lastName;
+    @Schema(description = "Email for the poster", example = "test@sundsvall.se")
+    private String email;
+    @Schema(description = "If the message was utbound from a manager or inbound from a customer ", example = "177")
+    private String userId;
 }
