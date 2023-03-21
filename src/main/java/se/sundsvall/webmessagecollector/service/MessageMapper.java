@@ -5,7 +5,6 @@ import java.util.List;
 import org.springframework.stereotype.Component;
 
 import se.sundsvall.webmessagecollector.api.model.MessageDTO;
-import se.sundsvall.webmessagecollector.api.model.PosterDTO;
 import se.sundsvall.webmessagecollector.integration.db.model.MessageEntity;
 
 @Component
@@ -21,13 +20,11 @@ class MessageMapper {
             .withExternalCaseId(String.valueOf(entity.getExternalCaseId()))
             .withMessage(entity.getMessage())
             .withSent(String.valueOf(entity.getSent()))
-            .withPoster(PosterDTO.builder()
-                .withEmail(entity.getPosterEntity().getEmail())
-                .withFirstName(entity.getPosterEntity().getFirstName())
-                .withLastName(entity.getPosterEntity().getLastName())
-                .withUsername(entity.getPosterEntity().getUsername())
-                .withUserId(String.valueOf(entity.getPosterEntity().getUserId()))
-                .build())
+            .withEmail(entity.getEmail())
+            .withFirstName(entity.getFirstName())
+            .withLastName(entity.getLastName())
+            .withUsername(entity.getUsername())
+            .withUserId(String.valueOf(entity.getUserId()))
             .build();
     }
     
