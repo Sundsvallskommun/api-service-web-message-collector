@@ -18,6 +18,7 @@ import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import se.sundsvall.webmessagecollector.api.model.Direction;
 import se.sundsvall.webmessagecollector.integration.db.MessageRepository;
 import se.sundsvall.webmessagecollector.integration.db.model.MessageEntity;
 
@@ -41,7 +42,7 @@ class MessageServiceTest {
             .withId("someId")
             .withSent(LocalDateTime.now())
             .withExternalCaseId("someExternalCaseId")
-            .withPostedByManager(true)
+            .withDirection(Direction.OUTBOUND)
             .withFamilyId("someFamilyId")
             .withUserId("someUserId")
             .withUsername("someUsername")

@@ -16,6 +16,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import se.sundsvall.webmessagecollector.api.model.Direction;
 import se.sundsvall.webmessagecollector.api.model.MessageDTO;
 import se.sundsvall.webmessagecollector.service.MessageService;
 
@@ -36,7 +37,7 @@ class MessageResourceTest {
             .withMessage("someMessage")
             .withExternalCaseId("someExternalCaseId")
             .withFamilyId("someFamilyId")
-            .withPostedByManager(true)
+            .withDirection(Direction.OUTBOUND)
             .withSent(LocalDateTime.now().toString())
             .withLastName("someLastName")
             .withFirstName("someFirstName")

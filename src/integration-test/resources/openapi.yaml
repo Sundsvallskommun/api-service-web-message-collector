@@ -21,24 +21,18 @@ paths:
       description: Returns a list of messages found
       operationId: getMessages
       responses:
-        "404":
-          description: Not found
-          content:
-            application/problem+json:
-              schema:
-                $ref: '#/components/schemas/Problem'
-        "500":
-          description: Internal Server error
-          content:
-            application/problem+json:
-              schema:
-                $ref: '#/components/schemas/Problem'
         "200":
           description: Successful Operation
           content:
             '*/*':
               schema:
                 $ref: '#/components/schemas/MessageDTO'
+        "500":
+          description: Internal Server error
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
         "400":
           description: Bad request
           content:
@@ -47,6 +41,12 @@ paths:
                 oneOf:
                   - $ref: '#/components/schemas/Problem'
                   - $ref: '#/components/schemas/ConstraintViolationProblem'
+        "404":
+          description: Not found
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
     delete:
       tags:
         - messages
@@ -62,12 +62,6 @@ paths:
                 type: string
         required: true
       responses:
-        "404":
-          description: Not found
-          content:
-            application/problem+json:
-              schema:
-                $ref: '#/components/schemas/Problem'
         "500":
           description: Internal Server error
           content:
@@ -82,6 +76,12 @@ paths:
                 oneOf:
                   - $ref: '#/components/schemas/Problem'
                   - $ref: '#/components/schemas/ConstraintViolationProblem'
+        "404":
+          description: Not found
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
   /api-docs:
     get:
       tags:
@@ -100,33 +100,6 @@ paths:
       x-wso2-mutual-ssl: Optional
 components:
   schemas:
-    Problem:
-      type: object
-      properties:
-        instance:
-          type: string
-          format: uri
-        type:
-          type: string
-          format: uri
-        parameters:
-          type: object
-          additionalProperties:
-            type: object
-        status:
-          $ref: '#/components/schemas/StatusType'
-        title:
-          type: string
-        detail:
-          type: string
-    StatusType:
-      type: object
-      properties:
-        statusCode:
-          type: integer
-          format: int32
-        reasonPhrase:
-          type: string
     MessageDTO:
       type: object
       properties:
@@ -134,11 +107,14 @@ components:
           type: string
           description: The webMessageCollector Id for the message
           example: "1"
-        postedByManager:
-          type: boolean
-          description: 'If the message was utbound from a manager or inbound from
-            a customer '
-          example: true
+        direction:
+          type: string
+          description: If the message is inbound or outbound from the perspective
+            of case-data/e-service.
+          example: INBOUND
+          enum:
+            - INBOUND
+            - OUTBOUND
         familyId:
           type: string
           description: What E-service the message was found in
@@ -181,6 +157,33 @@ components:
           description: 'If the message was utbound from a manager or inbound from
             a customer '
           example: "177"
+    Problem:
+      type: object
+      properties:
+        instance:
+          type: string
+          format: uri
+        type:
+          type: string
+          format: uri
+        parameters:
+          type: object
+          additionalProperties:
+            type: object
+        status:
+          $ref: '#/components/schemas/StatusType'
+        title:
+          type: string
+        detail:
+          type: string
+    StatusType:
+      type: object
+      properties:
+        statusCode:
+          type: integer
+          format: int32
+        reasonPhrase:
+          type: string
     ConstraintViolationProblem:
       type: object
       properties:
