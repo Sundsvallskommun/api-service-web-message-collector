@@ -13,6 +13,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
+import se.sundsvall.webmessagecollector.api.model.Direction;
 import se.sundsvall.webmessagecollector.integration.db.model.MessageEntity;
 import se.sundsvall.webmessagecollector.integration.opene.model.Messages;
 
@@ -43,7 +44,7 @@ class OpenEMapper {
                 .getExternalMessage().stream()
                 .map(externalMessage -> MessageEntity.builder()
                     .withFamilyId(familyId)
-                    .withPostedByManager(externalMessage.isPostedByManager())
+                    .withDirection(externalMessage.isPostedByManager() ? Direction.OUTBOUND: Direction.INBOUND)
                     .withMessageId(String.valueOf(externalMessage.getMessageID()))
                     .withExternalCaseId(String.valueOf(externalMessage.getFlowInstanceID()))
                     .withMessage(externalMessage.getMessage())
