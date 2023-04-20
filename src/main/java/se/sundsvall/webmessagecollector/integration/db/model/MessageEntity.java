@@ -27,7 +27,7 @@ public class MessageEntity {
     
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private String id;
+    private Integer id;
     @Enumerated(EnumType.STRING)
     private Direction direction;
     private String familyId;
