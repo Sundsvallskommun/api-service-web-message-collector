@@ -26,7 +26,7 @@ public class MessageService {
         return mapper.toDTOs(repository.findAll());
     }
     
-    public void deleteMessages(List<String> ids) {
+    public void deleteMessages(List<Integer> ids) {
         repository.deleteAllById(ids);
     }
 }

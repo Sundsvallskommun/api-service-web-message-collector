@@ -39,7 +39,7 @@ class MessageServiceTest {
         var entity = MessageEntity.builder()
             .withMessage("someMessage")
             .withMessageId("someMessageId")
-            .withId("someId")
+            .withId(1)
             .withSent(LocalDateTime.now())
             .withExternalCaseId("someExternalCaseId")
             .withDirection(Direction.OUTBOUND)
@@ -49,7 +49,6 @@ class MessageServiceTest {
             .withLastName("someLastname")
             .withFirstName("someFirstname")
             .withEmail("someEmail")
-            .withId("someId")
             .build();
         
         when(repository.findAll())
@@ -87,7 +86,7 @@ class MessageServiceTest {
     
     @Test
     void deleteMessages() {
-        service.deleteMessages(List.of("someIds"));
+        service.deleteMessages(List.of(1));
         verify(repository, times(1)).deleteAllById(anyList());
         verifyNoMoreInteractions(repository);
         

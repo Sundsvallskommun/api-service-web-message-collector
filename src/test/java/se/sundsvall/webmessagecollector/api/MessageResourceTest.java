@@ -60,7 +60,7 @@ class MessageResourceTest {
     
     @Test
     void deleteMessages() {
-        resource.deleteMessages(List.of("someId"));
+        resource.deleteMessages(List.of(1));
         verify(service, times(1)).deleteMessages(anyList());
         verifyNoMoreInteractions(service);
     }
