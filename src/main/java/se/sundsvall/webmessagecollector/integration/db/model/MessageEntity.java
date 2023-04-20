@@ -26,7 +26,7 @@ import lombok.NoArgsConstructor;
 public class MessageEntity {
     
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private String id;
     @Enumerated(EnumType.STRING)
     private Direction direction;
