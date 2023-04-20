@@ -1,6 +1,6 @@
 [
   {
-    "id":"1",
+    "id": 1,
     "direction": "INBOUND",
     "familyId": "123",
     "externalCaseId": "223",

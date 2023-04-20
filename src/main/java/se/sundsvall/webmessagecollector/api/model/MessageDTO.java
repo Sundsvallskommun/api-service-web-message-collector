@@ -2,6 +2,7 @@ package se.sundsvall.webmessagecollector.api.model;
 
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
+import javax.persistence.criteria.CriteriaBuilder;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Builder;
@@ -12,7 +13,7 @@ import lombok.Getter;
 @Builder(setterPrefix = "with")
 public class MessageDTO {
     @Schema(description = "The webMessageCollector Id for the message", example = "1")
-    private String id;
+    private Integer id;
     @Enumerated(EnumType.STRING)
     @Schema(description = "If the message is inbound or outbound from the perspective of " +
                           "case-data/e-service.", example = "INBOUND")

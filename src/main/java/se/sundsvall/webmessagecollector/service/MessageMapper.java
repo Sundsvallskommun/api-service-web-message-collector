@@ -13,7 +13,7 @@ class MessageMapper {
     
     MessageDTO toDTO(MessageEntity entity) {
         return MessageDTO.builder()
-            .withId(String.valueOf(entity.getId()))
+            .withId(entity.getId())
             .withFamilyId(entity.getFamilyId())
             .withDirection(entity.getDirection())
             .withMessageId(String.valueOf(entity.getMessageId()))

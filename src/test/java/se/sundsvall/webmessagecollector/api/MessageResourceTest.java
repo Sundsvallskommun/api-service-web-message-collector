@@ -32,7 +32,7 @@ class MessageResourceTest {
     @Test
     void getMessages() {
         when(service.getMessages()).thenReturn(List.of(MessageDTO.builder()
-            .withId("someId")
+            .withId(1)
             .withMessageId("someMessageId")
             .withMessage("someMessage")
             .withExternalCaseId("someExternalCaseId")

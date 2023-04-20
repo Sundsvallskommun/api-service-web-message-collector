@@ -21,12 +21,6 @@ paths:
       description: Returns a list of messages found
       operationId: getMessages
       responses:
-        "404":
-          description: Not found
-          content:
-            application/problem+json:
-              schema:
-                $ref: '#/components/schemas/Problem'
         "400":
           description: Bad request
           content:
@@ -47,6 +41,12 @@ paths:
             '*/*':
               schema:
                 $ref: '#/components/schemas/MessageDTO'
+        "404":
+          description: Not found
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
     delete:
       tags:
         - messages
@@ -63,12 +63,6 @@ paths:
                 format: int32
         required: true
       responses:
-        "404":
-          description: Not found
-          content:
-            application/problem+json:
-              schema:
-                $ref: '#/components/schemas/Problem'
         "400":
           description: Bad request
           content:
@@ -79,6 +73,12 @@ paths:
                   - $ref: '#/components/schemas/ConstraintViolationProblem'
         "500":
           description: Internal Server error
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        "404":
+          description: Not found
           content:
             application/problem+json:
               schema:
@@ -123,11 +123,11 @@ components:
     StatusType:
       type: object
       properties:
+        reasonPhrase:
+          type: string
         statusCode:
           type: integer
           format: int32
-        reasonPhrase:
-          type: string
     ConstraintViolationProblem:
       type: object
       properties:
@@ -357,9 +357,10 @@ components:
       type: object
       properties:
         id:
-          type: string
+          type: integer
           description: The webMessageCollector Id for the message
-          example: "1"
+          format: int32
+          example: 1
         direction:
           type: string
           description: If the message is inbound or outbound from the perspective
