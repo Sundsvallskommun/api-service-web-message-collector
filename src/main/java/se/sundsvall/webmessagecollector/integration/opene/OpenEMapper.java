@@ -42,6 +42,7 @@ class OpenEMapper {
             return new XmlMapper()
                 .readValue(xmlString, Messages.class)
                 .getExternalMessage().stream()
+                .filter(externalMessage -> !externalMessage.isPostedByManager())
                 .map(externalMessage -> {
                     var entity = MessageEntity.builder()
                         .withFamilyId(familyId)
