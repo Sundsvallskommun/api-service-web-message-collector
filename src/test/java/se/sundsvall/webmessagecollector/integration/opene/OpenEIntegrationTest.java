@@ -38,7 +38,7 @@ class OpenEIntegrationTest {
             <?xml version="1.0" encoding="ISO-8859-1" standalone="no"?>
             <Messages>
                 <ExternalMessage>
-                    <postedByManager>true</postedByManager>
+                    <postedByManager>false</postedByManager>
                     <systemMessage>false</systemMessage>
                     <readReceiptEnabled>false</readReceiptEnabled>
                     <messageID>1</messageID>
