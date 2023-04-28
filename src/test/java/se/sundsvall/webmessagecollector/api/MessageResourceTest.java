@@ -7,7 +7,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 
-import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 import java.util.List;
 
 import org.junit.jupiter.api.Test;
@@ -38,7 +38,7 @@ class MessageResourceTest {
             .withExternalCaseId("someExternalCaseId")
             .withFamilyId("someFamilyId")
             .withDirection(Direction.OUTBOUND)
-            .withSent(LocalDateTime.now().toString())
+            .withSent(OffsetDateTime.now().toString())
             .withLastName("someLastName")
             .withFirstName("someFirstName")
             .withUsername("someUsername")
