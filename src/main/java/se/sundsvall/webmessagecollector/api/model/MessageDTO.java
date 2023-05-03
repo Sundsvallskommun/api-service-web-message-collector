@@ -1,8 +1,8 @@
 package se.sundsvall.webmessagecollector.api.model;
 
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
-import javax.persistence.criteria.CriteriaBuilder;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.criteria.CriteriaBuilder;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Builder;

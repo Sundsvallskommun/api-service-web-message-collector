@@ -1,6 +1,6 @@
 package se.sundsvall.webmessagecollector.service.scheduler;
 
-import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
 
@@ -33,6 +33,6 @@ class MessageCacheService {
         
         Arrays.stream(messageCacheProperties.getFamilyId().split(",")).forEach(familyid ->
             messageRepository.saveAll(integration.getMessages(familyid,
-                LocalDateTime.now().minusHours(1).format(DateTimeFormatter.ofPattern(DATE_TIME_FORMAT)), "")));
+                OffsetDateTime.now().minusHours(1).format(DateTimeFormatter.ofPattern(DATE_TIME_FORMAT)), "")));
     }
 }
