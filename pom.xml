@@ -4,7 +4,7 @@
 	<parent>
 		<groupId>se.sundsvall.dept44</groupId>
 		<artifactId>dept44-service-parent</artifactId>
-		<version>2.0.1</version>
+		<version>1.35</version>
 		<relativePath /> <!-- lookup parent from repository -->
 	</parent>
 	<groupId>se.sundsvall</groupId>
@@ -18,7 +18,7 @@
 		<published.container.port.sandbox>9079</published.container.port.sandbox>
 		<published.container.port.test>9079</published.container.port.test>
 		<published.container.port.production>9079</published.container.port.production>
-		<testcontainers.version>1.17.3</testcontainers.version>
+		<testcontainers.version>1.18.1</testcontainers.version>
 	</properties>
 	<dependencies>
 		<!-- DEPT44 Framework-->
