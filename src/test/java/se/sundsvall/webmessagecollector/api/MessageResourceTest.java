@@ -7,7 +7,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 
-import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 import java.util.List;
 
 import org.junit.jupiter.api.Test;
@@ -16,6 +16,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import se.sundsvall.webmessagecollector.api.model.Direction;
 import se.sundsvall.webmessagecollector.api.model.MessageDTO;
 import se.sundsvall.webmessagecollector.service.MessageService;
 
@@ -31,13 +32,13 @@ class MessageResourceTest {
     @Test
     void getMessages() {
         when(service.getMessages()).thenReturn(List.of(MessageDTO.builder()
-            .withId("someId")
+            .withId(1)
             .withMessageId("someMessageId")
             .withMessage("someMessage")
             .withExternalCaseId("someExternalCaseId")
             .withFamilyId("someFamilyId")
-            .withPostedByManager(true)
-            .withSent(LocalDateTime.now().toString())
+            .withDirection(Direction.OUTBOUND)
+            .withSent(OffsetDateTime.now().toString())
             .withLastName("someLastName")
             .withFirstName("someFirstName")
             .withUsername("someUsername")
@@ -59,7 +60,7 @@ class MessageResourceTest {
     
     @Test
     void deleteMessages() {
-        resource.deleteMessages(List.of("someId"));
+        resource.deleteMessages(List.of(1));
         verify(service, times(1)).deleteMessages(anyList());
         verifyNoMoreInteractions(service);
     }

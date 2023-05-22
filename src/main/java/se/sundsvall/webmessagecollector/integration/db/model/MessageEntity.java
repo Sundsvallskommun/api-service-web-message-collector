@@ -2,14 +2,14 @@ package se.sundsvall.webmessagecollector.integration.db.model;
 
 import java.time.LocalDateTime;
 
-import javax.persistence.CascadeType;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.ManyToOne;
-import javax.persistence.OneToOne;
+import se.sundsvall.webmessagecollector.api.model.Direction;
 
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -25,9 +25,10 @@ import lombok.NoArgsConstructor;
 public class MessageEntity {
     
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    private String id;
-    private boolean postedByManager;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Integer id;
+    @Enumerated(EnumType.STRING)
+    private Direction direction;
     private String familyId;
     private String externalCaseId;
     private String message;

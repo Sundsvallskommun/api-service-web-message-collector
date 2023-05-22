@@ -15,7 +15,7 @@ class MessageMapper {
         return MessageDTO.builder()
             .withId(entity.getId())
             .withFamilyId(entity.getFamilyId())
-            .withPostedByManager(entity.isPostedByManager())
+            .withDirection(entity.getDirection())
             .withMessageId(String.valueOf(entity.getMessageId()))
             .withExternalCaseId(String.valueOf(entity.getExternalCaseId()))
             .withMessage(entity.getMessage())

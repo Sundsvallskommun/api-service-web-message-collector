@@ -1,7 +1,7 @@
 [
   {
-    "id":"1",
-    "postedByManager": false,
+    "id": 1,
+    "direction": "INBOUND",
     "familyId": "123",
     "externalCaseId": "223",
     "message": "Hello World",

@@ -1,12 +1,9 @@
 package se.sundsvall.webmessagecollector.service;
 
 
-import static org.zalando.problem.Status.NOT_FOUND;
-
 import java.util.List;
 
 import org.springframework.stereotype.Service;
-import org.zalando.problem.Problem;
 
 import se.sundsvall.webmessagecollector.api.model.MessageDTO;
 import se.sundsvall.webmessagecollector.integration.db.MessageRepository;
@@ -26,7 +23,7 @@ public class MessageService {
         return mapper.toDTOs(repository.findAll());
     }
     
-    public void deleteMessages(List<String> ids) {
+    public void deleteMessages(List<Integer> ids) {
         repository.deleteAllById(ids);
     }
 }

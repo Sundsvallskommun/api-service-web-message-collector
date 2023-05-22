@@ -1,5 +1,9 @@
 package se.sundsvall.webmessagecollector.api.model;
 
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.criteria.CriteriaBuilder;
+
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Builder;
 import lombok.Data;
@@ -9,9 +13,11 @@ import lombok.Getter;
 @Builder(setterPrefix = "with")
 public class MessageDTO {
     @Schema(description = "The webMessageCollector Id for the message", example = "1")
-    private String id;
-    @Schema(description = "If the message was utbound from a manager or inbound from a customer ", example = "true")
-    private boolean postedByManager;
+    private Integer id;
+    @Enumerated(EnumType.STRING)
+    @Schema(description = "If the message is inbound or outbound from the perspective of " +
+                          "case-data/e-service.", example = "INBOUND")
+    private Direction direction;
     @Schema(description = "What E-service the message was found in", example = "501")
     private String familyId;
     @Schema(description = "The external caseID ", example = "caa230c6-abb4-4592-ad9a-34e263c2787b")

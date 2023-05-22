@@ -13,6 +13,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
+import se.sundsvall.webmessagecollector.api.model.Direction;
 import se.sundsvall.webmessagecollector.integration.db.model.MessageEntity;
 import se.sundsvall.webmessagecollector.integration.opene.model.Messages;
 
@@ -41,19 +42,24 @@ class OpenEMapper {
             return new XmlMapper()
                 .readValue(xmlString, Messages.class)
                 .getExternalMessage().stream()
-                .map(externalMessage -> MessageEntity.builder()
-                    .withFamilyId(familyId)
-                    .withPostedByManager(externalMessage.isPostedByManager())
-                    .withMessageId(String.valueOf(externalMessage.getMessageID()))
-                    .withExternalCaseId(String.valueOf(externalMessage.getFlowInstanceID()))
-                    .withMessage(externalMessage.getMessage())
-                    .withSent(LocalDateTime.parse(externalMessage.getAdded(), formatter))
-                    .withEmail(externalMessage.getPoster().getEmail())
-                    .withFirstName(externalMessage.getPoster().getFirstname())
-                    .withLastName(externalMessage.getPoster().getLastname())
-                    .withUsername(externalMessage.getPoster().getUsername())
-                    .withUserId(String.valueOf(externalMessage.getPoster().getUserID()))
-                    .build())
+                .filter(externalMessage -> !externalMessage.isPostedByManager())
+                .map(externalMessage -> {
+                    var entity = MessageEntity.builder()
+                        .withFamilyId(familyId)
+                        .withDirection(externalMessage.isPostedByManager() ? Direction.OUTBOUND : Direction.INBOUND)
+                        .withMessageId(String.valueOf(externalMessage.getMessageID()))
+                        .withExternalCaseId(String.valueOf(externalMessage.getFlowInstanceID()))
+                        .withMessage(externalMessage.getMessage())
+                        .withSent(LocalDateTime.parse(externalMessage.getAdded(), formatter));
+                    if (externalMessage.getPoster() != null) {
+                        entity.withEmail(externalMessage.getPoster().getEmail())
+                            .withFirstName(externalMessage.getPoster().getFirstname())
+                            .withLastName(externalMessage.getPoster().getLastname())
+                            .withUsername(externalMessage.getPoster().getUsername())
+                            .withUserId(String.valueOf(externalMessage.getPoster().getUserID()));
+                    }
+                    return entity.build();
+                })
                 
                 .toList();
         } catch (JsonProcessingException e) {

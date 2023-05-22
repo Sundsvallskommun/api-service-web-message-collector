@@ -18,6 +18,7 @@ import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import se.sundsvall.webmessagecollector.api.model.Direction;
 import se.sundsvall.webmessagecollector.integration.db.MessageRepository;
 import se.sundsvall.webmessagecollector.integration.db.model.MessageEntity;
 
@@ -38,17 +39,16 @@ class MessageServiceTest {
         var entity = MessageEntity.builder()
             .withMessage("someMessage")
             .withMessageId("someMessageId")
-            .withId("someId")
+            .withId(1)
             .withSent(LocalDateTime.now())
             .withExternalCaseId("someExternalCaseId")
-            .withPostedByManager(true)
+            .withDirection(Direction.OUTBOUND)
             .withFamilyId("someFamilyId")
             .withUserId("someUserId")
             .withUsername("someUsername")
             .withLastName("someLastname")
             .withFirstName("someFirstname")
             .withEmail("someEmail")
-            .withId("someId")
             .build();
         
         when(repository.findAll())
@@ -86,7 +86,7 @@ class MessageServiceTest {
     
     @Test
     void deleteMessages() {
-        service.deleteMessages(List.of("someIds"));
+        service.deleteMessages(List.of(1));
         verify(repository, times(1)).deleteAllById(anyList());
         verifyNoMoreInteractions(repository);
         

@@ -5,6 +5,8 @@ import static org.springframework.http.MediaType.APPLICATION_PROBLEM_JSON_VALUE;
 
 import java.util.List;
 
+import jakarta.persistence.criteria.CriteriaBuilder;
+
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -49,7 +51,7 @@ public class MessageResource {
     @DeleteMapping
     @Operation(summary = "Delete a list of messages",
         description = "Deletes a list of messages with the ids provided")
-    public ResponseEntity<Void> deleteMessages(@RequestBody List<String> ids) {
+    public ResponseEntity<Void> deleteMessages(@RequestBody List<Integer> ids) {
         service.deleteMessages(ids);
         return ResponseEntity.ok().build();
     }
