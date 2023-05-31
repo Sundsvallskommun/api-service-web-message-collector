@@ -53,8 +53,8 @@ class OpenEClient {
             .host(properties.getBaseUrl())
             .port(properties.getPort())
             .path(path)
-            //.queryParam("fromDate", fromDate)
-           // .queryParam("toDate", toDate)
+            .queryParam("fromDate", fromDate)
+            .queryParam("toDate", toDate)
             .build(parameters);
     }
     
