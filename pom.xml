@@ -18,7 +18,7 @@
 		<published.container.port.sandbox>9079</published.container.port.sandbox>
 		<published.container.port.test>9079</published.container.port.test>
 		<published.container.port.production>9079</published.container.port.production>
-		<testcontainers.version>1.18.1</testcontainers.version>
+		<testcontainers.version>1.18.3</testcontainers.version>
 	</properties>
 	<dependencies>
 		<!-- DEPT44 Framework-->
