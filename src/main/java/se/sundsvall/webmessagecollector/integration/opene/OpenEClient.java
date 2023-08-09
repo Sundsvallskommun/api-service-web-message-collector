@@ -19,11 +19,11 @@ import java.util.Map;
 class OpenEClient {
     private final OpenEIntegrationProperties properties;
     
-    private final CloseableHttpClient response;
+    private final CloseableHttpClient httpClient;
     
     OpenEClient(OpenEIntegrationProperties properties) {
         this.properties = properties;
-        this.response = HttpClients.custom()
+        this.httpClient = HttpClients.custom()
             .setDefaultCredentialsProvider(getCredentials())
             .build();
     }
@@ -36,13 +36,13 @@ class OpenEClient {
 
     private byte[] getBytes(URI url) throws IOException, OpenEException {
 
-        var result = response.execute(new HttpGet(url), response1 -> response1);
+        return httpClient.execute(new HttpGet(url), responseHandler -> {
 
-        if (result.getCode() == 200) {
-            return EntityUtils.toByteArray(result.getEntity());
-        }
-        throw new OpenEException(result.toString());
-
+            if (responseHandler.getCode() == 200) {
+                return EntityUtils.toByteArray(responseHandler.getEntity());
+            }
+            throw new OpenEException(responseHandler.toString());
+        });
     }
     
     private URI buildUrl(String path, Map<String, String> parameters, String fromDate, String toDate) {
@@ -65,6 +65,4 @@ class OpenEClient {
             new UsernamePasswordCredentials(user, password));
         return credProvider;
     }
-    
-    
 }
