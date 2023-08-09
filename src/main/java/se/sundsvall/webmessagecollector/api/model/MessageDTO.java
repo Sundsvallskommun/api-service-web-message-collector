@@ -1,12 +1,9 @@
 package se.sundsvall.webmessagecollector.api.model;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
-import jakarta.persistence.criteria.CriteriaBuilder;
-
-import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Builder;
-import lombok.Data;
 import lombok.Getter;
 
 @Getter

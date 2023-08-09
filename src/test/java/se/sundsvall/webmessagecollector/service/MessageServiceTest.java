@@ -56,15 +56,14 @@ class MessageServiceTest {
         
         var result = service.getMessages();
         
-        assertThat(result).isNotNull();
-        assertThat(result.size()).isEqualTo(2);
+        assertThat(result).isNotNull().hasSize(2);
         assertThat(result.get(0)).hasNoNullFieldsOrProperties();
         assertThat(result.get(0)).usingRecursiveComparison()
             .isEqualTo(mapper.toDTO(entity));
         
-        verify(mapper, times(1)).toDTOs(any());
+        verify(mapper).toDTOs(any());
         verify(mapper, times(3)).toDTO(any(MessageEntity.class));
-        verify(repository, times(1)).findAll();
+        verify(repository).findAll();
         verifyNoMoreInteractions(mapper);
         verifyNoMoreInteractions(repository);
         
@@ -74,11 +73,10 @@ class MessageServiceTest {
     void getMessages_EmptyList() {
         var result = service.getMessages();
         
-        assertThat(result).isNotNull();
-        assertThat(result.size()).isEqualTo(0);
+        assertThat(result).isNotNull().isEmpty();
         
-        verify(mapper, times(1)).toDTOs(any());
-        verify(repository, times(1)).findAll();
+        verify(mapper).toDTOs(any());
+        verify(repository).findAll();
         verifyNoMoreInteractions(mapper);
         verifyNoMoreInteractions(repository);
         
@@ -87,7 +85,7 @@ class MessageServiceTest {
     @Test
     void deleteMessages() {
         service.deleteMessages(List.of(1));
-        verify(repository, times(1)).deleteAllById(anyList());
+        verify(repository).deleteAllById(anyList());
         verifyNoMoreInteractions(repository);
         
     }

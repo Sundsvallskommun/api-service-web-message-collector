@@ -1,10 +1,5 @@
 package se.sundsvall.webmessagecollector.integration.opene;
 
-
-import java.io.IOException;
-import java.net.URI;
-import java.util.Map;
-
 import org.apache.hc.client5.http.auth.AuthScope;
 import org.apache.hc.client5.http.auth.UsernamePasswordCredentials;
 import org.apache.hc.client5.http.classic.methods.HttpGet;
@@ -14,7 +9,11 @@ import org.apache.hc.client5.http.impl.classic.HttpClients;
 import org.apache.hc.core5.http.io.entity.EntityUtils;
 import org.springframework.stereotype.Component;
 import org.springframework.web.util.UriComponentsBuilder;
+import se.sundsvall.webmessagecollector.integration.opene.exception.OpenEException;
 
+import java.io.IOException;
+import java.net.URI;
+import java.util.Map;
 
 @Component
 class OpenEClient {
@@ -34,17 +33,16 @@ class OpenEClient {
         return getBytes(buildUrl(properties.getMessagesPath(), Map.of("familyid", familyId), fromDate, toDate));
         
     }
-    
-    private byte[] getBytes(URI url) throws IOException {
-        
-        
-        var result = response.execute(new HttpGet(url));
-        
+
+    private byte[] getBytes(URI url) throws IOException, OpenEException {
+
+        var result = response.execute(new HttpGet(url), response1 -> response1);
+
         if (result.getCode() == 200) {
             return EntityUtils.toByteArray(result.getEntity());
         }
-        throw new RuntimeException(result.toString());
-        
+        throw new OpenEException(result.toString());
+
     }
     
     private URI buildUrl(String path, Map<String, String> parameters, String fromDate, String toDate) {

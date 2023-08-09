@@ -19,7 +19,7 @@ class MessageCacheService {
     private final MessageRepository messageRepository;
     private final MessageCacheProperties messageCacheProperties;
     
-    private final static String DATE_TIME_FORMAT = "yyyy-MM-dd HH:mm";
+    private static final String DATE_TIME_FORMAT = "yyyy-MM-dd HH:mm";
     
     MessageCacheService(OpenEIntegration integration, MessageRepository messageRepository, MessageCacheProperties messageCacheProperties) {
         this.integration = integration;
