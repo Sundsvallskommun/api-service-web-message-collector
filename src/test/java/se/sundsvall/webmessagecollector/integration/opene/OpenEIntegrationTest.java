@@ -75,8 +75,7 @@ class OpenEIntegrationTest {
         verify(client, times(1))
             .getMessages(any(String.class), any(String.class), any(String.class));
         
-        verify(mapper, times(1))
-            .mapMessages(any(byte[].class), any(String.class));
+        verify(mapper).mapMessages(any(byte[].class), any(String.class));
     }
     
     @Test
@@ -86,14 +85,12 @@ class OpenEIntegrationTest {
         
         var result = integration.getMessages("", "", "");
         
-        assertThat(result).isNotNull();
-        assertThat(result.size()).isEqualTo(0);
+        assertThat(result).isNotNull().isEmpty();
         
         verify(client, times(1))
             .getMessages(any(String.class), any(String.class), any(String.class));
         
-        verify(mapper, times(1))
-            .mapMessages(any(), any(String.class));
+        verify(mapper).mapMessages(any(), any(String.class));
     }
     
     @Test
@@ -105,11 +102,9 @@ class OpenEIntegrationTest {
         
         var result = integration.getMessages("", "", "");
         
-        assertThat(result).isNotNull();
-        assertThat(result.size()).isEqualTo(0);
+        assertThat(result).isNotNull().isEmpty();
         
-        verify(client, times(1))
-            .getMessages(any(String.class), any(String.class), any(String.class));
+        verify(client).getMessages(any(String.class), any(String.class), any(String.class));
         
         verifyNoInteractions(mapper);
         
