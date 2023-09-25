@@ -15,7 +15,6 @@
 		<!-- Pipeline properties -->
 		<docker.image.name>ms-web-message-collector</docker.image.name>
 		<exposed.app.port>8080</exposed.app.port>
-		<published.container.port.sandbox>9079</published.container.port.sandbox>
 		<published.container.port.test>9079</published.container.port.test>
 		<published.container.port.production>9079</published.container.port.production>
 		<testcontainers.version>1.19.0</testcontainers.version>
