@@ -17,7 +17,6 @@
 		<exposed.app.port>8080</exposed.app.port>
 		<published.container.port.test>9079</published.container.port.test>
 		<published.container.port.production>9079</published.container.port.production>
-		<testcontainers.version>1.19.1</testcontainers.version>
 	</properties>
 	<dependencies>
 		<!-- DEPT44 Framework-->
@@ -30,9 +29,9 @@
 			<artifactId>dept44-common-validators</artifactId>
 		</dependency>
 		<dependency>
-			<groupId>org.hibernate</groupId>
+			<groupId>org.hibernate.orm</groupId>
 			<artifactId>hibernate-jpamodelgen</artifactId>
-			<version>6.2.1.Final</version>
+			<scope>provided</scope>
 		</dependency>
 
 		<!-- Database-->
@@ -59,7 +58,6 @@
 		<dependency>
 			<groupId>org.testcontainers</groupId>
 			<artifactId>junit-jupiter</artifactId>
-			<version>${testcontainers.version}</version>
 			<scope>test</scope>
 		</dependency>
 		<dependency>
@@ -70,11 +68,9 @@
 		<dependency>
 			<groupId>org.testcontainers</groupId>
 			<artifactId>mariadb</artifactId>
-			<version>${testcontainers.version}</version>
 			<scope>test</scope>
 		</dependency>
 	</dependencies>
-
 	<build>
 		<plugins>
 			<plugin>
@@ -89,7 +85,6 @@
 					</excludes>
 				</configuration>
 			</plugin>
-
 			<plugin>
 				<groupId>org.jacoco</groupId>
 				<artifactId>jacoco-maven-plugin</artifactId>
