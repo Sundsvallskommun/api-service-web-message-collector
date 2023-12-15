@@ -1,0 +1,15 @@
+integration:
+  open-e:
+    base-url: localhost:9090
+    basic-auth:
+      password: somePassword
+      username: someUsername
+    connect-timeout: 15s
+    errand-path: somepath
+    messages-path: someMessagesPath
+scheduler:
+  fixedRate: PT10M
+  initialDelay: PT10M
+spring:
+  datasource:
+    url: jdbc:h2:mem:test
