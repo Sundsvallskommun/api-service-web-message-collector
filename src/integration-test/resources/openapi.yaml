@@ -7,49 +7,51 @@ info:
     url: https://opensource.org/licenses/MIT
   version: "1.1"
 servers:
-  - url: http://localhost:58871
-    description: Generated server url
+- url: http://localhost:56535
+  description: Generated server url
 tags:
-  - name: messages
-    description: Messages
+- name: messages
+  description: Messages
 paths:
   /messages:
     get:
       tags:
-        - messages
+      - messages
       summary: Get a list of message
       description: Returns a list of messages found
       operationId: getMessages
       responses:
-        "200":
-          description: Successful Operation
-          content:
-            '*/*':
-              schema:
-                $ref: '#/components/schemas/MessageDTO'
-        "500":
-          description: Internal Server error
-          content:
-            application/problem+json:
-              schema:
-                $ref: '#/components/schemas/Problem'
-        "404":
-          description: Not found
-          content:
-            application/problem+json:
-              schema:
-                $ref: '#/components/schemas/Problem'
         "400":
           description: Bad request
           content:
             application/problem+json:
               schema:
                 oneOf:
-                  - $ref: '#/components/schemas/Problem'
-                  - $ref: '#/components/schemas/ConstraintViolationProblem'
+                - $ref: '#/components/schemas/Problem'
+                - $ref: '#/components/schemas/ConstraintViolationProblem'
+        "404":
+          description: Not found
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        "500":
+          description: Internal Server error
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        "200":
+          description: Successful Operation
+          content:
+            '*/*':
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/MessageDTO'
     delete:
       tags:
-        - messages
+      - messages
       summary: Delete a list of messages
       description: Deletes a list of messages with the ids provided
       operationId: deleteMessages
@@ -63,30 +65,32 @@ paths:
                 format: int32
         required: true
       responses:
-        "500":
-          description: Internal Server error
-          content:
-            application/problem+json:
-              schema:
-                $ref: '#/components/schemas/Problem'
-        "404":
-          description: Not found
-          content:
-            application/problem+json:
-              schema:
-                $ref: '#/components/schemas/Problem'
         "400":
           description: Bad request
           content:
             application/problem+json:
               schema:
                 oneOf:
-                  - $ref: '#/components/schemas/Problem'
-                  - $ref: '#/components/schemas/ConstraintViolationProblem'
+                - $ref: '#/components/schemas/Problem'
+                - $ref: '#/components/schemas/ConstraintViolationProblem'
+        "404":
+          description: Not found
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        "500":
+          description: Internal Server error
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        "200":
+          description: Successful Operation
   /api-docs:
     get:
       tags:
-        - API
+      - API
       summary: OpenAPI
       operationId: getApiDocs
       responses:
@@ -101,67 +105,11 @@ paths:
       x-wso2-mutual-ssl: Optional
 components:
   schemas:
-    MessageDTO:
-      type: object
-      properties:
-        id:
-          type: integer
-          description: The webMessageCollector Id for the message
-          format: int32
-          example: 1
-        direction:
-          type: string
-          description: If the message is inbound or outbound from the perspective
-            of case-data/e-service.
-          example: INBOUND
-          enum:
-            - INBOUND
-            - OUTBOUND
-        familyId:
-          type: string
-          description: What E-service the message was found in
-          example: "501"
-        externalCaseId:
-          type: string
-          description: 'The external caseID '
-          example: caa230c6-abb4-4592-ad9a-34e263c2787b
-        message:
-          type: string
-          description: 'The message '
-          example: Hello World
-        messageId:
-          type: string
-          description: The unique messageId from openE for the message
-          example: "12"
-        sent:
-          type: string
-          description: 'Time and date the message was sent '
-          example: 2023-02-23 17:26:23
-        username:
-          type: string
-          description: Username for the poster
-          example: te01st
-        firstName:
-          type: string
-          description: 'Firstname of the poster '
-          example: Test
-        lastName:
-          type: string
-          description: 'If the message was utbound from a manager or inbound from
-            a customer '
-          example: Testorsson
-        email:
-          type: string
-          description: Email for the poster
-          example: test@sundsvall.se
-        userId:
-          type: string
-          description: 'If the message was utbound from a manager or inbound from
-            a customer '
-          example: "177"
     Problem:
       type: object
       properties:
+        status:
+          $ref: '#/components/schemas/StatusType'
         instance:
           type: string
           format: uri
@@ -172,8 +120,6 @@ components:
           type: object
           additionalProperties:
             type: object
-        status:
-          $ref: '#/components/schemas/StatusType'
         title:
           type: string
         detail:
@@ -209,10 +155,10 @@ components:
               lineNumber:
                 type: integer
                 format: int32
-              nativeMethod:
-                type: boolean
               className:
                 type: string
+              nativeMethod:
+                type: boolean
         type:
           type: string
           format: uri
@@ -258,10 +204,10 @@ components:
                     lineNumber:
                       type: integer
                       format: int32
-                    nativeMethod:
-                      type: boolean
                     className:
                       type: string
+                    nativeMethod:
+                      type: boolean
               message:
                 type: string
               localizedMessage:
@@ -291,12 +237,14 @@ components:
               lineNumber:
                 type: integer
                 format: int32
-              nativeMethod:
-                type: boolean
               className:
                 type: string
+              nativeMethod:
+                type: boolean
         message:
           type: string
+        status:
+          $ref: '#/components/schemas/StatusType'
         instance:
           type: string
           format: uri
@@ -307,8 +255,6 @@ components:
           type: object
           additionalProperties:
             type: object
-        status:
-          $ref: '#/components/schemas/StatusType'
         title:
           type: string
         detail:
@@ -336,10 +282,10 @@ components:
                     lineNumber:
                       type: integer
                       format: int32
-                    nativeMethod:
-                      type: boolean
                     className:
                       type: string
+                    nativeMethod:
+                      type: boolean
               message:
                 type: string
               localizedMessage:
@@ -353,4 +299,62 @@ components:
           type: string
         message:
           type: string
+    MessageDTO:
+      type: object
+      properties:
+        id:
+          type: integer
+          description: The webMessageCollector Id for the message
+          format: int32
+          example: 1
+        direction:
+          type: string
+          description: If the message is inbound or outbound from the perspective
+            of case-data/e-service.
+          example: INBOUND
+          enum:
+          - INBOUND
+          - OUTBOUND
+        familyId:
+          type: string
+          description: What E-service the message was found in
+          example: "501"
+        externalCaseId:
+          type: string
+          description: 'The external caseID '
+          example: caa230c6-abb4-4592-ad9a-34e263c2787b
+        message:
+          type: string
+          description: 'The message '
+          example: Hello World
+        messageId:
+          type: string
+          description: The unique messageId from openE for the message
+          example: "12"
+        sent:
+          type: string
+          description: 'Time and date the message was sent '
+          example: 2023-02-23 17:26:23
+        username:
+          type: string
+          description: Username for the poster
+          example: te01st
+        firstName:
+          type: string
+          description: 'Firstname of the poster '
+          example: Test
+        lastName:
+          type: string
+          description: 'If the message was utbound from a manager or inbound from
+            a customer '
+          example: Testorsson
+        email:
+          type: string
+          description: Email for the poster
+          example: test@sundsvall.se
+        userId:
+          type: string
+          description: 'If the message was utbound from a manager or inbound from
+            a customer '
+          example: "177"
   securitySchemes: {}

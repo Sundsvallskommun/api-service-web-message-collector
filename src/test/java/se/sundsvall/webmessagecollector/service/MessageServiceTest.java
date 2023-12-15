@@ -24,69 +24,69 @@ import se.sundsvall.webmessagecollector.integration.db.model.MessageEntity;
 
 @ExtendWith(MockitoExtension.class)
 class MessageServiceTest {
-    
-    @Spy
-    MessageMapper mapper;
-    
-    @Mock
-    MessageRepository repository;
-    
-    @InjectMocks
-    MessageService service;
-    
-    @Test
-    void getMessages() {
-        var entity = MessageEntity.builder()
-            .withMessage("someMessage")
-            .withMessageId("someMessageId")
-            .withId(1)
-            .withSent(LocalDateTime.now())
-            .withExternalCaseId("someExternalCaseId")
-            .withDirection(Direction.OUTBOUND)
-            .withFamilyId("someFamilyId")
-            .withUserId("someUserId")
-            .withUsername("someUsername")
-            .withLastName("someLastname")
-            .withFirstName("someFirstname")
-            .withEmail("someEmail")
-            .build();
-        
-        when(repository.findAll())
-            .thenReturn(List.of(entity, MessageEntity.builder().build()));
-        
-        var result = service.getMessages();
-        
-        assertThat(result).isNotNull().hasSize(2);
-        assertThat(result.get(0)).hasNoNullFieldsOrProperties();
-        assertThat(result.get(0)).usingRecursiveComparison()
-            .isEqualTo(mapper.toDTO(entity));
-        
-        verify(mapper).toDTOs(any());
-        verify(mapper, times(3)).toDTO(any(MessageEntity.class));
-        verify(repository).findAll();
-        verifyNoMoreInteractions(mapper);
-        verifyNoMoreInteractions(repository);
-        
-    }
-    
-    @Test
-    void getMessages_EmptyList() {
-        var result = service.getMessages();
-        
-        assertThat(result).isNotNull().isEmpty();
-        
-        verify(mapper).toDTOs(any());
-        verify(repository).findAll();
-        verifyNoMoreInteractions(mapper);
-        verifyNoMoreInteractions(repository);
-        
-    }
-    
-    @Test
-    void deleteMessages() {
-        service.deleteMessages(List.of(1));
-        verify(repository).deleteAllById(anyList());
-        verifyNoMoreInteractions(repository);
-        
-    }
+
+	@Spy
+	private MessageMapper mapper;
+
+	@Mock
+	private MessageRepository repository;
+
+	@InjectMocks
+	private MessageService service;
+
+	@Test
+	void getMessages() {
+		final var entity = MessageEntity.builder()
+			.withMessage("someMessage")
+			.withMessageId("someMessageId")
+			.withId(1)
+			.withSent(LocalDateTime.now())
+			.withExternalCaseId("someExternalCaseId")
+			.withDirection(Direction.OUTBOUND)
+			.withFamilyId("someFamilyId")
+			.withUserId("someUserId")
+			.withUsername("someUsername")
+			.withLastName("someLastname")
+			.withFirstName("someFirstname")
+			.withEmail("someEmail")
+			.build();
+
+		when(repository.findAll())
+			.thenReturn(List.of(entity, MessageEntity.builder().build()));
+
+		final var result = service.getMessages();
+
+		assertThat(result).isNotNull().hasSize(2);
+		assertThat(result.get(0)).hasNoNullFieldsOrProperties();
+		assertThat(result.get(0)).usingRecursiveComparison()
+			.isEqualTo(mapper.toDTO(entity));
+
+		verify(mapper).toDTOs(any());
+		verify(mapper, times(3)).toDTO(any(MessageEntity.class));
+		verify(repository).findAll();
+		verifyNoMoreInteractions(mapper);
+		verifyNoMoreInteractions(repository);
+
+	}
+
+	@Test
+	void getMessages_EmptyList() {
+		final var result = service.getMessages();
+
+		assertThat(result).isNotNull().isEmpty();
+
+		verify(mapper).toDTOs(any());
+		verify(repository).findAll();
+		verifyNoMoreInteractions(mapper);
+		verifyNoMoreInteractions(repository);
+
+	}
+
+	@Test
+	void deleteMessages() {
+		service.deleteMessages(List.of(1));
+		verify(repository).deleteAllById(anyList());
+		verifyNoMoreInteractions(repository);
+
+	}
 }
