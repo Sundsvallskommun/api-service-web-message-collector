@@ -2,6 +2,7 @@ package se.sundsvall.webmessagecollector.configuration;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.fail;
+import static org.zalando.fauxpas.FauxPas.throwingFunction;
 
 import java.lang.reflect.Method;
 import java.util.ArrayList;
@@ -9,29 +10,47 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Set;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.context.annotation.ClassPathScanningCandidateComponentProvider;
 import org.springframework.scheduling.annotation.Scheduled;
 
+import net.javacrumbs.shedlock.spring.annotation.EnableSchedulerLock;
 import net.javacrumbs.shedlock.spring.annotation.SchedulerLock;
 
 class ShedlockUsageTest {
 
 	@Test
-	void verifySchedlockAnnotationIsPresentOnScheduledMethods() {
+	void verifyMandatorySchedlockAnnotations() {
 		final var scanner = new ClassPathScanningCandidateComponentProvider(true);
-		scanner.findCandidateComponents("se.sundsvall.webmessagecollector").stream()
+		final var candidates = scanner.findCandidateComponents("se.sundsvall.webmessagecollector");
+		final var hasEnableSchedulerLock = hasEnableSchedulerLock(candidates);
+
+		candidates.stream()
 			.map(this::getMethodsAnnotatedWith)
 			.flatMap(m -> m.entrySet().stream())
-			.forEach(this::verifyMandatoryAnnotations);
+			.forEach(set -> this.verifyAnnotations(hasEnableSchedulerLock, set));
 	}
 
-	private void verifyMandatoryAnnotations(Entry<String, List<Method>> entrySet) {
+	private boolean hasEnableSchedulerLock(Set<BeanDefinition> candidates) {
+		return candidates.stream()
+			.map(BeanDefinition::getBeanClassName)
+			.map(throwingFunction(Class::forName))
+			.map(c -> c.getAnnotationsByType(EnableSchedulerLock.class))
+			.anyMatch(matches -> matches.length > 0);
+	}
+
+	private void verifyAnnotations(boolean hasEnableSchedulerLockAnnotation, Entry<String, List<Method>> entrySet) {
 		entrySet.getValue().forEach(method -> {
+			// Verify that method annotated with Scheduled is also annotated with SchedulerLock
 			assertThat(method.isAnnotationPresent(SchedulerLock.class))
 				.withFailMessage(() -> "Method %s in class %s has @Scheduled annotation but no @SchedulerLock annotation".formatted(method.getName(), entrySet.getKey()))
+				.isTrue();
+
+			assertThat(hasEnableSchedulerLockAnnotation)
+				.withFailMessage(() -> "Service contains at least one method annotated with @Scheduled and @SchedulerLock but no @EnableSchedulerLock annotation is present")
 				.isTrue();
 		});
 	}
