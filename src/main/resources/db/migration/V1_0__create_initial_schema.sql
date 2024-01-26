@@ -10,6 +10,6 @@
         message_id varchar(255),
         user_id varchar(255),
         username varchar(255),
-        direction enum ('INBOUND','OUTBOUND'),
+        direction varchar(255),
         primary key (id)
     ) engine=InnoDB;
