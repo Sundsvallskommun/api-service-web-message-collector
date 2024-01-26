@@ -1,1 +1,1 @@
-	rename table message_entity to message;
+    rename table message_entity to message;
