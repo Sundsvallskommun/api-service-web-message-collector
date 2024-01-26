@@ -1,5 +1,6 @@
 package se.sundsvall.webmessagecollector.service;
 
+import static se.sundsvall.webmessagecollector.service.MessageMapper.toDTOs;
 
 import java.util.List;
 
@@ -12,15 +13,13 @@ import se.sundsvall.webmessagecollector.integration.db.MessageRepository;
 public class MessageService {
     
     private final MessageRepository repository;
-    private final MessageMapper mapper;
     
-    public MessageService(MessageRepository repository, MessageMapper mapper) {
+	public MessageService(MessageRepository repository) {
         this.repository = repository;
-        this.mapper = mapper;
     }
     
     public List<MessageDTO> getMessages() {
-        return mapper.toDTOs(repository.findAll());
+		return toDTOs(repository.findAll());
     }
     
     public void deleteMessages(List<Integer> ids) {

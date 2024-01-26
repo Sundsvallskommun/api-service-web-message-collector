@@ -1,9 +1,7 @@
 package se.sundsvall.webmessagecollector.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyList;
-import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
@@ -15,7 +13,6 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import se.sundsvall.webmessagecollector.api.model.Direction;
@@ -24,9 +21,6 @@ import se.sundsvall.webmessagecollector.integration.db.model.MessageEntity;
 
 @ExtendWith(MockitoExtension.class)
 class MessageServiceTest {
-
-	@Spy
-	private MessageMapper mapper;
 
 	@Mock
 	private MessageRepository repository;
@@ -59,14 +53,10 @@ class MessageServiceTest {
 		assertThat(result).isNotNull().hasSize(2);
 		assertThat(result.get(0)).hasNoNullFieldsOrProperties();
 		assertThat(result.get(0)).usingRecursiveComparison()
-			.isEqualTo(mapper.toDTO(entity));
+			.isEqualTo(MessageMapper.toDTO(entity));
 
-		verify(mapper).toDTOs(any());
-		verify(mapper, times(3)).toDTO(any(MessageEntity.class));
 		verify(repository).findAll();
-		verifyNoMoreInteractions(mapper);
 		verifyNoMoreInteractions(repository);
-
 	}
 
 	@Test
@@ -75,11 +65,8 @@ class MessageServiceTest {
 
 		assertThat(result).isNotNull().isEmpty();
 
-		verify(mapper).toDTOs(any());
 		verify(repository).findAll();
-		verifyNoMoreInteractions(mapper);
 		verifyNoMoreInteractions(repository);
-
 	}
 
 	@Test
@@ -87,6 +74,5 @@ class MessageServiceTest {
 		service.deleteMessages(List.of(1));
 		verify(repository).deleteAllById(anyList());
 		verifyNoMoreInteractions(repository);
-
 	}
 }

@@ -17,7 +17,10 @@ import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-@ExtendWith(MockitoExtension.class)
+import se.sundsvall.dept44.test.annotation.resource.Load;
+import se.sundsvall.dept44.test.extension.ResourceLoaderExtension;
+
+@ExtendWith({ MockitoExtension.class, ResourceLoaderExtension.class })
 class OpenEIntegrationTest {
 
 	@Spy
@@ -30,36 +33,9 @@ class OpenEIntegrationTest {
 	private OpenEIntegration integration;
 
 	@Test
-	void getMessages() throws IOException {
+	void getMessages(@Load("/messages.xml") final String input) throws IOException {
 
-		final var bytes = """
-			<?xml version="1.0" encoding="ISO-8859-1" standalone="no"?>
-			<Messages>
-			    <ExternalMessage>
-			        <postedByManager>false</postedByManager>
-			        <systemMessage>false</systemMessage>
-			        <readReceiptEnabled>false</readReceiptEnabled>
-			        <messageID>1</messageID>
-			        <message>Message</message>
-			        <poster>
-			            <userID>1</userID>
-			            <username>userName</username>
-			            <firstname>firstName</firstname>
-			            <lastname>lastName</lastname>
-			            <email>email@test.se</email>
-			            <admin>false</admin>
-			            <enabled>true</enabled>
-			            <lastLogin>2023-02-03 11:10</lastLogin>
-			            <lastLoginInMilliseconds>1675419056000</lastLoginInMilliseconds>
-			            <added>2016-09-16 01:03</added>
-			            <isMutable>true</isMutable>
-			            <hasFormProvider>true</hasFormProvider>
-			        </poster>
-			        <added>2022-05-25 11:20</added>
-			        <flowInstanceID>102251</flowInstanceID>
-			    </ExternalMessage>
-			</Messages>
-			""".getBytes(StandardCharsets.ISO_8859_1);
+		final var bytes = input.getBytes(StandardCharsets.ISO_8859_1);
 
 		when(client.getMessages(any(String.class), any(String.class), any(String.class))).thenReturn(bytes);
 
