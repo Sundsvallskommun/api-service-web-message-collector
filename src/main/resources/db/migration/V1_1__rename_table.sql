@@ -1,0 +1,1 @@
+	rename table message_entity to message;

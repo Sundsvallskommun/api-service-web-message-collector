@@ -22,16 +22,12 @@ public class OpenEIntegration {
         this.mapper = mapper;
     }
     
-    public List<MessageEntity> getMessages(String familyId, String fromDate,
-        String toDate) {
-        
+	public List<MessageEntity> getMessages(String familyId, String fromDate, String toDate) {
         try {
             return mapper.mapMessages(client.getMessages(familyId, fromDate, toDate), familyId);
         } catch (Exception e) {
             LOG.info("Unable to get errandIds for familyId {}", familyId, e);
             return List.of();
         }
-        
     }
-    
 }

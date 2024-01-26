@@ -14,9 +14,9 @@
 	<properties>
 		<!-- Pipeline properties -->
 		<docker.image.name>ms-web-message-collector</docker.image.name>
-		<exposed.app.port>8080</exposed.app.port>
 		<published.container.port.test>9079</published.container.port.test>
 		<published.container.port.production>9079</published.container.port.production>
+		<shedlock.version>5.10.2</shedlock.version>
 	</properties>
 	<dependencies>
 		<!-- DEPT44 Framework-->
@@ -48,25 +48,38 @@
 			<groupId>org.apache.httpcomponents.client5</groupId>
 			<artifactId>httpclient5-fluent</artifactId>
 		</dependency>
+		<dependency>
+			<groupId>org.flywaydb</groupId>
+			<artifactId>flyway-core</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.flywaydb</groupId>
+			<artifactId>flyway-mysql</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>net.javacrumbs.shedlock</groupId>
+			<artifactId>shedlock-spring</artifactId>
+			<version>${shedlock.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>net.javacrumbs.shedlock</groupId>
+			<artifactId>shedlock-provider-jdbc-template</artifactId>
+			<version>${shedlock.version}</version>
+		</dependency>
 		<!-- Test-->
+		<dependency>
+			<groupId>se.sundsvall.dept44</groupId>
+			<artifactId>dept44-starter-test</artifactId>
+			<scope>test</scope>
+		</dependency>
 		<dependency>
 			<groupId>org.testcontainers</groupId>
 			<artifactId>junit-jupiter</artifactId>
 			<scope>test</scope>
 		</dependency>
 		<dependency>
-			<groupId>com.h2database</groupId>
-			<artifactId>h2</artifactId>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
 			<groupId>org.testcontainers</groupId>
 			<artifactId>mariadb</artifactId>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
-			<groupId>se.sundsvall.dept44</groupId>
-			<artifactId>dept44-starter-test</artifactId>
 			<scope>test</scope>
 		</dependency>
 	</dependencies>
@@ -91,10 +104,8 @@
 					<excludes>
 						<exclude>**/generated/**</exclude>
 						<exclude>**/se/sundsvall/webmessagecollector/Application*</exclude>
-						<exclude>**/se/sundsvall/webmessagecollector/**/**/**Properties*</exclude>
-						<exclude>**/se/sundsvall/webmessagecollector/integration/**/model/**</exclude>
-						<exclude>**/se/sundsvall/webmessagecollector/integration/**/OpenEClient*</exclude>
-						<exclude>**/se/sundsvall/webmessagecollector/**/**/MessageCacheService*</exclude>
+						<exclude>**/se/sundsvall/webmessagecollector/integration/db/model/**/*_.*</exclude>
+						<exclude>**/se/sundsvall/webmessagecollector/integration/opene/OpenEClient.*</exclude>
 					</excludes>
 				</configuration>
 			</plugin>

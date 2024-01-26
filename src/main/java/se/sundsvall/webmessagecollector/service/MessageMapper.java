@@ -1,34 +1,40 @@
 package se.sundsvall.webmessagecollector.service;
 
-import java.util.List;
+import static java.util.Collections.emptyList;
+import static java.util.Optional.ofNullable;
 
-import org.springframework.stereotype.Component;
+import java.util.List;
+import java.util.Objects;
 
 import se.sundsvall.webmessagecollector.api.model.MessageDTO;
 import se.sundsvall.webmessagecollector.integration.db.model.MessageEntity;
 
-@Component
 class MessageMapper {
+	private MessageMapper() {}
     
-    
-    MessageDTO toDTO(MessageEntity entity) {
-        return MessageDTO.builder()
-            .withId(entity.getId())
-            .withFamilyId(entity.getFamilyId())
-            .withDirection(entity.getDirection())
-            .withMessageId(String.valueOf(entity.getMessageId()))
-            .withExternalCaseId(String.valueOf(entity.getExternalCaseId()))
-            .withMessage(entity.getMessage())
-            .withSent(String.valueOf(entity.getSent()))
-            .withEmail(entity.getEmail())
-            .withFirstName(entity.getFirstName())
-            .withLastName(entity.getLastName())
-            .withUsername(entity.getUsername())
-            .withUserId(String.valueOf(entity.getUserId()))
-            .build();
+	static MessageDTO toDTO(MessageEntity entity) {
+		return ofNullable(entity)
+			.map(e -> MessageDTO.builder()
+				.withId(e.getId())
+				.withFamilyId(e.getFamilyId())
+				.withDirection(e.getDirection())
+				.withMessageId(e.getMessageId())
+				.withExternalCaseId(e.getExternalCaseId())
+				.withMessage(e.getMessage())
+				.withSent(String.valueOf(e.getSent()))
+				.withEmail(e.getEmail())
+				.withFirstName(e.getFirstName())
+				.withLastName(e.getLastName())
+				.withUsername(e.getUsername())
+				.withUserId(e.getUserId())
+				.build())
+			.orElse(null);
     }
     
-    List<MessageDTO> toDTOs(List<MessageEntity> entities) {
-        return entities.stream().map(this::toDTO).toList();
+	static List<MessageDTO> toDTOs(List<MessageEntity> entities) {
+		return ofNullable(entities).orElse(emptyList()).stream()
+			.map(MessageMapper::toDTO)
+			.filter(Objects::nonNull)
+			.toList();
     }
 }

@@ -1,15 +1,40 @@
 integration:
   open-e:
-    base-url: localhost:9090
+    scheme: http
+    base-url: base-url
+    port: 1234
     basic-auth:
       password: somePassword
       username: someUsername
     connect-timeout: 15s
-    errand-path: somepath
+    read-timeout: 20s
+    errand-path: someErrandPath
     messages-path: someMessagesPath
 scheduler:
   fixedRate: PT10M
-  initialDelay: PT10M
+  initialDelay: PT11M
+  familyId: someFamilyId
 spring:
   datasource:
-    url: jdbc:h2:mem:test
+    driver-class-name: org.testcontainers.jdbc.ContainerDatabaseDriver
+    url: jdbc:tc:mariadb:10.6.14:///
+  flyway:
+    enabled: true
+  jpa:
+    properties:
+      hibernate:
+        format_sql: true
+        hbm2ddl:
+          schema-generation:
+            script:
+              append: false
+      jakarta:
+        persistence:
+          schema-generation:
+            create-source: metadata
+            database:
+              action: none
+            scripts:
+              action: create
+              create-target: target/database/generated-schema.sql
+    

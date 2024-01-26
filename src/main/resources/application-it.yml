@@ -7,9 +7,16 @@ integration:
     connect-timeout: 15s
     errand-path: somepath
     messages-path: someMessagesPath
-scheduler:
-  fixedRate: PT10M
-  initialDelay: PT10M
 spring:
+  datasource:
+    driver-class-name: org.testcontainers.jdbc.ContainerDatabaseDriver
+    url: jdbc:tc:mariadb:10.6.14:///
+  flyway:
+    enabled: true
   jpa:
-    database-platform: org.hibernate.dialect.MariaDBDialect
+    properties:
+      jakarta:
+        persistence:
+          schema-generation:
+            database:
+              action: validate
