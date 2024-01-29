@@ -2,6 +2,7 @@ package se.sundsvall.webmessagecollector.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.anyList;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
@@ -30,6 +31,7 @@ class MessageServiceTest {
 
 	@Test
 	void getMessages() {
+		// Arrange
 		final var entity = MessageEntity.builder()
 			.withMessage("someMessage")
 			.withMessageId("someMessageId")
@@ -44,34 +46,36 @@ class MessageServiceTest {
 			.withFirstName("someFirstname")
 			.withEmail("someEmail")
 			.build();
-
-		when(repository.findAll())
+		// Mock
+		when(repository.findAllByFamilyId(anyString()))
 			.thenReturn(List.of(entity, MessageEntity.builder().build()));
-
-		final var result = service.getMessages();
-
+		// Act
+		final var result = service.getMessages("someFamilyId");
+		// Assert
 		assertThat(result).isNotNull().hasSize(2);
-		assertThat(result.get(0)).hasNoNullFieldsOrProperties();
-		assertThat(result.get(0)).usingRecursiveComparison()
+		assertThat(result.getFirst()).hasNoNullFieldsOrProperties();
+		assertThat(result.getFirst()).usingRecursiveComparison()
 			.isEqualTo(MessageMapper.toDTO(entity));
-
-		verify(repository).findAll();
+		// Verify
+		verify(repository).findAllByFamilyId(anyString());
 		verifyNoMoreInteractions(repository);
 	}
 
 	@Test
 	void getMessages_EmptyList() {
-		final var result = service.getMessages();
-
+		// Act
+		final var result = service.getMessages("someFamilyId");
+		// Assert & Verify
 		assertThat(result).isNotNull().isEmpty();
-
-		verify(repository).findAll();
+		verify(repository).findAllByFamilyId(anyString());
 		verifyNoMoreInteractions(repository);
 	}
 
 	@Test
 	void deleteMessages() {
+		//Act
 		service.deleteMessages(List.of(1));
+		//Verify
 		verify(repository).deleteAllById(anyList());
 		verifyNoMoreInteractions(repository);
 	}

@@ -5,21 +5,29 @@ info:
   license:
     name: MIT License
     url: https://opensource.org/licenses/MIT
-  version: "1.1"
+  version: "2.0"
 servers:
-- url: http://localhost:56535
-  description: Generated server url
+  - url: http://localhost:50563
+    description: Generated server url
 tags:
-- name: messages
-  description: Messages
+  - name: messages
+    description: Messages
 paths:
   /messages:
     get:
       tags:
-      - messages
-      summary: Get a list of message
-      description: Returns a list of messages found
+        - messages
+      summary: Get a list of messages related to a specific familyId
+      description: Returns a list of messages found for the specified familyId
       operationId: getMessages
+      parameters:
+        - name: familyid
+          in: query
+          description: FamilyId to fetch messages for
+          required: true
+          schema:
+            type: string
+          example: 123
       responses:
         "400":
           description: Bad request
@@ -27,14 +35,8 @@ paths:
             application/problem+json:
               schema:
                 oneOf:
-                - $ref: '#/components/schemas/Problem'
-                - $ref: '#/components/schemas/ConstraintViolationProblem'
-        "404":
-          description: Not found
-          content:
-            application/problem+json:
-              schema:
-                $ref: '#/components/schemas/Problem'
+                  - $ref: '#/components/schemas/Problem'
+                  - $ref: '#/components/schemas/ConstraintViolationProblem'
         "500":
           description: Internal Server error
           content:
@@ -49,9 +51,15 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/MessageDTO'
+        "404":
+          description: Not found
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
     delete:
       tags:
-      - messages
+        - messages
       summary: Delete a list of messages
       description: Deletes a list of messages with the ids provided
       operationId: deleteMessages
@@ -71,14 +79,8 @@ paths:
             application/problem+json:
               schema:
                 oneOf:
-                - $ref: '#/components/schemas/Problem'
-                - $ref: '#/components/schemas/ConstraintViolationProblem'
-        "404":
-          description: Not found
-          content:
-            application/problem+json:
-              schema:
-                $ref: '#/components/schemas/Problem'
+                  - $ref: '#/components/schemas/Problem'
+                  - $ref: '#/components/schemas/ConstraintViolationProblem'
         "500":
           description: Internal Server error
           content:
@@ -87,10 +89,16 @@ paths:
                 $ref: '#/components/schemas/Problem'
         "200":
           description: Successful Operation
+        "404":
+          description: Not found
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
   /api-docs:
     get:
       tags:
-      - API
+        - API
       summary: OpenAPI
       operationId: getApiDocs
       responses:
@@ -108,8 +116,6 @@ components:
     Problem:
       type: object
       properties:
-        status:
-          $ref: '#/components/schemas/StatusType'
         instance:
           type: string
           format: uri
@@ -124,6 +130,8 @@ components:
           type: string
         detail:
           type: string
+        status:
+          $ref: '#/components/schemas/StatusType'
     StatusType:
       type: object
       properties:
@@ -243,8 +251,6 @@ components:
                 type: boolean
         message:
           type: string
-        status:
-          $ref: '#/components/schemas/StatusType'
         instance:
           type: string
           format: uri
@@ -259,6 +265,8 @@ components:
           type: string
         detail:
           type: string
+        status:
+          $ref: '#/components/schemas/StatusType'
         suppressed:
           type: array
           items:
@@ -313,8 +321,8 @@ components:
             of case-data/e-service.
           example: INBOUND
           enum:
-          - INBOUND
-          - OUTBOUND
+            - INBOUND
+            - OUTBOUND
         familyId:
           type: string
           description: What E-service the message was found in
