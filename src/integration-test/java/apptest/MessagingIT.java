@@ -23,7 +23,7 @@ class MessagingIT extends AbstractAppTest {
 	@Test
 	void test1_getAllMessages() {
 		setupCall()
-			.withServicePath("/messages")
+			.withServicePath("/messages?familyid=123")
 			.withHttpMethod(HttpMethod.GET)
 			.withExpectedResponseStatus(HttpStatus.OK)
 			.withExpectedResponse("expected.json")

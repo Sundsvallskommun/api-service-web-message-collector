@@ -14,15 +14,15 @@ public class MessageService {
     
     private final MessageRepository repository;
     
-	public MessageService(MessageRepository repository) {
+	public MessageService(final MessageRepository repository) {
         this.repository = repository;
     }
     
-    public List<MessageDTO> getMessages() {
-		return toDTOs(repository.findAll());
+    public List<MessageDTO> getMessages(final String familyId) {
+		return toDTOs(repository.findAllByFamilyId(familyId));
     }
     
-    public void deleteMessages(List<Integer> ids) {
+    public void deleteMessages(final List<Integer> ids) {
         repository.deleteAllById(ids);
     }
 }

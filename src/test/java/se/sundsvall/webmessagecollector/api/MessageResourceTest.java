@@ -1,6 +1,7 @@
 package se.sundsvall.webmessagecollector.api;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
@@ -35,8 +36,8 @@ class MessageResourceTest {
 
 	@Test
 	void getMessages() {
-		// Arrange
-		when(serviceMock.getMessages()).thenReturn(List.of(MessageDTO.builder()
+		// Arrange & Mock
+		when(serviceMock.getMessages(anyString())).thenReturn(List.of(MessageDTO.builder()
 			.withId(1)
 			.withMessageId("someMessageId")
 			.withMessage("someMessage")
@@ -51,10 +52,9 @@ class MessageResourceTest {
 			.withUserId("someUserid")
 			.build()));
 
-
 		// Act
 		final var response = webTestClient.get()
-			.uri(PATH)
+			.uri(PATH+"?familyid=123")
 			.exchange()
 			.expectStatus().isOk()
 			.expectBodyList(MessageDTO.class)
@@ -66,7 +66,7 @@ class MessageResourceTest {
 			assertThat(message).hasNoNullFieldsOrProperties();
 		});
 
-		verify(serviceMock).getMessages();
+		verify(serviceMock).getMessages(anyString());
 		verifyNoMoreInteractions(serviceMock);
 	}
 
