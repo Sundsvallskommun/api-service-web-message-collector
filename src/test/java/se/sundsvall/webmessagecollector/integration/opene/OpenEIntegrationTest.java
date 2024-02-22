@@ -23,9 +23,6 @@ import se.sundsvall.dept44.test.extension.ResourceLoaderExtension;
 @ExtendWith({ MockitoExtension.class, ResourceLoaderExtension.class })
 class OpenEIntegrationTest {
 
-	@Spy
-	private OpenEMapper mapper;
-
 	@Mock
 	private OpenEClient client;
 
@@ -48,7 +45,6 @@ class OpenEIntegrationTest {
 		verify(client, times(1))
 			.getMessages(any(String.class), any(String.class), any(String.class));
 
-		verify(mapper).mapMessages(any(byte[].class), any(String.class));
 	}
 
 	@Test
@@ -62,8 +58,6 @@ class OpenEIntegrationTest {
 
 		verify(client, times(1))
 			.getMessages(any(String.class), any(String.class), any(String.class));
-
-		verify(mapper).mapMessages(any(), any(String.class));
 	}
 
 	@Test
@@ -77,8 +71,6 @@ class OpenEIntegrationTest {
 		assertThat(result).isNotNull().isEmpty();
 
 		verify(client).getMessages(any(String.class), any(String.class), any(String.class));
-
-		verifyNoInteractions(mapper);
 
 	}
 }

@@ -14,15 +14,13 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.dataformat.xml.XmlMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.stereotype.Component;
 
 import se.sundsvall.webmessagecollector.api.model.Direction;
 import se.sundsvall.webmessagecollector.integration.db.model.MessageEntity;
 import se.sundsvall.webmessagecollector.integration.opene.model.Messages;
 
 
-@Component
-class OpenEMapper {
+final class OpenEMapper {
 
 	private static final Logger LOG = LoggerFactory.getLogger(OpenEMapper.class);
 
@@ -35,10 +33,14 @@ class OpenEMapper {
 		.parseDefaulting(ChronoField.MINUTE_OF_HOUR, 0)
 		.toFormatter();
 
-	List<MessageEntity> mapMessages(final byte[] errands, final String familyId) {
+	private OpenEMapper() {
+		// Intentionally Empty
+	}
+
+	static List<MessageEntity> mapMessages(final byte[] errands, final String familyId) {
 
 		if (errands == null) {
-			return List.of();
+			return emptyList();
 		}
 
 		final var xmlString = new String(errands, StandardCharsets.ISO_8859_1);
@@ -66,11 +68,10 @@ class OpenEMapper {
 						}
 						return entity.build();
 					})
-
 					.toList();
 		} catch (final JsonProcessingException e) {
 			LOG.info("Something went wrong parsing messages", e);
-			return List.of();
+			return emptyList();
 		}
 	}
 

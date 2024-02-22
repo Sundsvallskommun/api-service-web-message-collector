@@ -14,17 +14,15 @@ public class OpenEIntegration {
     private static final Logger LOG = LoggerFactory.getLogger(OpenEIntegration.class);
     
     private final OpenEClient client;
-    
-    private final OpenEMapper mapper;
-    
-    public OpenEIntegration(final OpenEClient client, OpenEMapper mapper) {
+
+    public OpenEIntegration(final OpenEClient client) {
         this.client = client;
-        this.mapper = mapper;
+
     }
     
 	public List<MessageEntity> getMessages(String familyId, String fromDate, String toDate) {
         try {
-            return mapper.mapMessages(client.getMessages(familyId, fromDate, toDate), familyId);
+            return OpenEMapper.mapMessages(client.getMessages(familyId, fromDate, toDate), familyId);
         } catch (Exception e) {
             LOG.info("Unable to get errandIds for familyId {}", familyId, e);
             return List.of();
