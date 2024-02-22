@@ -1,12 +1,12 @@
 package se.sundsvall.webmessagecollector.integration.opene;
 
+import static java.nio.charset.StandardCharsets.ISO_8859_1;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import java.util.List;
+import java.time.LocalDateTime;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -16,35 +16,50 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.zalando.problem.Problem;
 import org.zalando.problem.Status;
 
-import se.sundsvall.webmessagecollector.integration.db.model.MessageEntity;
+import se.sundsvall.dept44.test.annotation.resource.Load;
+import se.sundsvall.dept44.test.extension.ResourceLoaderExtension;
+import se.sundsvall.webmessagecollector.api.model.Direction;
 
-@ExtendWith(MockitoExtension.class)
+@ExtendWith({MockitoExtension.class, ResourceLoaderExtension.class})
 class OpenEIntegrationTest {
 
 	@Mock
 	private OpenEClient clientMock;
 
-	@Mock
-	private OpenEMapper mapperMock;
-
 	@InjectMocks
 	private OpenEIntegration integration;
 
 	@Test
-	void getMessages() {
+	void getMessages(@Load("/messages.xml") final String input) {
 		// Arrange
 		final var familyId = "familyId";
 		final var from = "from";
 		final var tom = "tom";
-		final var response = "some response".getBytes();
+		final var bytes = input.getBytes(ISO_8859_1);
 
-		when(clientMock.getMessages(familyId, from, tom)).thenReturn(response);
-		when(mapperMock.mapMessages(response, familyId)).thenReturn(List.of(MessageEntity.builder().withFamilyId(familyId).build()));
+		when(clientMock.getMessages(familyId, from, tom)).thenReturn(bytes);
 
-		// Act assert and verify
-		assertThat(integration.getMessages(familyId, from, tom)).isEqualTo(List.of(MessageEntity.builder().withFamilyId(familyId).build()));
+		// Act
+		final var result = integration.getMessages(familyId, from, tom);
+
+		// Assert and verify
+		assertThat(result).hasSize(1)
+			.allSatisfy(entity -> {
+				assertThat(entity.getDirection()).isEqualTo(Direction.INBOUND);
+				assertThat(entity.getEmail()).isEqualTo("email_1@test.se");
+				assertThat(entity.getExternalCaseId()).isEqualTo("102251");
+				assertThat(entity.getFamilyId()).isEqualTo(familyId);
+				assertThat(entity.getFirstName()).isEqualTo("firstName_1");
+				assertThat(entity.getId()).isNull();
+				assertThat(entity.getLastName()).isEqualTo("lastName_1");
+				assertThat(entity.getMessage()).isEqualTo("Inbound message");
+				assertThat(entity.getMessageId()).isEqualTo("10");
+				assertThat(entity.getSent()).isEqualTo(LocalDateTime.of(2022, 5, 25, 11, 20));
+				assertThat(entity.getUserId()).isEqualTo("1");
+				assertThat(entity.getUsername()).isEqualTo("userName_1");
+			});
+
 		verify(clientMock).getMessages(familyId, from, tom);
-		verify(mapperMock).mapMessages(response, familyId);
 	}
 
 	@Test
@@ -59,6 +74,5 @@ class OpenEIntegrationTest {
 		// Act, assert and verify
 		assertThat(integration.getMessages(familyId, from, tom)).isEmpty();
 		verify(clientMock).getMessages(familyId, from, tom);
-		verify(mapperMock, never()).mapMessages(any(), any());
 	}
 }

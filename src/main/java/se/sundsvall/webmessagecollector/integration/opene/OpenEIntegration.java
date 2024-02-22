@@ -1,6 +1,7 @@
 package se.sundsvall.webmessagecollector.integration.opene;
 
 import static java.util.Collections.emptyList;
+import static se.sundsvall.webmessagecollector.integration.opene.OpenEMapper.mapMessages;
 
 import java.util.List;
 
@@ -17,16 +18,13 @@ public class OpenEIntegration {
 
 	private final OpenEClient client;
 
-	private final OpenEMapper mapper;
-
-	public OpenEIntegration(final OpenEClient client, final OpenEMapper mapper) {
+	public OpenEIntegration(final OpenEClient client) {
 		this.client = client;
-		this.mapper = mapper;
 	}
 
 	public List<MessageEntity> getMessages(final String familyId, final String fromDate, final String toDate) {
 		try {
-			return mapper.mapMessages(client.getMessages(familyId, fromDate, toDate), familyId);
+			return mapMessages(client.getMessages(familyId, fromDate, toDate), familyId);
 		} catch (Exception e) {
 			LOG.info("Unable to get messages for familyId {}", familyId, e);
 			return emptyList();
