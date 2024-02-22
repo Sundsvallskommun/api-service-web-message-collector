@@ -2,75 +2,63 @@ package se.sundsvall.webmessagecollector.integration.opene;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
-import java.io.IOException;
-import java.nio.charset.StandardCharsets;
+import java.util.List;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.zalando.problem.Problem;
+import org.zalando.problem.Status;
 
-import se.sundsvall.dept44.test.annotation.resource.Load;
-import se.sundsvall.dept44.test.extension.ResourceLoaderExtension;
+import se.sundsvall.webmessagecollector.integration.db.model.MessageEntity;
 
-@ExtendWith({ MockitoExtension.class, ResourceLoaderExtension.class })
+@ExtendWith(MockitoExtension.class)
 class OpenEIntegrationTest {
 
 	@Mock
-	private OpenEClient client;
+	private OpenEClient clientMock;
+
+	@Mock
+	private OpenEMapper mapperMock;
 
 	@InjectMocks
 	private OpenEIntegration integration;
 
 	@Test
-	void getMessages(@Load("/messages.xml") final String input) throws IOException {
+	void getMessages() {
+		// Arrange
+		final var familyId = "familyId";
+		final var from = "from";
+		final var tom = "tom";
+		final var response = "some response".getBytes();
 
-		final var bytes = input.getBytes(StandardCharsets.ISO_8859_1);
+		when(clientMock.getMessages(familyId, from, tom)).thenReturn(response);
+		when(mapperMock.mapMessages(response, familyId)).thenReturn(List.of(MessageEntity.builder().withFamilyId(familyId).build()));
 
-		when(client.getMessages(any(String.class), any(String.class), any(String.class))).thenReturn(bytes);
-
-		final var result = integration.getMessages("", "", "");
-
-		assertThat(result).isNotNull();
-		assertThat(result.size()).isNotZero();
-		assertThat(result.get(0)).hasNoNullFieldsOrPropertiesExcept("id");
-
-		verify(client, times(1))
-			.getMessages(any(String.class), any(String.class), any(String.class));
-
+		// Act assert and verify
+		assertThat(integration.getMessages(familyId, from, tom)).isEqualTo(List.of(MessageEntity.builder().withFamilyId(familyId).build()));
+		verify(clientMock).getMessages(familyId, from, tom);
+		verify(mapperMock).mapMessages(response, familyId);
 	}
 
 	@Test
-	void getMessages_OpenEReturnsNull() throws IOException {
+	void getMessagesThrowsException() {
+		// Arrange
+		final var familyId = "familyId";
+		final var from = "from";
+		final var tom = "tom";
 
-		when(client.getMessages(any(String.class), any(String.class), any(String.class))).thenReturn(null);
+		when(clientMock.getMessages(any(), any(), any())).thenThrow(Problem.valueOf(Status.I_AM_A_TEAPOT, "Big and stout"));
 
-		final var result = integration.getMessages("", "", "");
-
-		assertThat(result).isNotNull().isEmpty();
-
-		verify(client, times(1))
-			.getMessages(any(String.class), any(String.class), any(String.class));
-	}
-
-	@Test
-	void getMessages_throwsException() throws IOException {
-
-		when(client.getMessages(any(String.class), any(String.class), any(String.class)))
-			.thenThrow(new IOException());
-
-		final var result = integration.getMessages("", "", "");
-
-		assertThat(result).isNotNull().isEmpty();
-
-		verify(client).getMessages(any(String.class), any(String.class), any(String.class));
-
+		// Act, assert and verify
+		assertThat(integration.getMessages(familyId, from, tom)).isEmpty();
+		verify(clientMock).getMessages(familyId, from, tom);
+		verify(mapperMock, never()).mapMessages(any(), any());
 	}
 }

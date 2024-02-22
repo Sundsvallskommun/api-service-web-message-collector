@@ -10,22 +10,24 @@ import se.sundsvall.webmessagecollector.integration.db.model.MessageEntity;
 
 @Component
 public class OpenEIntegration {
-    
-    private static final Logger LOG = LoggerFactory.getLogger(OpenEIntegration.class);
-    
-    private final OpenEClient client;
 
-    public OpenEIntegration(final OpenEClient client) {
-        this.client = client;
+	private static final Logger LOG = LoggerFactory.getLogger(OpenEIntegration.class);
 
-    }
-    
-	public List<MessageEntity> getMessages(String familyId, String fromDate, String toDate) {
-        try {
-            return OpenEMapper.mapMessages(client.getMessages(familyId, fromDate, toDate), familyId);
-        } catch (Exception e) {
-            LOG.info("Unable to get errandIds for familyId {}", familyId, e);
-            return List.of();
-        }
-    }
+	private final OpenEClient client;
+
+	private final OpenEMapper mapper;
+
+	public OpenEIntegration(final OpenEClient client, final OpenEMapper mapper) {
+		this.client = client;
+		this.mapper = mapper;
+	}
+
+	public List<MessageEntity> getMessages(final String familyId, final String fromDate, final String toDate) {
+		try {
+			return mapper.mapMessages(client.getMessages(familyId, fromDate, toDate), familyId);
+		} catch (Exception e) {
+			LOG.info("Unable to get messages for familyId {}", familyId, e);
+			return List.of();
+		}
+	}
 }

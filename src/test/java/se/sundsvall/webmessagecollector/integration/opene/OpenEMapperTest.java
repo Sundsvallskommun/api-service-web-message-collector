@@ -1,129 +1,61 @@
 package se.sundsvall.webmessagecollector.integration.opene;
 
+import static java.nio.charset.StandardCharsets.ISO_8859_1;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.time.LocalDateTime;
 
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.test.context.ActiveProfiles;
 
+import se.sundsvall.dept44.test.annotation.resource.Load;
+import se.sundsvall.dept44.test.extension.ResourceLoaderExtension;
 import se.sundsvall.webmessagecollector.api.model.Direction;
 
+@ExtendWith({ MockitoExtension.class, ResourceLoaderExtension.class })
+@ActiveProfiles("junit")
 class OpenEMapperTest {
 
-	@Test
-	void mapMessages() {
-
-		// Arrange
-		final var externalMessage = """
-			<?xml version="1.0" encoding="ISO-8859-1" standalone="no"?>
-			<Messages>
-			    <ExternalMessage>
-			        <postedByManager>false</postedByManager>
-			        <systemMessage>false</systemMessage>
-			        <readReceiptEnabled>false</readReceiptEnabled>
-			        <attachments>
-			            <ExternalMessageAttachment>
-			                <attachmentID>73</attachmentID>
-			                <filename>Test G Test - 2421.pdf</filename>
-			                <size>126438</size>
-			                <added>2022-09-15 11:16</added>
-			                <FormatedSize>123 KB</FormatedSize>
-			            </ExternalMessageAttachment>
-			        </attachments>
-			        <messageID>190</messageID>
-			        <message>test</message>
-			        <poster>
-			            <userID>1337</userID>
-			            <username>te69st</username>
-			            <firstname>Test</firstname>
-			            <lastname>Testorsson</lastname>
-			            <email>Test.Testorsson@sundsvall.se</email>
-			            <admin>false</admin>
-			            <enabled>true</enabled>
-			            <lastLogin>2024-02-22 13:35</lastLogin>
-			            <lastLoginInMilliseconds>1708605349000</lastLoginInMilliseconds>
-			            <added>2015-07-03 01:02</added>
-			            <isMutable>true</isMutable>
-			            <hasFormProvider>true</hasFormProvider>
-			        </poster>
-			        <added>2022-09-15 11:16</added>
-			        <flowInstanceID>2542</flowInstanceID>
-			    </ExternalMessage>
-			   </Messages>
-			""";
-
-		//Act
-		final var result = OpenEMapper.mapMessages(externalMessage.getBytes(), "123");
-		//Assert
-		assertThat(result).isNotNull().hasSize(1);
-		assertThat(result.getFirst()).hasNoNullFieldsOrPropertiesExcept("id");
-		assertThat(result.getFirst().getDirection()).isEqualTo(Direction.INBOUND);
-		assertThat(result.getFirst().getFamilyId()).isEqualTo("123");
-		assertThat(result.getFirst().getExternalCaseId()).isEqualTo("2542");
-		assertThat(result.getFirst().getMessage()).isEqualTo("test");
-		assertThat(result.getFirst().getMessageId()).isEqualTo("190");
-		assertThat(result.getFirst().getSent()).isEqualTo(LocalDateTime.parse("2022-09-15T11:16"));
-		assertThat(result.getFirst().getUsername()).isEqualTo("te69st");
-		assertThat(result.getFirst().getFirstName()).isEqualTo("Test");
-		assertThat(result.getFirst().getLastName()).isEqualTo("Testorsson");
-		assertThat(result.getFirst().getEmail()).isEqualTo("Test.Testorsson@sundsvall.se");
-		assertThat(result.getFirst().getUserId()).isEqualTo("1337");
-	}
-
+	private OpenEMapper mapper = new OpenEMapper();
 
 	@Test
-	void mapMessages_IsPostedByManager() {
+	void mapWhenInputIsNull() {
+		final var familyId = "familyId";
 
-		// Arrange
-		final var externalMessage = """
-			<?xml version="1.0" encoding="ISO-8859-1" standalone="no"?>
-			<Messages>
-			    <ExternalMessage>
-			        <postedByManager>true</postedByManager>
-			        <systemMessage>false</systemMessage>
-			        <readReceiptEnabled>false</readReceiptEnabled>
-			        <attachments>
-			            <ExternalMessageAttachment>
-			                <attachmentID>73</attachmentID>
-			                <filename>Test G Test - 2421.pdf</filename>
-			                <size>126438</size>
-			                <added>2022-09-15 11:16</added>
-			                <FormatedSize>123 KB</FormatedSize>
-			            </ExternalMessageAttachment>
-			        </attachments>
-			        <messageID>190</messageID>
-			        <message>test</message>
-			        <poster>
-			            <userID>1337</userID>
-			            <username>te69st</username>
-			            <firstname>Test</firstname>
-			            <lastname>Testorsson</lastname>
-			            <email>Test.Testorsson@sundsvall.se</email>
-			            <admin>false</admin>
-			            <enabled>true</enabled>
-			            <lastLogin>2024-02-22 13:35</lastLogin>
-			            <lastLoginInMilliseconds>1708605349000</lastLoginInMilliseconds>
-			            <added>2015-07-03 01:02</added>
-			            <isMutable>true</isMutable>
-			            <hasFormProvider>true</hasFormProvider>
-			        </poster>
-			        <added>2022-09-15 11:16</added>
-			        <flowInstanceID>2542</flowInstanceID>
-			    </ExternalMessage>
-			   </Messages>
-			""";
-
-		//Act
-		final var result = OpenEMapper.mapMessages(externalMessage.getBytes(), "123");
-		//Assert
-		assertThat(result).isNotNull().isEmpty();
+		assertThat(mapper.mapMessages(null, familyId)).isEmpty();
 	}
-
 
 	@Test
-	void mapMessages_messageIsNull() {
-		final var result = OpenEMapper.mapMessages(null, "123");
-		assertThat(result).isNotNull().isEmpty();
+	void mapWhenExternalMessagesAreNull(@Load(value = "/emptymessages.xml") final String input) {
+		final var familyId = "123";
+		final var bytes = input.getBytes(ISO_8859_1);
+
+		assertThat(mapper.mapMessages(bytes, familyId)).isEmpty();
 	}
 
+	@Test
+	void mapMessages(@Load("/messages.xml") final String input) {
+		final var familyId = "123";
+		final var bytes = input.getBytes(ISO_8859_1);
+
+		final var result = mapper.mapMessages(bytes, familyId);
+
+		assertThat(result).hasSize(1)
+			.allSatisfy(entity -> {
+				assertThat(entity.getDirection()).isEqualTo(Direction.INBOUND);
+				assertThat(entity.getEmail()).isEqualTo("email_1@test.se");
+				assertThat(entity.getExternalCaseId()).isEqualTo("102251");
+				assertThat(entity.getFamilyId()).isEqualTo(familyId);
+				assertThat(entity.getFirstName()).isEqualTo("firstName_1");
+				assertThat(entity.getId()).isNull();
+				assertThat(entity.getLastName()).isEqualTo("lastName_1");
+				assertThat(entity.getMessage()).isEqualTo("Inbound message");
+				assertThat(entity.getMessageId()).isEqualTo("10");
+				assertThat(entity.getSent()).isEqualTo(LocalDateTime.of(2022, 5, 25, 11, 20));
+				assertThat(entity.getUserId()).isEqualTo("1");
+				assertThat(entity.getUsername()).isEqualTo("userName_1");
+			});
+	}
 }
