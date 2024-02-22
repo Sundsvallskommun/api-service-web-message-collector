@@ -1,5 +1,7 @@
 package se.sundsvall.webmessagecollector.integration.opene;
 
+import static java.util.Collections.emptyList;
+
 import java.util.List;
 
 import org.slf4j.Logger;
@@ -27,7 +29,7 @@ public class OpenEIntegration {
 			return mapper.mapMessages(client.getMessages(familyId, fromDate, toDate), familyId);
 		} catch (Exception e) {
 			LOG.info("Unable to get messages for familyId {}", familyId, e);
-			return List.of();
+			return emptyList();
 		}
 	}
 }

@@ -9,5 +9,4 @@ public record OpenEProperties(
 	int connectTimeout,
 	int readTimeout
 ) {
-
 }

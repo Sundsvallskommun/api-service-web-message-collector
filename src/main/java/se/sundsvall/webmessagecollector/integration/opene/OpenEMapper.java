@@ -72,5 +72,4 @@ class OpenEMapper {
 			return emptyList();
 		}
 	}
-
 }

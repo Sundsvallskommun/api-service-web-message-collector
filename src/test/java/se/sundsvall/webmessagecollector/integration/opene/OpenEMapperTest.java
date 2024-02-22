@@ -36,6 +36,14 @@ class OpenEMapperTest {
 	}
 
 	@Test
+	void mapWithFaultXML() {
+		final var familyId = "123";
+		final var bytes = "{this is not a valid xml}".getBytes(ISO_8859_1);
+
+		assertThat(mapper.mapMessages(bytes, familyId)).isEmpty();
+	}
+
+	@Test
 	void mapMessages(@Load("/messages.xml") final String input) {
 		final var familyId = "123";
 		final var bytes = input.getBytes(ISO_8859_1);
