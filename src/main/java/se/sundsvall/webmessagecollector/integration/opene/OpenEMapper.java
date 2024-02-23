@@ -48,26 +48,26 @@ final class OpenEMapper {
 			return ofNullable(new XmlMapper()
 				.readValue(xmlString, Messages.class)
 				.getExternalMessages())
-					.orElse(emptyList()).stream()
-					.filter(externalMessage -> !externalMessage.isPostedByManager())
-					.map(externalMessage -> {
-						final var entity = MessageEntity.builder()
-							.withFamilyId(familyId)
-							.withDirection(externalMessage.isPostedByManager() ? Direction.OUTBOUND : Direction.INBOUND)
-							.withMessageId(String.valueOf(externalMessage.getMessageID()))
-							.withExternalCaseId(String.valueOf(externalMessage.getFlowInstanceID()))
-							.withMessage(externalMessage.getMessage())
-							.withSent(LocalDateTime.parse(externalMessage.getAdded(), formatter));
-						if (externalMessage.getPoster() != null) {
-							entity.withEmail(externalMessage.getPoster().getEmail())
-								.withFirstName(externalMessage.getPoster().getFirstname())
-								.withLastName(externalMessage.getPoster().getLastname())
-								.withUsername(externalMessage.getPoster().getUsername())
-								.withUserId(String.valueOf(externalMessage.getPoster().getUserID()));
-						}
-						return entity.build();
-					})
-					.toList();
+				.orElse(emptyList()).stream()
+				.filter(externalMessage -> !externalMessage.isPostedByManager())
+				.map(externalMessage -> {
+					final var entity = MessageEntity.builder()
+						.withFamilyId(familyId)
+						.withDirection(externalMessage.isPostedByManager() ? Direction.OUTBOUND : Direction.INBOUND)
+						.withMessageId(String.valueOf(externalMessage.getMessageID()))
+						.withExternalCaseId(String.valueOf(externalMessage.getFlowInstanceID()))
+						.withMessage(externalMessage.getMessage())
+						.withSent(LocalDateTime.parse(externalMessage.getAdded(), formatter));
+					if (externalMessage.getPoster() != null) {
+						entity.withEmail(externalMessage.getPoster().getEmail())
+							.withFirstName(externalMessage.getPoster().getFirstname())
+							.withLastName(externalMessage.getPoster().getLastname())
+							.withUsername(externalMessage.getPoster().getUsername())
+							.withUserId(String.valueOf(externalMessage.getPoster().getUserID()));
+					}
+					return entity.build();
+				})
+				.toList();
 		} catch (final JsonProcessingException e) {
 			LOG.info("Something went wrong parsing messages", e);
 			return emptyList();
