@@ -19,5 +19,6 @@ class MessageCachePropertiesTest {
 	@Test
 	void testProperties() {
 		assertThat(properties.familyId()).isEqualTo("someFamilyId");
+		assertThat(properties.backtrackHours()).isEqualTo(12);
 	}
 }

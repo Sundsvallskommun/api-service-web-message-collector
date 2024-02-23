@@ -51,6 +51,7 @@ class MessageCacheSchedulerTest {
 		scheduler.cacheMessages();
 
 		verify(messageCachePropertiesMock).familyId();
+		verify(messageCachePropertiesMock).backtrackHours();
 		verify(integrationMock).getMessages(eq("123"), any(), eq(""));
 		verify(messageRepositoryMock).saveAll(messages);
 
