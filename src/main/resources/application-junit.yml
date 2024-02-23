@@ -1,19 +1,15 @@
 integration:
   open-e:
-    scheme: http
     base-url: base-url
-    port: 1234
-    basic-auth:
-      password: somePassword
-      username: someUsername
-    connect-timeout: 15s
-    read-timeout: 20s
-    errand-path: someErrandPath
-    messages-path: someMessagesPath
+    password: somePassword
+    username: someUsername
+    connect-timeout: 15
+    read-timeout: 20
+
 scheduler:
-  fixedRate: PT10M
-  initialDelay: PT11M
+  backtrackHours: 12
   familyId: someFamilyId
+
 spring:
   datasource:
     driver-class-name: org.testcontainers.jdbc.ContainerDatabaseDriver

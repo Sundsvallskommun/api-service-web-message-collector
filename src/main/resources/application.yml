@@ -1,14 +1,3 @@
-logging:
-  level:
-    root: INFO
-openapi:
-  name: ${spring.application.name}
-  title: ${spring.application.name}
-  version: '@project.version@'
-scheduler:
-  fixedRate: PT10M
-  initialDelay: PT10M
-  lock-at-most-for: PT2M
 spring:
   application:
     name: api-web-message-collector
@@ -19,3 +8,21 @@ spring:
     baseline-on-migrate: true
     baseline-version: 1.0
     enabled: false
+
+openapi:
+  name: ${spring.application.name}
+  title: ${spring.application.name}
+  version: '@project.version@'
+
+integration:
+  open-e:
+    connect-timeout: 5
+    read-timeout: 60
+
+scheduler:
+  cron: "-"
+  lock-at-most-for: PT2M
+
+logging:
+  level:
+    root: INFO

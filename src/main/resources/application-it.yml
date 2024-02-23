@@ -1,12 +1,10 @@
 integration:
   open-e:
     base-url: localhost:9090
-    basic-auth:
-      password: somePassword
-      username: someUsername
-    connect-timeout: 15s
-    errand-path: somepath
-    messages-path: someMessagesPath
+    password: somePassword
+    username: someUsername
+    connect-timeout: 15
+    read-timeout: 20
 spring:
   datasource:
     driver-class-name: org.testcontainers.jdbc.ContainerDatabaseDriver

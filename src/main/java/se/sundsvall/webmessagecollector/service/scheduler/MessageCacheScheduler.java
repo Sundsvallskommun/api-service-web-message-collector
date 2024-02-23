@@ -17,11 +17,11 @@ import se.sundsvall.webmessagecollector.integration.opene.OpenEIntegration;
 @Component
 class MessageCacheScheduler {
     
+	private static final String DATE_TIME_FORMAT = "yyyy-MM-dd HH:mm";
+
     private final OpenEIntegration integration;
     private final MessageRepository messageRepository;
     private final MessageCacheProperties messageCacheProperties;
-
-    private static final String DATE_TIME_FORMAT = "yyyy-MM-dd HH:mm";
     
     MessageCacheScheduler(OpenEIntegration integration, MessageRepository messageRepository, MessageCacheProperties messageCacheProperties) {
         this.integration = integration;
@@ -29,13 +29,13 @@ class MessageCacheScheduler {
         this.messageCacheProperties = messageCacheProperties;
     }
     
-	@Scheduled(initialDelayString = "${scheduler.initialDelay}", fixedRateString = "${scheduler.fixedRate}")
+	@Scheduled(cron = "${scheduler.cron}")
 	@SchedulerLock(name = "cacheMessages", lockAtMostFor = "${scheduler.lock-at-most-for}")
 	public void cacheMessages() {
 		Arrays.stream(ofNullable(messageCacheProperties.familyId()).orElse("")
 			.split(","))
 			.filter(StringUtils::isNotBlank)
 			.forEach(familyid -> messageRepository
-				.saveAll(integration.getMessages(familyid, OffsetDateTime.now().minusHours(1).format(DateTimeFormatter.ofPattern(DATE_TIME_FORMAT)), "")));
+				.saveAll(integration.getMessages(familyid, OffsetDateTime.now().minusHours(messageCacheProperties.backtrackHours()).format(DateTimeFormatter.ofPattern(DATE_TIME_FORMAT)), "")));
     }
 }

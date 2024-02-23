@@ -1,4 +1,4 @@
-package se.sundsvall.webmessagecollector.service.scheduler;
+package se.sundsvall.webmessagecollector.integration.opene.configuration;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -11,14 +11,16 @@ import se.sundsvall.webmessagecollector.Application;
 
 @SpringBootTest(classes = Application.class)
 @ActiveProfiles("junit")
-class MessageCachePropertiesTest {
+class OpenEPropertiesTest {
 
 	@Autowired
-	private MessageCacheProperties properties;
+	private OpenEProperties properties;
 
 	@Test
 	void testProperties() {
-		assertThat(properties.familyId()).isEqualTo("someFamilyId");
-		assertThat(properties.backtrackHours()).isEqualTo(12);
+		assertThat(properties.connectTimeout()).isEqualTo(15);
+		assertThat(properties.readTimeout()).isEqualTo(20);
+		assertThat(properties.username()).isEqualTo("someUsername");
+		assertThat(properties.password()).isEqualTo("somePassword");
 	}
 }

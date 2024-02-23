@@ -23,6 +23,10 @@
 		<!-- DEPT44 Framework-->
 		<dependency>
 			<groupId>se.sundsvall.dept44</groupId>
+			<artifactId>dept44-starter-feign</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>se.sundsvall.dept44</groupId>
 			<artifactId>dept44-common-validators</artifactId>
 		</dependency>
 		<!-- Database-->
@@ -44,10 +48,6 @@
 			<groupId>org.projectlombok</groupId>
 			<artifactId>lombok</artifactId>
 			<optional>true</optional>
-		</dependency>
-		<dependency>
-			<groupId>org.apache.httpcomponents.client5</groupId>
-			<artifactId>httpclient5-fluent</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>org.flywaydb</groupId>
