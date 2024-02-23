@@ -7,8 +7,7 @@ integration:
     read-timeout: 20
 
 scheduler:
-  fixedRate: PT10M
-  initialDelay: PT11M
+  cron: "-"
   familyId: someFamilyId
 
 spring:

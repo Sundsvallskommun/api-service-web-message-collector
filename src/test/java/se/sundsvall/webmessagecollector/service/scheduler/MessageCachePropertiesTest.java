@@ -19,7 +19,5 @@ class MessageCachePropertiesTest {
 	@Test
 	void testProperties() {
 		assertThat(properties.familyId()).isEqualTo("someFamilyId");
-		assertThat(properties.fixedRate()).isEqualTo("PT10M");
-		assertThat(properties.initialDelay()).isEqualTo("PT11M");
 	}
 }

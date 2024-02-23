@@ -29,7 +29,7 @@ class MessageCacheScheduler {
         this.messageCacheProperties = messageCacheProperties;
     }
     
-	@Scheduled(initialDelayString = "${scheduler.initialDelay}", fixedRateString = "${scheduler.fixedRate}")
+	@Scheduled(cron = "${scheduler.cron}")
 	@SchedulerLock(name = "cacheMessages", lockAtMostFor = "${scheduler.lock-at-most-for}")
 	public void cacheMessages() {
 		Arrays.stream(ofNullable(messageCacheProperties.familyId()).orElse("")
