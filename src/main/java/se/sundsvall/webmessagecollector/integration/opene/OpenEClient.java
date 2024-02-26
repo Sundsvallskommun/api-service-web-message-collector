@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import se.sundsvall.webmessagecollector.integration.opene.configuration.OpenEConfiguration;
 
 @FeignClient(name = CLIENT_ID, url = "${integration.open-e.base-url}", configuration = OpenEConfiguration.class)
-interface OpenEClient {
+public interface OpenEClient {
 
 	String TEXT_XML_CHARSET_ISO_8859_1 = "text/xml; charset=ISO-8859-1";
 
