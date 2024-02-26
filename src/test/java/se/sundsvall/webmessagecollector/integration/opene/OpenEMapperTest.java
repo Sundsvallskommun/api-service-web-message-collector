@@ -36,7 +36,7 @@ class OpenEMapperTest {
 		final var e = assertThrows(ThrowableProblem.class, () -> toMessageEntities(bytes, familyId));
 
 		assertThat(e.getStatus()).isEqualTo(Status.INTERNAL_SERVER_ERROR);
-		assertThat(e.getMessage()).isEqualTo(
+		assertThat(e.getMessage()).isEqualToIgnoringNewLines(
 			"Internal Server Error: JsonParseException occurred when parsing open-e messages for familyId 123. Message is: Unexpected character '{' (code 123) in prolog; expected '<'\r\n at [row,col {unknown-source}]: [1,1]");
 	}
 
