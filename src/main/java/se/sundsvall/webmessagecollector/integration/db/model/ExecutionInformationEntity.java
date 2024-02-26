@@ -16,7 +16,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Entity
-@Table(name = "executionInformation")
+@Table(name = "execution_information")
 @Data
 @Builder(setterPrefix = "with")
 @AllArgsConstructor
