@@ -1,0 +1,33 @@
+package se.sundsvall.webmessagecollector.integration.db.model;
+
+import java.time.OffsetDateTime;
+
+import org.hibernate.annotations.TimeZoneStorage;
+import org.hibernate.annotations.TimeZoneStorageType;
+
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+@Entity
+@Table(name = "executionInformation")
+@Data
+@Builder(setterPrefix = "with")
+@AllArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+public class ExecutionInformationEntity {
+    
+	@Id
+	@Column(name = "family_id", unique = true)
+    private String familyId;
+
+	@Column(name = "last_successful_execution")
+	@TimeZoneStorage(TimeZoneStorageType.NORMALIZE)
+	private OffsetDateTime lastSuccessfulExecution;
+}

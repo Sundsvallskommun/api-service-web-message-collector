@@ -2,30 +2,26 @@ package se.sundsvall.webmessagecollector.service.scheduler;
 
 import static java.util.Optional.ofNullable;
 
-import java.time.OffsetDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
 
 import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 import net.javacrumbs.shedlock.spring.annotation.SchedulerLock;
-import se.sundsvall.webmessagecollector.integration.db.MessageRepository;
-import se.sundsvall.webmessagecollector.integration.opene.OpenEIntegration;
 
 @Component
 class MessageCacheScheduler {
     
-	private static final String DATE_TIME_FORMAT = "yyyy-MM-dd HH:mm";
+	private static final Logger LOG = LoggerFactory.getLogger(MessageCacheScheduler.class);
 
-    private final OpenEIntegration integration;
-    private final MessageRepository messageRepository;
     private final MessageCacheProperties messageCacheProperties;
+	private final MessageCacheService messageCacheService;
     
-    MessageCacheScheduler(OpenEIntegration integration, MessageRepository messageRepository, MessageCacheProperties messageCacheProperties) {
-        this.integration = integration;
-        this.messageRepository = messageRepository;
+	MessageCacheScheduler(MessageCacheService messageCacheService, MessageCacheProperties messageCacheProperties) {
+		this.messageCacheService = messageCacheService;
         this.messageCacheProperties = messageCacheProperties;
     }
     
@@ -35,7 +31,15 @@ class MessageCacheScheduler {
 		Arrays.stream(ofNullable(messageCacheProperties.familyId()).orElse("")
 			.split(","))
 			.filter(StringUtils::isNotBlank)
-			.forEach(familyid -> messageRepository
-				.saveAll(integration.getMessages(familyid, OffsetDateTime.now().minusHours(messageCacheProperties.backtrackHours()).format(DateTimeFormatter.ofPattern(DATE_TIME_FORMAT)), "")));
-    }
+			.map(String::trim)
+			.forEach(this::fetchMessages);
+	}
+
+	private void fetchMessages(String familyId) {
+		try {
+			messageCacheService.fetchMessages(familyId);
+		} catch (Exception e) {
+			LOG.error("Unable to process messages for familyId {}", familyId, e);
+		}
+	}
 }

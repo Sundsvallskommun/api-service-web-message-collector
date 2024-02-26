@@ -7,7 +7,6 @@ integration:
     read-timeout: 20
 
 scheduler:
-  backtrackHours: 12
   familyId: someFamilyId
 
 spring:

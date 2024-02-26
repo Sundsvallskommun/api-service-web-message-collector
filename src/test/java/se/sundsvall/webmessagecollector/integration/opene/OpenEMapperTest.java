@@ -2,13 +2,16 @@ package se.sundsvall.webmessagecollector.integration.opene;
 
 import static java.nio.charset.StandardCharsets.ISO_8859_1;
 import static org.assertj.core.api.Assertions.assertThat;
-import static se.sundsvall.webmessagecollector.integration.opene.OpenEMapper.mapMessages;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static se.sundsvall.webmessagecollector.integration.opene.OpenEMapper.toMessageEntities;
 
 import java.time.LocalDateTime;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.test.context.ActiveProfiles;
+import org.zalando.problem.Status;
+import org.zalando.problem.ThrowableProblem;
 
 import se.sundsvall.dept44.test.annotation.resource.Load;
 import se.sundsvall.dept44.test.extension.ResourceLoaderExtension;
@@ -22,7 +25,7 @@ class OpenEMapperTest {
 	void mapWhenInputIsNull() {
 		final var familyId = "familyId";
 
-		assertThat(mapMessages(null, familyId)).isEmpty();
+		assertThat(toMessageEntities(null, familyId)).isEmpty();
 	}
 
 	@Test
@@ -30,7 +33,13 @@ class OpenEMapperTest {
 		final var familyId = "123";
 		final var bytes = "{this is not a valid xml}".getBytes(ISO_8859_1);
 
-		assertThat(mapMessages(bytes, familyId)).isEmpty();
+		final var e = assertThrows(ThrowableProblem.class, () -> toMessageEntities(bytes, familyId));
+
+		assertThat(e.getStatus()).isEqualTo(Status.INTERNAL_SERVER_ERROR);
+		assertThat(e.getMessage()).isEqualTo("""
+			Internal Server Error: JsonParseException occurred when parsing open-e messages for familyId 123. \
+			Message is: Unexpected character '{' (code 123) in prolog; expected '<'\r\n at [row,col {unknown-source}]: [1,1]\
+			""");
 	}
 
 	@Test
@@ -38,7 +47,7 @@ class OpenEMapperTest {
 		final var familyId = "123";
 		final var bytes = input.getBytes(ISO_8859_1);
 
-		assertThat(mapMessages(bytes, familyId)).isEmpty();
+		assertThat(toMessageEntities(bytes, familyId)).isEmpty();
 	}
 
 	@Test
@@ -46,7 +55,7 @@ class OpenEMapperTest {
 		final var familyId = "123";
 		final var bytes = input.getBytes(ISO_8859_1);
 
-		final var result = mapMessages(bytes, familyId);
+		final var result = toMessageEntities(bytes, familyId);
 
 		assertThat(result).hasSize(1)
 			.allSatisfy(entity -> {
