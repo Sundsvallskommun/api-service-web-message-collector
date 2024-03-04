@@ -16,7 +16,7 @@
 		<docker.image.name>ms-web-message-collector</docker.image.name>
 		<published.container.port.test>9079</published.container.port.test>
 		<published.container.port.production>9079</published.container.port.production>
-		<shedlock.version>5.11.0</shedlock.version>
+		<shedlock.version>5.12.0</shedlock.version>
 		<faux-pas.version>0.9.0</faux-pas.version>
 	</properties>
 	<dependencies>
