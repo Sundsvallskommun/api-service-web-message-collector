@@ -1,10 +1,12 @@
 package se.sundsvall.webmessagecollector.api;
 
+import static org.springframework.http.MediaType.ALL_VALUE;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static org.springframework.http.MediaType.APPLICATION_PROBLEM_JSON_VALUE;
-import static org.springframework.http.MediaType.TEXT_PLAIN_VALUE;
 
 import java.util.List;
+
+import jakarta.servlet.http.HttpServletResponse;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -57,12 +59,12 @@ public class MessageResource {
 		return ResponseEntity.noContent().build();
 	}
 
-	@GetMapping(value = "attachments/{attachmentId}", produces = TEXT_PLAIN_VALUE)
+	@GetMapping(value = "attachments/{attachmentId}", produces = {ALL_VALUE, APPLICATION_PROBLEM_JSON_VALUE})
 	@ApiResponse(responseCode = "200", description = "Successful Operation", useReturnTypeSchema = true)
-	@Operation(summary = "Get a messageAttachment", description = "Returns a messageAttachment as a BASE64 string for the specified attachmentId")
-	public ResponseEntity<String> getAttachment(
-		@Parameter(name = "attachmentId", description = "MessageId to fetch attachment for", example = "123", required = true) @PathVariable("attachmentId") final int attachmentId) {
-		return ResponseEntity.ok(service.getAttachment(attachmentId));
+	@Operation(summary = "Get a messageAttachment", description = "Returns a messageAttachment as a stream for the specified attachmentId")
+	public void getAttachment(
+		@Parameter(name = "attachmentId", description = "MessageId to fetch attachment for", example = "123", required = true) @PathVariable("attachmentId") final int attachmentId, final HttpServletResponse response) {
+		service.getMessageAttachmentStreamed(attachmentId, response);
 	}
 
 	@DeleteMapping("attachments/{attachmentId}")

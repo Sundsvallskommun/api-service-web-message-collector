@@ -1,28 +1,29 @@
 package se.sundsvall.webmessagecollector.service;
 
+import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.mockito.ArgumentMatchers.anyList;
-import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
+import static org.springframework.http.HttpHeaders.CONTENT_DISPOSITION;
+import static org.springframework.http.HttpHeaders.CONTENT_TYPE;
 
-import java.sql.SQLException;
+import java.sql.Blob;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
-import javax.sql.rowset.serial.SerialBlob;
+import jakarta.servlet.ServletOutputStream;
+import jakarta.servlet.http.HttpServletResponse;
 
-import org.apache.hc.client5.http.utils.Base64;
+import org.apache.commons.io.IOUtils;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.zalando.problem.Problem;
 
 import se.sundsvall.webmessagecollector.api.model.Direction;
 import se.sundsvall.webmessagecollector.integration.db.MessageAttachmentRepository;
@@ -34,10 +35,23 @@ import se.sundsvall.webmessagecollector.integration.db.model.MessageEntity;
 class MessageServiceTest {
 
 	@Mock
-	private MessageRepository messageRepository;
+	private MessageRepository messageRepositoryMock;
 
 	@Mock
-	private MessageAttachmentRepository attachmentRepository;
+	private MessageAttachmentEntity messageAttachmentEntityMock;
+
+	@Mock
+	private MessageAttachmentRepository attachmentRepositoryMock;
+
+	@Mock
+	private HttpServletResponse servletResponseMock;
+
+	@Mock
+	private ServletOutputStream servletOutputStreamMock;
+
+
+	@Mock
+	private Blob blobMock;
 
 	@InjectMocks
 	private MessageService service;
@@ -61,7 +75,7 @@ class MessageServiceTest {
 			.withAttachments(List.of(MessageAttachmentEntity.builder().build()))
 			.build();
 		// Mock
-		when(messageRepository.findAllByFamilyId(anyString()))
+		when(messageRepositoryMock.findAllByFamilyId("someFamilyId"))
 			.thenReturn(List.of(entity, MessageEntity.builder().build()));
 		// Act
 		final var result = service.getMessages("someFamilyId");
@@ -71,8 +85,8 @@ class MessageServiceTest {
 		assertThat(result.getFirst()).usingRecursiveComparison()
 			.isEqualTo(MessageMapper.toMessageDTO(entity));
 		// Verify
-		verify(messageRepository).findAllByFamilyId(anyString());
-		verifyNoMoreInteractions(messageRepository);
+		verify(messageRepositoryMock).findAllByFamilyId("someFamilyId");
+		verifyNoMoreInteractions(messageRepositoryMock);
 	}
 
 	@Test
@@ -81,85 +95,58 @@ class MessageServiceTest {
 		final var result = service.getMessages("someFamilyId");
 		// Assert & Verify
 		assertThat(result).isNotNull().isEmpty();
-		verify(messageRepository).findAllByFamilyId(anyString());
-		verifyNoMoreInteractions(messageRepository);
+		verify(messageRepositoryMock).findAllByFamilyId("someFamilyId");
+		verifyNoMoreInteractions(messageRepositoryMock);
 	}
 
 	@Test
 	void deleteMessages() {
+		//Arrange
+		final var list = List.of(1, 2);
 		//Act
-		service.deleteMessages(List.of(1));
+		service.deleteMessages(list);
 		//Verify
-		verify(messageRepository).deleteAllById(anyList());
-		verifyNoMoreInteractions(messageRepository);
+		verify(messageRepositoryMock).deleteAllById(list);
+		verifyNoMoreInteractions(messageRepositoryMock);
 	}
 
 	@Test
-	void getAttachment() throws SQLException {
-		// Arrange
-		final var attachmentId = 1;
-		final var file = new SerialBlob(new byte[]{1, 2, 3});
+	void getMessageAttachmentStreamed() throws Exception {
+		final var attachmentId = 12;
+		final var content = "content";
+		final var contentType = "contentType";
 		final var fileName = "fileName";
-		final var entity = MessageAttachmentEntity.builder()
-			.withFileName(fileName)
-			.withFile(file)
-			.withAttachmentId(attachmentId)
-			.build();
-		// Mock
-		when(attachmentRepository.findById(1)).thenReturn(Optional.ofNullable(entity));
-		// Act
-		final var result = service.getAttachment(attachmentId);
-		// Assert
-		assertThat(result).isNotNull().isEqualTo(Base64.encodeBase64String(file.getBytes(1, (int) file.length())));
-		// Verify
-		verify(attachmentRepository).findById(attachmentId);
-		verifyNoMoreInteractions(attachmentRepository);
-		verifyNoInteractions(messageRepository);
+		final var inputStream = IOUtils.toInputStream(content, UTF_8);
+
+		when(attachmentRepositoryMock.findById(any())).thenReturn(Optional.of(messageAttachmentEntityMock));
+		when(messageAttachmentEntityMock.getMimeType()).thenReturn(contentType);
+		when(messageAttachmentEntityMock.getName()).thenReturn(fileName);
+		when(messageAttachmentEntityMock.getFile()).thenReturn(blobMock);
+		when(blobMock.length()).thenReturn((long) content.length());
+		when(blobMock.getBinaryStream()).thenReturn(inputStream);
+		when(servletResponseMock.getOutputStream()).thenReturn(servletOutputStreamMock);
+
+		service.getMessageAttachmentStreamed(attachmentId, servletResponseMock);
+
+		verify(attachmentRepositoryMock).findById(attachmentId);
+		verify(messageAttachmentEntityMock).getFile();
+		verify(blobMock).length();
+		verify(blobMock).getBinaryStream();
+		verify(servletResponseMock).addHeader(CONTENT_TYPE, contentType);
+		verify(servletResponseMock).addHeader(CONTENT_DISPOSITION, "attachment; filename=\"" + fileName + "\"");
+		verify(servletResponseMock).setContentLength(content.length());
+		verify(servletResponseMock).getOutputStream();
 	}
 
-	@Test
-	void getAttachment_NotFound() {
-		// Mock
-		when(attachmentRepository.findById(1)).thenReturn(Optional.empty());
-		// Act
-		assertThatThrownBy(() -> service.getAttachment(1))
-			.isInstanceOf(Problem.class)
-			.hasMessageContaining("Not Found: Attachment not found");
-		// Verify
-		verify(attachmentRepository).findById(1);
-		verifyNoMoreInteractions(attachmentRepository);
-		verifyNoInteractions(messageRepository);
-	}
-
-	@Test
-	void getAttachment_EmptyFile() throws SQLException {
-		// Arrange
-		final var attachmentId = 1;
-		final var entity = MessageAttachmentEntity.builder()
-			.withFileName("fileName")
-			.withFile(new SerialBlob(new byte[0]))
-			.withAttachmentId(attachmentId)
-			.build();
-		// Mock
-		when(attachmentRepository.findById(1)).thenReturn(Optional.ofNullable(entity));
-		// Act & Assert
-		assertThatThrownBy(() -> service.getAttachment(attachmentId))
-			.isInstanceOf(Problem.class)
-			.hasMessageContaining("Internal Server Error: Could not fetch attachment");
-		// Verify
-		verify(attachmentRepository).findById(attachmentId);
-		verifyNoMoreInteractions(attachmentRepository);
-		verifyNoInteractions(messageRepository);
-	}
 
 	@Test
 	void deleteAttachment() {
 		//Act
 		service.deleteAttachment(1);
 		//Verify
-		verify(attachmentRepository).deleteById(1);
-		verifyNoMoreInteractions(attachmentRepository);
-		verifyNoInteractions(messageRepository);
+		verify(attachmentRepositoryMock).deleteById(1);
+		verifyNoMoreInteractions(attachmentRepositoryMock);
+		verifyNoInteractions(messageRepositoryMock);
 	}
 
 }

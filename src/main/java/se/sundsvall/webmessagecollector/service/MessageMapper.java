@@ -46,7 +46,9 @@ final class MessageMapper {
 		return ofNullable(entity)
 			.map(e -> MessageAttachment.builder()
 				.withAttachmentId(e.getAttachmentId())
-				.withFileName(e.getFileName())
+				.withExtension(e.getExtension())
+				.withMimeType(e.getMimeType())
+				.withName(e.getName())
 				.build())
 			.orElse(null);
 	}

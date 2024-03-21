@@ -3,7 +3,10 @@ package se.sundsvall.webmessagecollector.integration.opene;
 import static java.util.Collections.emptyList;
 import static java.util.Optional.ofNullable;
 
+import java.io.IOException;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeFormatterBuilder;
@@ -74,11 +77,28 @@ public final class OpenEMapper {
 			.withAttachments(attachments.stream()
 				.map(attachment -> MessageAttachmentEntity.builder()
 					.withAttachmentId(attachment.getAttachmentID())
-					.withFileName(attachment.getFileName())
+					.withName(attachment.getFileName())
+					.withMimeType(getMimeType(attachment.getFileName()))
+					.withExtension(getFileExtension(attachment.getFileName()))
 					.build())
 				.toList()));
 
 		return entity.build();
 	}
+
+	private static String getMimeType(final String file) {
+		try {
+			return Files.probeContentType(Path.of(file));
+		} catch (final IOException e) {
+			throw Problem.valueOf(Status.INTERNAL_SERVER_ERROR, "Unable to determine mime type for file %s".formatted(file));
+		}
+
+	}
+
+	private static String getFileExtension(final String file) {
+		final int dotIndex = file.lastIndexOf('.');
+		return (dotIndex == -1) ? "" : file.substring(dotIndex + 1);
+	}
+
 
 }

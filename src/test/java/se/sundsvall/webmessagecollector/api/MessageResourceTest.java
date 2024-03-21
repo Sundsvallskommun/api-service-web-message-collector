@@ -11,7 +11,6 @@ import static org.springframework.http.HttpMethod.DELETE;
 import java.time.OffsetDateTime;
 import java.util.List;
 
-import org.bouncycastle.util.encoders.Base64;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -86,26 +85,6 @@ class MessageResourceTest {
 
 		// Assert and verify
 		verify(serviceMock).deleteMessages(List.of(1, 2, 3));
-		verifyNoMoreInteractions(serviceMock);
-	}
-
-	@Test
-	void getAttachment() {
-		// Arrange
-		final var attachment = Base64.toBase64String(new byte[]{1, 2, 2, 3});
-		when(serviceMock.getAttachment(1)).thenReturn(attachment);
-
-		// Act
-		final var result = webTestClient.get()
-			.uri(PATH + "/attachments/1")
-			.exchange()
-			.expectStatus().isOk()
-			.expectBody(String.class)
-			.returnResult().getResponseBody();
-
-		// Assert and verify
-		assertThat(result).isNotNull().isEqualTo(attachment);
-		verify(serviceMock).getAttachment(1);
 		verifyNoMoreInteractions(serviceMock);
 	}
 

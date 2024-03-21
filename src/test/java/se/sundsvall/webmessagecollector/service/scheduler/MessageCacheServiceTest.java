@@ -15,6 +15,8 @@ import java.time.OffsetDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Optional;
 
+import javax.sql.rowset.serial.SerialBlob;
+
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
@@ -106,8 +108,10 @@ class MessageCacheServiceTest {
 			assertThat(entity.getUsername()).isNull();
 			assertThat(entity.getAttachments()).hasSize(1);
 			assertThat(entity.getAttachments().getFirst().getAttachmentId()).isEqualTo(123);
-			assertThat(entity.getAttachments().getFirst().getFileName()).isEqualTo("someFile.pdf");
-			assertThat(entity.getAttachments().getFirst().getFile()).isNotNull();
+			assertThat(entity.getAttachments().getFirst().getName()).isEqualTo("someFile.pdf");
+			assertThat(entity.getAttachments().getFirst().getMimeType()).isEqualTo("application/pdf");
+
+			assertThat(entity.getAttachments().getFirst().getFile()).isEqualTo(new SerialBlob("attachment".getBytes()));
 		});
 		assertThat(executionInformationEntityCaptor.getValue()).satisfies(entity -> {
 			assertThat(entity.getFamilyId()).isEqualTo(familyId);

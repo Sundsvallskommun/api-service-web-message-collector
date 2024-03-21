@@ -32,7 +32,6 @@ class ExternalMessageTest {
 		final var message = "someMessage";
 		final var poster = new Poster();
 		final var added = "someAdded";
-		final var sent = "someSent";
 		final var flowInstanceID = 123;
 		final var attachments = List.of(new ExternalMessageAttachment());
 
@@ -48,10 +47,10 @@ class ExternalMessageTest {
 		// Assert
 		assertThat(externalMessage.getMessageID()).isEqualTo(messageID);
 		assertThat(externalMessage.getMessage()).isEqualTo(message);
-		assertThat(externalMessage.getPoster()).isEqualTo(poster);
+		assertThat(externalMessage.getPoster()).isSameAs(poster);
 		assertThat(externalMessage.getAdded()).isEqualTo(added);
 		assertThat(externalMessage.getFlowInstanceID()).isEqualTo(flowInstanceID);
-		assertThat(externalMessage.getAttachments()).isEqualTo(attachments);
+		assertThat(externalMessage.getAttachments()).isSameAs(attachments);
 	}
 
 	@Test

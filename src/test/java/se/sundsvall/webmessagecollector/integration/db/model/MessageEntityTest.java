@@ -80,7 +80,7 @@ class MessageEntityTest {
 		assertThat(bean.getSent()).isEqualTo(sent);
 		assertThat(bean.getUserId()).isEqualTo(userId);
 		assertThat(bean.getUsername()).isEqualTo(username);
-		assertThat(bean.getAttachments()).isEqualTo(attachments);
+		assertThat(bean.getAttachments()).isSameAs(attachments);
 	}
 
 }

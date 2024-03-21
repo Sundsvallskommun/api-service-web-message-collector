@@ -41,11 +41,6 @@
 			<groupId>org.mariadb.jdbc</groupId>
 			<artifactId>mariadb-java-client</artifactId>
 		</dependency>
-		<dependency>
-			<groupId>org.hibernate.orm</groupId>
-			<artifactId>hibernate-jpamodelgen</artifactId>
-			<scope>provided</scope>
-		</dependency>
 		<!-- Other-->
 		<dependency>
 			<groupId>org.projectlombok</groupId>
@@ -114,9 +109,6 @@
 						<exclude>**/generated/**</exclude>
 						<exclude>**/se/sundsvall/webmessagecollector/Application*</exclude>
 						<exclude>**/se/sundsvall/webmessagecollector/integration/db/model/**/*_.*
-						</exclude>
-						<exclude>
-							**/se/sundsvall/webmessagecollector/integration/opene/OpenEClient.*
 						</exclude>
 					</excludes>
 				</configuration>

@@ -12,9 +12,12 @@ public class MessageAttachment {
 	private final Integer attachmentId;
 
 	@Schema(description = "The name of the file", example = "file.txt")
-	private final String fileName;
+	private final String name;
 
-	@Schema(description = "The file as a base64 encoded string", example = "dGhpcyBpcyBhIGJhc2U2NCBlbmNvZGVkIHN0cmluZw==")
-	private final String file;
+	@Schema(description = "The extension of the file", example = "txt")
+	private final String extension;
+
+	@Schema(description = "The mime type of the file", example = "text/plain")
+	private final String mimeType;
 
 }

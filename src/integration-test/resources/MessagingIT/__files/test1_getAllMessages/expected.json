@@ -3,7 +3,9 @@
     "attachments": [
       {
         "attachmentId": 1,
-        "fileName": "test.txt"
+        "name": "test_image.png",
+        "mimeType": "image/png",
+        "extension": "png"
       }
     ],
     "direction": "INBOUND",

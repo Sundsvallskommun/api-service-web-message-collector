@@ -55,9 +55,7 @@ public class MessageCacheService {
 		final var messages = toMessageEntities(bytes, familyId);
 
 		messages.forEach(messageEntity -> {
-			Optional.ofNullable(messageEntity.getAttachments()).orElse(emptyList()).forEach(attachmentEntity -> {
-				fetchAttachment(messageEntity, attachmentEntity);
-			});
+			Optional.ofNullable(messageEntity.getAttachments()).orElse(emptyList()).forEach(attachmentEntity -> fetchAttachment(messageEntity, attachmentEntity));
 			messageRepository.save(messageEntity);
 		});
 		executionInformationRepository.save(executionInfo);

@@ -1,13 +1,19 @@
 package se.sundsvall.webmessagecollector.service;
 
+import static org.springframework.http.HttpHeaders.CONTENT_DISPOSITION;
+import static org.springframework.http.HttpHeaders.CONTENT_TYPE;
 import static se.sundsvall.webmessagecollector.service.MessageMapper.toMessageDTOs;
 
+import java.io.IOException;
+import java.sql.SQLException;
 import java.util.List;
 
-import org.bouncycastle.util.encoders.Base64;
+import jakarta.servlet.http.HttpServletResponse;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StreamUtils;
 import org.zalando.problem.Problem;
 import org.zalando.problem.Status;
 
@@ -33,16 +39,21 @@ public class MessageService {
 		return toMessageDTOs(repository.findAllByFamilyId(familyId));
 	}
 
-	public String getAttachment(final int attachmentId) {
-		return attachmentRepository.findById(attachmentId).map(messageAttachmentEntity -> {
-			try {
-				final var file = messageAttachmentEntity.getFile();
-				return Base64.toBase64String(file.getBytes(1, (int) file.length()));
-			} catch (final Exception e) {
-				log.error("Could not fetch attachment: {}", e.getMessage());
-				throw Problem.valueOf(Status.INTERNAL_SERVER_ERROR, "Could not fetch attachment");
-			}
-		}).orElseThrow(() -> Problem.valueOf(Status.NOT_FOUND, "Attachment not found"));
+	public void getMessageAttachmentStreamed(final int attachmentID, final HttpServletResponse response) {
+		try {
+			final var attachmentEntity = attachmentRepository
+				.findById(attachmentID)
+				.orElseThrow(() -> Problem.valueOf(Status.NOT_FOUND, "MessageAttachment not found"));
+
+			final var file = attachmentEntity.getFile();
+
+			response.addHeader(CONTENT_TYPE, attachmentEntity.getMimeType());
+			response.addHeader(CONTENT_DISPOSITION, "attachment; filename=\"" + attachmentEntity.getName() + "\"");
+			response.setContentLength((int) file.length());
+			StreamUtils.copy(file.getBinaryStream(), response.getOutputStream());
+		} catch (final IOException | SQLException e) {
+			throw Problem.valueOf(Status.INTERNAL_SERVER_ERROR, "%s occurred when copying file with attachment id '%s' to response: %s".formatted(e.getClass().getSimpleName(), attachmentID, e.getMessage()));
+		}
 	}
 
 	public void deleteAttachment(final int id) {

@@ -33,19 +33,25 @@ class MessageAttachmentEntityTest {
 	void builder() throws SQLException {
 		// Arrange
 		final var attachmentId = 1;
-		final var fileName = "fileName";
+		final var name = "fileName";
 		final var file = new SerialBlob(new byte[0]);
+		final var mimeType = "text/plain";
+		final var extension = "txt";
 		// Act
 		final var result = MessageAttachmentEntity.builder()
 			.withFile(file)
 			.withAttachmentId(attachmentId)
-			.withFileName(fileName)
+			.withName(name)
+			.withMimeType(mimeType)
+			.withExtension(extension)
 			.build();
 		// Assert
 		assertThat(result).isNotNull().hasNoNullFieldsOrProperties();
 		assertThat(result.getAttachmentId()).isEqualTo(attachmentId);
-		assertThat(result.getFileName()).isEqualTo(fileName);
-		assertThat(result.getFile()).isEqualTo(file);
+		assertThat(result.getName()).isEqualTo(name);
+		assertThat(result.getFile()).isSameAs(file);
+		assertThat(result.getExtension()).isEqualTo(extension);
+		assertThat(result.getMimeType()).isEqualTo(mimeType);
 	}
 
 	@Test

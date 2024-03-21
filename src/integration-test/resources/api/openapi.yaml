@@ -7,7 +7,7 @@ info:
     url: https://opensource.org/licenses/MIT
   version: "3.0"
 servers:
-  - url: http://localhost:60183
+  - url: http://localhost:50331
     description: Generated server url
 tags:
   - name: messages
@@ -29,6 +29,20 @@ paths:
             type: string
           example: 123
       responses:
+        "400":
+          description: Bad request
+          content:
+            application/problem+json:
+              schema:
+                oneOf:
+                  - $ref: '#/components/schemas/Problem'
+                  - $ref: '#/components/schemas/ConstraintViolationProblem'
+        "404":
+          description: Not found
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
         "500":
           description: Internal Server error
           content:
@@ -43,20 +57,6 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/MessageDTO'
-        "404":
-          description: Not found
-          content:
-            application/problem+json:
-              schema:
-                $ref: '#/components/schemas/Problem'
-        "400":
-          description: Bad request
-          content:
-            application/problem+json:
-              schema:
-                oneOf:
-                  - $ref: '#/components/schemas/Problem'
-                  - $ref: '#/components/schemas/ConstraintViolationProblem'
     delete:
       tags:
         - messages
@@ -73,20 +73,6 @@ paths:
                 format: int32
         required: true
       responses:
-        "500":
-          description: Internal Server error
-          content:
-            application/problem+json:
-              schema:
-                $ref: '#/components/schemas/Problem'
-        "204":
-          description: No Content
-        "404":
-          description: Not found
-          content:
-            application/problem+json:
-              schema:
-                $ref: '#/components/schemas/Problem'
         "400":
           description: Bad request
           content:
@@ -95,13 +81,26 @@ paths:
                 oneOf:
                   - $ref: '#/components/schemas/Problem'
                   - $ref: '#/components/schemas/ConstraintViolationProblem'
+        "404":
+          description: Not found
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        "500":
+          description: Internal Server error
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        "204":
+          description: No Content
   /messages/attachments/{attachmentId}:
     get:
       tags:
         - messages
       summary: Get a messageAttachment
-      description: Returns a messageAttachment as a BASE64 string for the specified
-        attachmentId
+      description: Returns a messageAttachment as a stream for the specified attachmentId
       operationId: getAttachment
       parameters:
         - name: attachmentId
@@ -113,24 +112,6 @@ paths:
             format: int32
           example: 123
       responses:
-        "500":
-          description: Internal Server error
-          content:
-            application/problem+json:
-              schema:
-                $ref: '#/components/schemas/Problem'
-        "200":
-          description: Successful Operation
-          content:
-            text/plain:
-              schema:
-                type: string
-        "404":
-          description: Not found
-          content:
-            application/problem+json:
-              schema:
-                $ref: '#/components/schemas/Problem'
         "400":
           description: Bad request
           content:
@@ -139,6 +120,20 @@ paths:
                 oneOf:
                   - $ref: '#/components/schemas/Problem'
                   - $ref: '#/components/schemas/ConstraintViolationProblem'
+        "404":
+          description: Not found
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        "500":
+          description: Internal Server error
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        "200":
+          description: Successful Operation
     delete:
       tags:
         - messages
@@ -155,20 +150,6 @@ paths:
             format: int32
           example: 123
       responses:
-        "500":
-          description: Internal Server error
-          content:
-            application/problem+json:
-              schema:
-                $ref: '#/components/schemas/Problem'
-        "204":
-          description: No Content
-        "404":
-          description: Not found
-          content:
-            application/problem+json:
-              schema:
-                $ref: '#/components/schemas/Problem'
         "400":
           description: Bad request
           content:
@@ -177,6 +158,20 @@ paths:
                 oneOf:
                   - $ref: '#/components/schemas/Problem'
                   - $ref: '#/components/schemas/ConstraintViolationProblem'
+        "404":
+          description: Not found
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        "500":
+          description: Internal Server error
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        "204":
+          description: No Content
   /api-docs:
     get:
       tags:
@@ -208,20 +203,20 @@ components:
           type: object
           additionalProperties:
             type: object
-        status:
-          $ref: '#/components/schemas/StatusType'
         title:
           type: string
         detail:
           type: string
+        status:
+          $ref: '#/components/schemas/StatusType'
     StatusType:
       type: object
       properties:
-        reasonPhrase:
-          type: string
         statusCode:
           type: integer
           format: int32
+        reasonPhrase:
+          type: string
     ConstraintViolationProblem:
       type: object
       properties:
@@ -343,12 +338,12 @@ components:
           type: object
           additionalProperties:
             type: object
-        status:
-          $ref: '#/components/schemas/StatusType'
         title:
           type: string
         detail:
           type: string
+        status:
+          $ref: '#/components/schemas/StatusType'
         suppressed:
           type: array
           items:
@@ -397,14 +392,18 @@ components:
           description: The Id for the attachment
           format: int32
           example: 1
-        fileName:
+        name:
           type: string
           description: The name of the file
           example: file.txt
-        file:
+        extension:
           type: string
-          description: The file as a base64 encoded string
-          example: dGhpcyBpcyBhIGJhc2U2NCBlbmNvZGVkIHN0cmluZw==
+          description: The extension of the file
+          example: txt
+        mimeType:
+          type: string
+          description: The mime type of the file
+          example: text/plain
       description: List of attachments for the message
       example: "attachment1, attachment2"
     MessageDTO:

@@ -1,5 +1,10 @@
 package apptest;
 
+import static org.springframework.http.HttpHeaders.CONTENT_TYPE;
+import static org.springframework.http.HttpStatus.OK;
+import static org.springframework.http.MediaType.IMAGE_PNG_VALUE;
+
+import java.io.IOException;
 import java.util.List;
 
 import com.google.gson.Gson;
@@ -40,12 +45,13 @@ class MessagingIT extends AbstractAppTest {
 	}
 
 	@Test
-	void test3_getAttachment() {
+	void test3_getAttachment() throws IOException {
 		setupCall()
 			.withServicePath("/messages/attachments/1")
 			.withHttpMethod(HttpMethod.GET)
-			.withExpectedResponseStatus(HttpStatus.OK)
-			.withExpectedResponse("SGVsbG8gV29ybGQ=")
+			.withExpectedResponseStatus(OK)
+			.withExpectedResponseHeader(CONTENT_TYPE, List.of(IMAGE_PNG_VALUE))
+			.withExpectedBinaryResponse("test_image.png")
 			.sendRequestAndVerifyResponse();
 	}
 

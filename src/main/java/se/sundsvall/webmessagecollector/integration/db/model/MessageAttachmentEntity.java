@@ -25,7 +25,11 @@ public class MessageAttachmentEntity {
 	@Id
 	private Integer attachmentId;
 
-	private String fileName;
+	private String name;
+
+	private String extension;
+
+	private String mimeType;
 
 	@Lob
 	@Column(columnDefinition = "longblob")
