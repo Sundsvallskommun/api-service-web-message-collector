@@ -56,7 +56,7 @@ public class MessageCacheService {
 
 		final var bytes = openEClient.getMessages(familyId, fromTimestamp, "");
 		final var messages = toMessageEntities(bytes, familyId);
-		messageRepository.saveAll(messages);
+		messageRepository.saveAllAndFlush(messages);
 
 		executionInformationRepository.save(executionInfo);
 		return messages;
@@ -68,7 +68,7 @@ public class MessageCacheService {
 			final var attachmentStream = openEClient.getAttachment(attachmentEntity.getAttachmentId());
 			if (attachmentStream != null) {
 				attachmentEntity.setFile(new SerialBlob(attachmentStream));
-				messageAttachmentRepository.save(attachmentEntity);
+				messageAttachmentRepository.saveAndFlush(attachmentEntity);
 			}
 		} catch (final SQLException e) {
 			LOG.error("Unable to fetch Attachment ", e);

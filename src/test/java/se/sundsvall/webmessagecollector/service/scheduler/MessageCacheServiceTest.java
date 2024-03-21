@@ -99,7 +99,7 @@ class MessageCacheServiceTest {
 
 		// Assert and verify
 		verify(openEClientMock).getMessages(familyId, lastExecuted.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm")), "");
-		verify(messageRepositoryMock).saveAll(messageEntityCaptor.capture());
+		verify(messageRepositoryMock).saveAllAndFlush(messageEntityCaptor.capture());
 		verify(executionInformationRepositoryMock).save(executionInformationEntityCaptor.capture());
 		assertThat(messageEntityCaptor.getValue().getFirst()).satisfies(entity -> {
 			assertThat(entity.getDirection()).isEqualTo(Direction.INBOUND);
@@ -139,7 +139,7 @@ class MessageCacheServiceTest {
 
 		// Assert and verify
 		verify(openEClientMock).getMessages(eq(familyId), fromTimeStampCaptor.capture(), eq(""));
-		verify(messageRepositoryMock).saveAll(messageEntityCaptor.capture());
+		verify(messageRepositoryMock).saveAllAndFlush(messageEntityCaptor.capture());
 		verify(executionInformationRepositoryMock).save(executionInformationEntityCaptor.capture());
 		assertThat(LocalDateTime.parse(fromTimeStampCaptor.getValue(), DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm")))
 			.isCloseTo(LocalDateTime.now().minusHours(1), within(1, MINUTES));
@@ -181,7 +181,7 @@ class MessageCacheServiceTest {
 
 		// Assert
 		verify(openEClientMock).getAttachment(123);
-		verify(messageAttachmentRepositoryMock).save(messageAttachmentEntityCaptor.capture());
+		verify(messageAttachmentRepositoryMock).saveAndFlush(messageAttachmentEntityCaptor.capture());
 		assertThat(messageAttachmentEntityCaptor.getValue()).satisfies(entity -> {
 			assertThat(entity.getAttachmentId()).isEqualTo(123);
 			assertThat(entity.getFile()).isEqualTo(new SerialBlob(attachment));
