@@ -5,9 +5,9 @@ info:
   license:
     name: MIT License
     url: https://opensource.org/licenses/MIT
-  version: "2.0"
+  version: "3.0"
 servers:
-  - url: http://localhost:57161
+  - url: http://localhost:60183
     description: Generated server url
 tags:
   - name: messages
@@ -29,14 +29,22 @@ paths:
             type: string
           example: 123
       responses:
-        "404":
-          description: Not found
+        "500":
+          description: Internal Server error
           content:
             application/problem+json:
               schema:
                 $ref: '#/components/schemas/Problem'
-        "500":
-          description: Internal Server error
+        "200":
+          description: Successful Operation
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/MessageDTO'
+        "404":
+          description: Not found
           content:
             application/problem+json:
               schema:
@@ -49,14 +57,6 @@ paths:
                 oneOf:
                   - $ref: '#/components/schemas/Problem'
                   - $ref: '#/components/schemas/ConstraintViolationProblem'
-        "200":
-          description: Successful Operation
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/MessageDTO'
     delete:
       tags:
         - messages
@@ -73,12 +73,6 @@ paths:
                 format: int32
         required: true
       responses:
-        "404":
-          description: Not found
-          content:
-            application/problem+json:
-              schema:
-                $ref: '#/components/schemas/Problem'
         "500":
           description: Internal Server error
           content:
@@ -87,6 +81,12 @@ paths:
                 $ref: '#/components/schemas/Problem'
         "204":
           description: No Content
+        "404":
+          description: Not found
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
         "400":
           description: Bad request
           content:
@@ -100,7 +100,8 @@ paths:
       tags:
         - messages
       summary: Get a messageAttachment
-      description: Returns a messageAttachment for the specified messageId
+      description: Returns a messageAttachment as a BASE64 string for the specified
+        attachmentId
       operationId: getAttachment
       parameters:
         - name: attachmentId
@@ -112,14 +113,20 @@ paths:
             format: int32
           example: 123
       responses:
-        "404":
-          description: Not found
+        "500":
+          description: Internal Server error
           content:
             application/problem+json:
               schema:
                 $ref: '#/components/schemas/Problem'
-        "500":
-          description: Internal Server error
+        "200":
+          description: Successful Operation
+          content:
+            text/plain:
+              schema:
+                type: string
+        "404":
+          description: Not found
           content:
             application/problem+json:
               schema:
@@ -132,12 +139,6 @@ paths:
                 oneOf:
                   - $ref: '#/components/schemas/Problem'
                   - $ref: '#/components/schemas/ConstraintViolationProblem'
-        "200":
-          description: Successful Operation
-          content:
-            text/plain:
-              schema:
-                type: string
     delete:
       tags:
         - messages
@@ -154,12 +155,6 @@ paths:
             format: int32
           example: 123
       responses:
-        "404":
-          description: Not found
-          content:
-            application/problem+json:
-              schema:
-                $ref: '#/components/schemas/Problem'
         "500":
           description: Internal Server error
           content:
@@ -168,6 +163,12 @@ paths:
                 $ref: '#/components/schemas/Problem'
         "204":
           description: No Content
+        "404":
+          description: Not found
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
         "400":
           description: Bad request
           content:
