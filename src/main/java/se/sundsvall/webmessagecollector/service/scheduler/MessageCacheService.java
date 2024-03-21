@@ -1,12 +1,11 @@
 package se.sundsvall.webmessagecollector.service.scheduler;
 
-import static java.util.Collections.emptyList;
 import static se.sundsvall.webmessagecollector.integration.opene.OpenEMapper.toMessageEntities;
 
 import java.sql.SQLException;
 import java.time.OffsetDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.Optional;
+import java.util.List;
 
 import javax.sql.rowset.serial.SerialBlob;
 
@@ -16,6 +15,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 import se.sundsvall.webmessagecollector.integration.db.ExecutionInformationRepository;
+import se.sundsvall.webmessagecollector.integration.db.MessageAttachmentRepository;
 import se.sundsvall.webmessagecollector.integration.db.MessageRepository;
 import se.sundsvall.webmessagecollector.integration.db.model.ExecutionInformationEntity;
 import se.sundsvall.webmessagecollector.integration.db.model.MessageAttachmentEntity;
@@ -34,16 +34,19 @@ public class MessageCacheService {
 
 	private final MessageRepository messageRepository;
 
+	private final MessageAttachmentRepository messageAttachmentRepository;
+
 	private final ExecutionInformationRepository executionInformationRepository;
 
-	MessageCacheService(final OpenEClient openEClient, final MessageRepository messageRepository, final ExecutionInformationRepository executionInformationRepository) {
+	MessageCacheService(final OpenEClient openEClient, final MessageRepository messageRepository, final MessageAttachmentRepository messageAttachmentRepository, final ExecutionInformationRepository executionInformationRepository) {
 		this.openEClient = openEClient;
 		this.messageRepository = messageRepository;
+		this.messageAttachmentRepository = messageAttachmentRepository;
 		this.executionInformationRepository = executionInformationRepository;
 	}
 
 	@Transactional
-	public void fetchMessages(final String familyId) {
+	public List<MessageEntity> fetchMessages(final String familyId) {
 		// Fetch info regarding last execution for fetching familyId (or initiate entity if no info exists)
 		final var executionInfo = executionInformationRepository.findById(familyId).orElse(initiateExecutionInfo(familyId));
 		// Calculate timestamp from when messages should be fetched
@@ -53,23 +56,22 @@ public class MessageCacheService {
 
 		final var bytes = openEClient.getMessages(familyId, fromTimestamp, "");
 		final var messages = toMessageEntities(bytes, familyId);
+		messageRepository.saveAll(messages);
 
-		messages.forEach(messageEntity -> {
-			Optional.ofNullable(messageEntity.getAttachments()).orElse(emptyList()).forEach(attachmentEntity -> fetchAttachment(messageEntity, attachmentEntity));
-			messageRepository.save(messageEntity);
-		});
 		executionInformationRepository.save(executionInfo);
+		return messages;
 	}
 
-	private void fetchAttachment(final MessageEntity messageEntity, final MessageAttachmentEntity attachmentEntity) {
-		final var attachment = openEClient.getAttachment(attachmentEntity.getAttachmentId());
-
+	@Transactional
+	public void fetchAttachment(final MessageAttachmentEntity attachmentEntity) {
 		try {
-			if (attachment != null && attachment.length > 0) {
-				attachmentEntity.setFile(new SerialBlob(attachment));
+			final var attachmentStream = openEClient.getAttachment(attachmentEntity.getAttachmentId());
+			if (attachmentStream != null) {
+				attachmentEntity.setFile(new SerialBlob(attachmentStream));
+				messageAttachmentRepository.save(attachmentEntity);
 			}
 		} catch (final SQLException e) {
-			LOG.error("Unable to set attachment for message with id {}", messageEntity.getId(), e);
+			LOG.error("Unable to fetch Attachment ", e);
 		}
 	}
 
