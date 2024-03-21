@@ -10,6 +10,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.CoreMatchers.allOf;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Random;
 
 import org.hamcrest.MatcherAssert;
@@ -19,7 +20,7 @@ import org.junit.jupiter.api.Test;
 import se.sundsvall.webmessagecollector.api.model.Direction;
 
 class MessageEntityTest {
-	
+
 	@BeforeAll
 	static void setup() {
 		registerValueGenerator(() -> LocalDateTime.now().plusDays((new Random().nextInt())), LocalDateTime.class);
@@ -49,6 +50,7 @@ class MessageEntityTest {
 		final var sent = LocalDateTime.now();
 		final var userId = "userId";
 		final var username = "username";
+		final var attachments = List.of(MessageAttachmentEntity.builder().build());
 
 		final var bean = MessageEntity.builder()
 			.withDirection(direction)
@@ -63,6 +65,7 @@ class MessageEntityTest {
 			.withSent(sent)
 			.withUserId(userId)
 			.withUsername(username)
+			.withAttachments(attachments)
 			.build();
 
 		assertThat(bean.getDirection()).isEqualTo(direction);
@@ -77,5 +80,7 @@ class MessageEntityTest {
 		assertThat(bean.getSent()).isEqualTo(sent);
 		assertThat(bean.getUserId()).isEqualTo(userId);
 		assertThat(bean.getUsername()).isEqualTo(username);
+		assertThat(bean.getAttachments()).isEqualTo(attachments);
 	}
+
 }

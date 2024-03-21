@@ -1,3 +1,4 @@
+
     create table execution_information (
         last_successful_execution datetime(6),
         family_id varchar(255) not null,
@@ -18,4 +19,11 @@
         username varchar(255),
         direction enum ('INBOUND','OUTBOUND'),
         primary key (id)
+    ) engine=InnoDB;
+
+    create table message_attachment (
+        attachment_id integer not null,
+        file_name varchar(255),
+        file longblob,
+        primary key (attachment_id)
     ) engine=InnoDB;

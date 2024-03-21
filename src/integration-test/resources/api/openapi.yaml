@@ -1,13 +1,13 @@
 openapi: 3.0.1
 info:
   title: api-web-message-collector
-  contact: {}
+  contact: { }
   license:
     name: MIT License
     url: https://opensource.org/licenses/MIT
   version: "2.0"
 servers:
-  - url: http://localhost:50563
+  - url: http://localhost:57161
     description: Generated server url
 tags:
   - name: messages
@@ -29,6 +29,18 @@ paths:
             type: string
           example: 123
       responses:
+        "404":
+          description: Not found
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        "500":
+          description: Internal Server error
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
         "400":
           description: Bad request
           content:
@@ -37,26 +49,14 @@ paths:
                 oneOf:
                   - $ref: '#/components/schemas/Problem'
                   - $ref: '#/components/schemas/ConstraintViolationProblem'
-        "500":
-          description: Internal Server error
-          content:
-            application/problem+json:
-              schema:
-                $ref: '#/components/schemas/Problem'
         "200":
           description: Successful Operation
           content:
-            '*/*':
+            application/json:
               schema:
                 type: array
                 items:
                   $ref: '#/components/schemas/MessageDTO'
-        "404":
-          description: Not found
-          content:
-            application/problem+json:
-              schema:
-                $ref: '#/components/schemas/Problem'
     delete:
       tags:
         - messages
@@ -73,6 +73,20 @@ paths:
                 format: int32
         required: true
       responses:
+        "404":
+          description: Not found
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        "500":
+          description: Internal Server error
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        "204":
+          description: No Content
         "400":
           description: Bad request
           content:
@@ -81,20 +95,87 @@ paths:
                 oneOf:
                   - $ref: '#/components/schemas/Problem'
                   - $ref: '#/components/schemas/ConstraintViolationProblem'
-        "500":
-          description: Internal Server error
-          content:
-            application/problem+json:
-              schema:
-                $ref: '#/components/schemas/Problem'
-        "200":
-          description: Successful Operation
+  /messages/attachments/{attachmentId}:
+    get:
+      tags:
+        - messages
+      summary: Get a messageAttachment
+      description: Returns a messageAttachment for the specified messageId
+      operationId: getAttachment
+      parameters:
+        - name: attachmentId
+          in: path
+          description: MessageId to fetch attachment for
+          required: true
+          schema:
+            type: integer
+            format: int32
+          example: 123
+      responses:
         "404":
           description: Not found
           content:
             application/problem+json:
               schema:
                 $ref: '#/components/schemas/Problem'
+        "500":
+          description: Internal Server error
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        "400":
+          description: Bad request
+          content:
+            application/problem+json:
+              schema:
+                oneOf:
+                  - $ref: '#/components/schemas/Problem'
+                  - $ref: '#/components/schemas/ConstraintViolationProblem'
+        "200":
+          description: Successful Operation
+          content:
+            text/plain:
+              schema:
+                type: string
+    delete:
+      tags:
+        - messages
+      summary: Delete a messageAttachment
+      description: Deletes a messageAttachment with the specified id
+      operationId: deleteAttachment
+      parameters:
+        - name: attachmentId
+          in: path
+          description: Id of the attachment to delete
+          required: true
+          schema:
+            type: integer
+            format: int32
+          example: 123
+      responses:
+        "404":
+          description: Not found
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        "500":
+          description: Internal Server error
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        "204":
+          description: No Content
+        "400":
+          description: Bad request
+          content:
+            application/problem+json:
+              schema:
+                oneOf:
+                  - $ref: '#/components/schemas/Problem'
+                  - $ref: '#/components/schemas/ConstraintViolationProblem'
   /api-docs:
     get:
       tags:
@@ -126,20 +207,20 @@ components:
           type: object
           additionalProperties:
             type: object
+        status:
+          $ref: '#/components/schemas/StatusType'
         title:
           type: string
         detail:
           type: string
-        status:
-          $ref: '#/components/schemas/StatusType'
     StatusType:
       type: object
       properties:
+        reasonPhrase:
+          type: string
         statusCode:
           type: integer
           format: int32
-        reasonPhrase:
-          type: string
     ConstraintViolationProblem:
       type: object
       properties:
@@ -261,12 +342,12 @@ components:
           type: object
           additionalProperties:
             type: object
+        status:
+          $ref: '#/components/schemas/StatusType'
         title:
           type: string
         detail:
           type: string
-        status:
-          $ref: '#/components/schemas/StatusType'
         suppressed:
           type: array
           items:
@@ -307,6 +388,24 @@ components:
           type: string
         message:
           type: string
+    MessageAttachment:
+      type: object
+      properties:
+        attachmentId:
+          type: integer
+          description: The Id for the attachment
+          format: int32
+          example: 1
+        fileName:
+          type: string
+          description: The name of the file
+          example: file.txt
+        file:
+          type: string
+          description: The file as a base64 encoded string
+          example: dGhpcyBpcyBhIGJhc2U2NCBlbmNvZGVkIHN0cmluZw==
+      description: List of attachments for the message
+      example: "attachment1, attachment2"
     MessageDTO:
       type: object
       properties:
@@ -365,4 +464,8 @@ components:
           description: 'If the message was utbound from a manager or inbound from
             a customer '
           example: "177"
-  securitySchemes: {}
+        attachments:
+          type: array
+          items:
+            $ref: '#/components/schemas/MessageAttachment'
+  securitySchemes: { }

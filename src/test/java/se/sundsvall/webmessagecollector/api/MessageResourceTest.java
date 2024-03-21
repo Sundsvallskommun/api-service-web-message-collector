@@ -11,6 +11,7 @@ import static org.springframework.http.HttpMethod.DELETE;
 import java.time.OffsetDateTime;
 import java.util.List;
 
+import org.bouncycastle.util.encoders.Base64;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -20,12 +21,14 @@ import org.springframework.test.web.reactive.server.WebTestClient;
 
 import se.sundsvall.webmessagecollector.Application;
 import se.sundsvall.webmessagecollector.api.model.Direction;
+import se.sundsvall.webmessagecollector.api.model.MessageAttachment;
 import se.sundsvall.webmessagecollector.api.model.MessageDTO;
 import se.sundsvall.webmessagecollector.service.MessageService;
 
 @SpringBootTest(classes = Application.class, webEnvironment = RANDOM_PORT)
 @ActiveProfiles("junit")
 class MessageResourceTest {
+
 	private static final String PATH = "/messages";
 
 	@MockBean
@@ -50,11 +53,12 @@ class MessageResourceTest {
 			.withUsername("someUsername")
 			.withEmail("someEmail")
 			.withUserId("someUserid")
+			.withAttachments(List.of(MessageAttachment.builder().build()))
 			.build()));
 
 		// Act
 		final var response = webTestClient.get()
-			.uri(PATH+"?familyid=123")
+			.uri(PATH + "?familyid=123")
 			.exchange()
 			.expectStatus().isOk()
 			.expectBodyList(MessageDTO.class)
@@ -77,11 +81,46 @@ class MessageResourceTest {
 			.uri(PATH)
 			.bodyValue(List.of(1, 2, 3))
 			.exchange()
-			.expectStatus().isOk()
+			.expectStatus().isNoContent()
 			.expectBody().isEmpty();
 
 		// Assert and verify
 		verify(serviceMock).deleteMessages(List.of(1, 2, 3));
 		verifyNoMoreInteractions(serviceMock);
 	}
+
+	@Test
+	void getAttachment() {
+		// Arrange
+		final var attachment = Base64.toBase64String(new byte[]{1, 2, 2, 3});
+		when(serviceMock.getAttachment(1)).thenReturn(attachment);
+
+		// Act
+		final var result = webTestClient.get()
+			.uri(PATH + "/attachments/1")
+			.exchange()
+			.expectStatus().isOk()
+			.expectBody(String.class)
+			.returnResult().getResponseBody();
+
+		// Assert and verify
+		assertThat(result).isNotNull().isEqualTo(attachment);
+		verify(serviceMock).getAttachment(1);
+		verifyNoMoreInteractions(serviceMock);
+	}
+
+	@Test
+	void deleteAttachment() {
+		// Act
+		webTestClient.method(DELETE)
+			.uri(PATH + "/attachments/1")
+			.exchange()
+			.expectStatus().isNoContent()
+			.expectBody().isEmpty();
+
+		// Assert and verify
+		verify(serviceMock).deleteAttachment(1);
+		verifyNoMoreInteractions(serviceMock);
+	}
+
 }

@@ -10,12 +10,12 @@ import java.time.format.DateTimeFormatterBuilder;
 import java.time.temporal.ChronoField;
 import java.util.List;
 
+import com.fasterxml.jackson.dataformat.xml.XmlMapper;
 import org.zalando.problem.Problem;
 import org.zalando.problem.Status;
 
-import com.fasterxml.jackson.dataformat.xml.XmlMapper;
-
 import se.sundsvall.webmessagecollector.api.model.Direction;
+import se.sundsvall.webmessagecollector.integration.db.model.MessageAttachmentEntity;
 import se.sundsvall.webmessagecollector.integration.db.model.MessageEntity;
 import se.sundsvall.webmessagecollector.integration.opene.model.ExternalMessage;
 import se.sundsvall.webmessagecollector.integration.opene.model.Messages;
@@ -54,7 +54,7 @@ public final class OpenEMapper {
 		}
 	}
 
-	private static MessageEntity toMessageEntity(final String familyId, ExternalMessage externalMessage) {
+	private static MessageEntity toMessageEntity(final String familyId, final ExternalMessage externalMessage) {
 		final var entity = MessageEntity.builder()
 			.withFamilyId(familyId)
 			.withDirection(externalMessage.isPostedByManager() ? Direction.OUTBOUND : Direction.INBOUND)
@@ -63,14 +63,22 @@ public final class OpenEMapper {
 			.withMessage(externalMessage.getMessage())
 			.withSent(LocalDateTime.parse(externalMessage.getAdded(), formatter));
 
-		ofNullable(externalMessage.getPoster()).ifPresent(poster -> {
-			entity.withEmail(poster.getEmail())
-				.withFirstName(poster.getFirstname())
-				.withLastName(poster.getLastname())
-				.withUsername(poster.getUsername())
-				.withUserId(String.valueOf(poster.getUserID()));
-		});
+		ofNullable(externalMessage.getPoster()).ifPresent(poster -> entity
+			.withEmail(poster.getEmail())
+			.withFirstName(poster.getFirstname())
+			.withLastName(poster.getLastname())
+			.withUsername(poster.getUsername())
+			.withUserId(String.valueOf(poster.getUserID())));
+
+		ofNullable(externalMessage.getAttachments()).ifPresent(attachments -> entity
+			.withAttachments(attachments.stream()
+				.map(attachment -> MessageAttachmentEntity.builder()
+					.withAttachmentId(attachment.getAttachmentID())
+					.withFileName(attachment.getFileName())
+					.build())
+				.toList()));
 
 		return entity.build();
 	}
+
 }

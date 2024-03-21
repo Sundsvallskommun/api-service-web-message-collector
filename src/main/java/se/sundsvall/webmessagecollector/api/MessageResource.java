@@ -1,12 +1,15 @@
 package se.sundsvall.webmessagecollector.api;
 
+import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static org.springframework.http.MediaType.APPLICATION_PROBLEM_JSON_VALUE;
+import static org.springframework.http.MediaType.TEXT_PLAIN_VALUE;
 
 import java.util.List;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -27,7 +30,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 @RestController
 @RequestMapping("messages")
 @Tag(name = "messages", description = "Messages")
-@ApiResponse(responseCode = "400", description = "Bad request", content = @Content(mediaType = APPLICATION_PROBLEM_JSON_VALUE, schema = @Schema(oneOf = { Problem.class, ConstraintViolationProblem.class })))
+@ApiResponse(responseCode = "400", description = "Bad request", content = @Content(mediaType = APPLICATION_PROBLEM_JSON_VALUE, schema = @Schema(oneOf = {Problem.class, ConstraintViolationProblem.class})))
 @ApiResponse(responseCode = "404", description = "Not found", content = @Content(mediaType = APPLICATION_PROBLEM_JSON_VALUE, schema = @Schema(implementation = Problem.class)))
 @ApiResponse(responseCode = "500", description = "Internal Server error", content = @Content(mediaType = APPLICATION_PROBLEM_JSON_VALUE, schema = @Schema(implementation = Problem.class)))
 public class MessageResource {
@@ -38,19 +41,38 @@ public class MessageResource {
 		this.service = service;
 	}
 
-	@GetMapping
+	@GetMapping(produces = APPLICATION_JSON_VALUE)
 	@ApiResponse(responseCode = "200", description = "Successful Operation", useReturnTypeSchema = true)
 	@Operation(summary = "Get a list of messages related to a specific familyId", description = "Returns a list of messages found for the specified familyId")
 	public ResponseEntity<List<MessageDTO>> getMessages(
-		@Parameter(name = "familyid", description = "FamilyId to fetch messages for", example = "123", required = true)  @RequestParam("familyid") final String familyId) {
+		@Parameter(name = "familyid", description = "FamilyId to fetch messages for", example = "123", required = true) @RequestParam("familyid") final String familyId) {
 		return ResponseEntity.ok(service.getMessages(familyId));
 	}
 
 	@DeleteMapping
-	@ApiResponse(responseCode = "200", description = "Successful Operation", useReturnTypeSchema = true)
+	@ApiResponse(responseCode = "204", description = "No Content", useReturnTypeSchema = true)
 	@Operation(summary = "Delete a list of messages", description = "Deletes a list of messages with the ids provided")
 	public ResponseEntity<Void> deleteMessages(@RequestBody final List<Integer> ids) {
 		service.deleteMessages(ids);
-		return ResponseEntity.ok().build();
+		return ResponseEntity.noContent().build();
 	}
+
+	@GetMapping(value = "attachments/{attachmentId}", produces = TEXT_PLAIN_VALUE)
+	@ApiResponse(responseCode = "200", description = "Successful Operation", useReturnTypeSchema = true)
+	@Operation(summary = "Get a messageAttachment", description = "Returns a messageAttachment as a BASE64 string for the specified attachmentId")
+	public ResponseEntity<String> getAttachment(
+		@Parameter(name = "attachmentId", description = "MessageId to fetch attachment for", example = "123", required = true) @PathVariable("attachmentId") final int attachmentId) {
+		return ResponseEntity.ok(service.getAttachment(attachmentId));
+	}
+
+	@DeleteMapping("attachments/{attachmentId}")
+	@ApiResponse(responseCode = "204", description = "No Content", useReturnTypeSchema = true)
+	@Operation(summary = "Delete a messageAttachment", description = "Deletes a messageAttachment with the specified id")
+	public ResponseEntity<Void> deleteAttachment(
+		@Parameter(name = "attachmentId", description = "Id of the attachment to delete", example = "123", required = true) @PathVariable("attachmentId") final int attachmentId) {
+		service.deleteAttachment(attachmentId);
+		return ResponseEntity.noContent().build();
+	}
+
+
 }
