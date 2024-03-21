@@ -18,4 +18,8 @@ public interface OpenEClient {
 	byte[] getMessages(@PathVariable(name = "familyId") final String familyId,
 		@RequestParam(name = "fromDate") final String fromDate,
 		@RequestParam(name = "toDate") final String toDate);
+
+	@GetMapping(path = "/api/messageapi/getattachment/{attachmentId}", produces = TEXT_XML_CHARSET_ISO_8859_1)
+	byte[] getAttachment(@PathVariable(name = "attachmentId") final int attachmentId);
+
 }

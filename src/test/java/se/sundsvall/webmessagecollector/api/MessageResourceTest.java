@@ -20,12 +20,14 @@ import org.springframework.test.web.reactive.server.WebTestClient;
 
 import se.sundsvall.webmessagecollector.Application;
 import se.sundsvall.webmessagecollector.api.model.Direction;
+import se.sundsvall.webmessagecollector.api.model.MessageAttachment;
 import se.sundsvall.webmessagecollector.api.model.MessageDTO;
 import se.sundsvall.webmessagecollector.service.MessageService;
 
 @SpringBootTest(classes = Application.class, webEnvironment = RANDOM_PORT)
 @ActiveProfiles("junit")
 class MessageResourceTest {
+
 	private static final String PATH = "/messages";
 
 	@MockBean
@@ -50,11 +52,12 @@ class MessageResourceTest {
 			.withUsername("someUsername")
 			.withEmail("someEmail")
 			.withUserId("someUserid")
+			.withAttachments(List.of(MessageAttachment.builder().build()))
 			.build()));
 
 		// Act
 		final var response = webTestClient.get()
-			.uri(PATH+"?familyid=123")
+			.uri(PATH + "?familyid=123")
 			.exchange()
 			.expectStatus().isOk()
 			.expectBodyList(MessageDTO.class)
@@ -77,11 +80,26 @@ class MessageResourceTest {
 			.uri(PATH)
 			.bodyValue(List.of(1, 2, 3))
 			.exchange()
-			.expectStatus().isOk()
+			.expectStatus().isNoContent()
 			.expectBody().isEmpty();
 
 		// Assert and verify
 		verify(serviceMock).deleteMessages(List.of(1, 2, 3));
 		verifyNoMoreInteractions(serviceMock);
 	}
+
+	@Test
+	void deleteAttachment() {
+		// Act
+		webTestClient.method(DELETE)
+			.uri(PATH + "/attachments/1")
+			.exchange()
+			.expectStatus().isNoContent()
+			.expectBody().isEmpty();
+
+		// Assert and verify
+		verify(serviceMock).deleteAttachment(1);
+		verifyNoMoreInteractions(serviceMock);
+	}
+
 }

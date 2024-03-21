@@ -1,20 +1,25 @@
 package se.sundsvall.webmessagecollector.integration.db.model;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
+
+import se.sundsvall.webmessagecollector.api.model.Direction;
+
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import se.sundsvall.webmessagecollector.api.model.Direction;
 
 @Entity
 @Table(name = "message")
@@ -23,20 +28,35 @@ import se.sundsvall.webmessagecollector.api.model.Direction;
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class MessageEntity {
-    
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer id;
-    @Enumerated(EnumType.STRING)
-    private Direction direction;
-    private String familyId;
-    private String externalCaseId;
-    private String message;
-    private String messageId;
-    private LocalDateTime sent;
-    private String username;
-    private String firstName;
-    private String lastName;
-    private String email;
-    private String userId;
+
+	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	private Integer id;
+
+	@Enumerated(EnumType.STRING)
+	private Direction direction;
+
+	private String familyId;
+
+	private String externalCaseId;
+
+	private String message;
+
+	private String messageId;
+
+	private LocalDateTime sent;
+
+	private String username;
+
+	private String firstName;
+
+	private String lastName;
+
+	private String email;
+
+	private String userId;
+
+	@OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, mappedBy = "attachmentId")
+	private List<MessageAttachmentEntity> attachments;
+
 }

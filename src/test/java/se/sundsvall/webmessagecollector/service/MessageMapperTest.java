@@ -12,23 +12,35 @@ import se.sundsvall.webmessagecollector.api.model.Direction;
 import se.sundsvall.webmessagecollector.integration.db.model.MessageEntity;
 
 class MessageMapperTest {
+
 	private static final Direction DIRECTION = Direction.INBOUND;
+
 	private static final String EMAIL = "email";
+
 	private static final String EXTERNAL_CASE_ID = "externalCaseId";
+
 	private static final String FAMILY_ID = "familyId";
+
 	private static final String FIRST_NAME = "firstName";
+
 	private static final int ID = 558877;
+
 	private static final String LAST_NAME = "lastName";
+
 	private static final String MESSAGE = "message";
+
 	private static final String MESSAGE_ID = "messageId";
+
 	private static final LocalDateTime SENT = LocalDateTime.now();
+
 	private static final String USER_ID = "userId";
+
 	private static final String USERNAME = "username";
 
 	@Test
 	void toDTO() {
 		// Act
-		final var bean = MessageMapper.toDTO(createEntity());
+		final var bean = MessageMapper.toMessageDTO(createEntity());
 
 		// Assert
 		assertThat(bean.getDirection()).isEqualTo(DIRECTION);
@@ -48,7 +60,7 @@ class MessageMapperTest {
 	@Test
 	void toDTOFromNull() {
 		// Act and assert
-		assertThat(MessageMapper.toDTO(null)).isNull();
+		assertThat(MessageMapper.toMessageDTO(null)).isNull();
 	}
 
 	@Test
@@ -58,7 +70,7 @@ class MessageMapperTest {
 		arrayList.addFirst(null);
 
 		// Act
-		final var beans = MessageMapper.toDTOs(arrayList);
+		final var beans = MessageMapper.toMessageDTOs(arrayList);
 
 		// Assert
 		assertThat(beans).isNotNull().hasSize(2).allSatisfy(bean -> {
@@ -80,7 +92,7 @@ class MessageMapperTest {
 	@Test
 	void toDTOsFromNull() {
 		// Act and assert
-		assertThat(MessageMapper.toDTOs(null)).isEmpty();
+		assertThat(MessageMapper.toMessageDTOs(null)).isEmpty();
 	}
 
 	private MessageEntity createEntity() {
@@ -99,4 +111,5 @@ class MessageMapperTest {
 			.withUsername(USERNAME)
 			.build();
 	}
+
 }

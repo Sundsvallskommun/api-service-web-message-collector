@@ -8,39 +8,45 @@ import static com.google.code.beanmatchers.BeanMatchers.hasValidGettersAndSetter
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.CoreMatchers.allOf;
 
-import java.util.List;
-
 import org.hamcrest.MatcherAssert;
 import org.junit.jupiter.api.Test;
 
-class MessagesTest {
+class ExternalMessageAttachmentTest {
 
 	@Test
 	void bean() {
-		MatcherAssert.assertThat(Messages.class, allOf(
+		MatcherAssert.assertThat(ExternalMessageAttachment.class, allOf(
 			hasValidBeanConstructor(),
 			hasValidGettersAndSetters(),
-			hasValidBeanToString(),
 			hasValidBeanHashCode(),
-			hasValidBeanEquals()));
+			hasValidBeanEquals(),
+			hasValidBeanToString()));
 	}
 
 	@Test
 	void gettersAndSetters() {
 		// Arrange
-		final var externalMessages = List.of(new ExternalMessage());
+		final var attachmentID = 123;
+		final var fileName = "someFileName";
 
 		// Act
-		final var messages = new Messages();
-		messages.setExternalMessages(externalMessages);
+		final var externalMessageAttachment = new ExternalMessageAttachment();
+		externalMessageAttachment.setAttachmentID(attachmentID);
+		externalMessageAttachment.setFileName(fileName);
 
 		// Assert
-		assertThat(messages.getExternalMessages()).isSameAs(externalMessages);
+		assertThat(externalMessageAttachment.getAttachmentID()).isEqualTo(attachmentID);
+		assertThat(externalMessageAttachment.getFileName()).isEqualTo(fileName);
 	}
+
 
 	@Test
 	void noDirtOnCreatedBean() {
-		assertThat(new Messages()).hasAllNullFieldsOrProperties();
+		assertThat(new ExternalMessageAttachment()).hasAllNullFieldsOrPropertiesExcept("attachmentID").satisfies(
+			externalMessageAttachment -> {
+				assertThat(externalMessageAttachment.getAttachmentID()).isZero();
+			}
+		);
 	}
 
 }

@@ -14,32 +14,35 @@ import net.javacrumbs.shedlock.spring.annotation.SchedulerLock;
 
 @Component
 class MessageCacheScheduler {
-    
+
 	private static final Logger LOG = LoggerFactory.getLogger(MessageCacheScheduler.class);
 
-    private final MessageCacheProperties messageCacheProperties;
+	private final MessageCacheProperties messageCacheProperties;
+
 	private final MessageCacheService messageCacheService;
-    
-	MessageCacheScheduler(MessageCacheService messageCacheService, MessageCacheProperties messageCacheProperties) {
+
+	MessageCacheScheduler(final MessageCacheService messageCacheService, final MessageCacheProperties messageCacheProperties) {
 		this.messageCacheService = messageCacheService;
-        this.messageCacheProperties = messageCacheProperties;
-    }
-    
+		this.messageCacheProperties = messageCacheProperties;
+	}
+
 	@Scheduled(cron = "${scheduler.cron}")
 	@SchedulerLock(name = "cacheMessages", lockAtMostFor = "${scheduler.lock-at-most-for}")
 	public void cacheMessages() {
 		Arrays.stream(ofNullable(messageCacheProperties.familyId()).orElse("")
-			.split(","))
+				.split(","))
 			.filter(StringUtils::isNotBlank)
 			.map(String::trim)
 			.forEach(this::fetchMessages);
 	}
 
-	private void fetchMessages(String familyId) {
+	private void fetchMessages(final String familyId) {
 		try {
-			messageCacheService.fetchMessages(familyId);
-		} catch (Exception e) {
+			final var messages = messageCacheService.fetchMessages(familyId);
+			messages.forEach(message -> message.getAttachments().forEach(messageCacheService::fetchAttachment));
+		} catch (final Exception e) {
 			LOG.error("Unable to process messages for familyId {}", familyId, e);
 		}
 	}
+
 }

@@ -1,8 +1,12 @@
 package se.sundsvall.webmessagecollector.api.model;
 
-import io.swagger.v3.oas.annotations.media.Schema;
+import java.util.List;
+
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
+
+import io.swagger.v3.oas.annotations.media.ArraySchema;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Builder;
 import lombok.Getter;
 
@@ -47,4 +51,8 @@ public class MessageDTO {
 
 	@Schema(description = "If the message was utbound from a manager or inbound from a customer ", example = "177")
 	private final String userId;
+
+	@ArraySchema(schema = @Schema(description = "List of attachments for the message", example = "attachment1, attachment2"))
+	private final List<MessageAttachment> attachments;
+
 }
