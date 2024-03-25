@@ -58,7 +58,7 @@ public final class OpenEMapper {
 	}
 
 	private static MessageEntity toMessageEntity(final String familyId, final ExternalMessage externalMessage) {
-		final var entity = MessageEntity.builder()
+		final var builder = MessageEntity.builder()
 			.withFamilyId(familyId)
 			.withDirection(externalMessage.isPostedByManager() ? Direction.OUTBOUND : Direction.INBOUND)
 			.withMessageId(String.valueOf(externalMessage.getMessageID()))
@@ -66,27 +66,27 @@ public final class OpenEMapper {
 			.withMessage(externalMessage.getMessage())
 			.withSent(LocalDateTime.parse(externalMessage.getAdded(), formatter));
 
-		ofNullable(externalMessage.getPoster()).ifPresent(poster -> entity
+		ofNullable(externalMessage.getPoster()).ifPresent(poster -> builder
 			.withEmail(poster.getEmail())
 			.withFirstName(poster.getFirstname())
 			.withLastName(poster.getLastname())
 			.withUsername(poster.getUsername())
 			.withUserId(String.valueOf(poster.getUserID())));
 
-		final var builtEntity = entity.build();
+		final var entity = builder.build();
 
-		ofNullable(externalMessage.getAttachments()).ifPresent(attachments -> builtEntity
+		ofNullable(externalMessage.getAttachments()).ifPresent(attachments -> entity
 			.setAttachments(attachments.stream()
 				.map(attachment -> MessageAttachmentEntity.builder()
 					.withAttachmentId(attachment.getAttachmentID())
-					.withMessage(builtEntity)
+					.withMessage(entity)
 					.withName(attachment.getFileName())
 					.withMimeType(getMimeType(attachment.getFileName()))
 					.withExtension(getFileExtension(attachment.getFileName()))
 					.build())
 				.toList()));
 
-		return builtEntity;
+		return entity;
 	}
 
 	private static String getMimeType(final String file) {
