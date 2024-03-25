@@ -56,7 +56,7 @@ public class MessageEntity {
 
 	private String userId;
 
-	@OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, mappedBy = "attachmentId")
+	@OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, mappedBy = "message")
 	private List<MessageAttachmentEntity> attachments;
 
 }

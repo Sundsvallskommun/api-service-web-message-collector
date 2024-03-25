@@ -37,6 +37,7 @@ class MessageAttachmentEntityTest {
 		final var file = new SerialBlob(new byte[0]);
 		final var mimeType = "text/plain";
 		final var extension = "txt";
+		final var message = new MessageEntity();
 		// Act
 		final var result = MessageAttachmentEntity.builder()
 			.withFile(file)
@@ -44,6 +45,7 @@ class MessageAttachmentEntityTest {
 			.withName(name)
 			.withMimeType(mimeType)
 			.withExtension(extension)
+			.withMessage(message)
 			.build();
 		// Assert
 		assertThat(result).isNotNull().hasNoNullFieldsOrProperties();
@@ -52,6 +54,7 @@ class MessageAttachmentEntityTest {
 		assertThat(result.getFile()).isSameAs(file);
 		assertThat(result.getExtension()).isEqualTo(extension);
 		assertThat(result.getMimeType()).isEqualTo(mimeType);
+		assertThat(result.getMessage()).isSameAs(message);
 	}
 
 	@Test
