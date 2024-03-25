@@ -1,49 +1,58 @@
 <?xml version="1.0" encoding="ISO-8859-1" standalone="no"?>
 <Messages>
-    <ExternalMessage>
-        <postedByManager>false</postedByManager>
-        <systemMessage>false</systemMessage>
-        <readReceiptEnabled>false</readReceiptEnabled>
-        <messageID>10</messageID>
-        <message>Inbound message</message>
-        <poster>
-            <userID>1</userID>
-            <username>userName_1</username>
-            <firstname>firstName_1</firstname>
-            <lastname>lastName_1</lastname>
-            <email>email_1@test.se</email>
-            <admin>false</admin>
-            <enabled>true</enabled>
-            <lastLogin>2023-02-03 11:10</lastLogin>
-            <lastLoginInMilliseconds>1675419056000</lastLoginInMilliseconds>
-            <added>2016-09-16 01:03</added>
-            <isMutable>true</isMutable>
-            <hasFormProvider>true</hasFormProvider>
-        </poster>
-        <added>2022-05-25 11:20</added>
-        <flowInstanceID>102251</flowInstanceID>
-    </ExternalMessage>
-    <ExternalMessage>
-        <postedByManager>true</postedByManager>
-        <systemMessage>false</systemMessage>
-        <readReceiptEnabled>false</readReceiptEnabled>
-        <messageID>11</messageID>
-        <message>Outbound message</message>
-        <poster>
-            <userID>2</userID>
-            <username>userName_2</username>
-            <firstname>firstName_2</firstname>
-            <lastname>lastName_2</lastname>
-            <email>email_2@test.se</email>
-            <admin>true</admin>
-            <enabled>true</enabled>
-            <lastLogin>2023-02-03 11:10</lastLogin>
-            <lastLoginInMilliseconds>1675419056000</lastLoginInMilliseconds>
-            <added>2016-09-16 01:03</added>
-            <isMutable>true</isMutable>
-            <hasFormProvider>true</hasFormProvider>
-        </poster>
-        <added>2022-05-25 11:20</added>
-        <flowInstanceID>102251</flowInstanceID>
-    </ExternalMessage>
+	<ExternalMessage>
+		<postedByManager>false</postedByManager>
+		<systemMessage>false</systemMessage>
+		<readReceiptEnabled>false</readReceiptEnabled>
+		<messageID>10</messageID>
+		<message>Inbound message</message>
+		<attachments>
+			<ExternalMessageAttachment>
+				<attachmentID>164</attachmentID>
+				<filename>test.pdf</filename>
+				<size>489831</size>
+				<added>2024-03-25 13:16</added>
+				<FormatedSize>478 KB</FormatedSize>
+			</ExternalMessageAttachment>
+		</attachments>
+		<poster>
+			<userID>1</userID>
+			<username>userName_1</username>
+			<firstname>firstName_1</firstname>
+			<lastname>lastName_1</lastname>
+			<email>email_1@test.se</email>
+			<admin>false</admin>
+			<enabled>true</enabled>
+			<lastLogin>2023-02-03 11:10</lastLogin>
+			<lastLoginInMilliseconds>1675419056000</lastLoginInMilliseconds>
+			<added>2016-09-16 01:03</added>
+			<isMutable>true</isMutable>
+			<hasFormProvider>true</hasFormProvider>
+		</poster>
+		<added>2022-05-25 11:20</added>
+		<flowInstanceID>102251</flowInstanceID>
+	</ExternalMessage>
+	<ExternalMessage>
+		<postedByManager>true</postedByManager>
+		<systemMessage>false</systemMessage>
+		<readReceiptEnabled>false</readReceiptEnabled>
+		<messageID>11</messageID>
+		<message>Outbound message</message>
+		<poster>
+			<userID>2</userID>
+			<username>userName_2</username>
+			<firstname>firstName_2</firstname>
+			<lastname>lastName_2</lastname>
+			<email>email_2@test.se</email>
+			<admin>true</admin>
+			<enabled>true</enabled>
+			<lastLogin>2023-02-03 11:10</lastLogin>
+			<lastLoginInMilliseconds>1675419056000</lastLoginInMilliseconds>
+			<added>2016-09-16 01:03</added>
+			<isMutable>true</isMutable>
+			<hasFormProvider>true</hasFormProvider>
+		</poster>
+		<added>2022-05-25 11:20</added>
+		<flowInstanceID>102251</flowInstanceID>
+	</ExternalMessage>
 </Messages>

@@ -118,6 +118,8 @@ class MessageCacheServiceTest {
 			assertThat(entity.getAttachments().getFirst().getAttachmentId()).isEqualTo(123);
 			assertThat(entity.getAttachments().getFirst().getName()).isEqualTo("someFile.pdf");
 			assertThat(entity.getAttachments().getFirst().getMimeType()).isEqualTo("application/pdf");
+			assertThat(entity.getAttachments().getFirst().getExtension()).isEqualTo("pdf");
+			assertThat(entity.getAttachments().getFirst().getMessage()).isEqualTo(entity);
 			assertThat(entity.getAttachments().getFirst().getFile()).isNull();
 		});
 		assertThat(executionInformationEntityCaptor.getValue()).satisfies(entity -> {
@@ -167,7 +169,9 @@ class MessageCacheServiceTest {
 	@Test
 	void fetchAttachment() {
 		// Arrange
+		final var message = MessageEntity.builder().build();
 		final var attachmentEntity = MessageAttachmentEntity.builder()
+			.withMessage(message)
 			.withExtension("pdf")
 			.withAttachmentId(123)
 			.withMimeType("application/pdf")
@@ -188,6 +192,7 @@ class MessageCacheServiceTest {
 			assertThat(entity.getMimeType()).isEqualTo("application/pdf");
 			assertThat(entity.getName()).isEqualTo("someFile.pdf");
 			assertThat(entity.getExtension()).isEqualTo("pdf");
+			assertThat(entity.getMessage()).isEqualTo(message);
 		});
 	}
 
@@ -195,7 +200,7 @@ class MessageCacheServiceTest {
 	void fetchAttachmentWhenAttachmentIsNull() {
 		// Arrange
 		final var attachmentId = 123;
-
+		final var message = MessageEntity.builder().build();
 		final var attachmentEntity = MessageAttachmentEntity.builder()
 			.withExtension("pdf")
 			.withAttachmentId(attachmentId)

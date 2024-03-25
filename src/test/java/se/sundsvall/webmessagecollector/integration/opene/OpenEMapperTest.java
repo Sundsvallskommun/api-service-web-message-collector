@@ -69,6 +69,14 @@ class OpenEMapperTest {
 				assertThat(entity.getSent()).isEqualTo(LocalDateTime.of(2022, 5, 25, 11, 20));
 				assertThat(entity.getUserId()).isEqualTo("1");
 				assertThat(entity.getUsername()).isEqualTo("userName_1");
+				assertThat(entity.getAttachments()).hasSize(1)
+					.allSatisfy(attachment -> {
+						assertThat(attachment.getAttachmentId()).isEqualTo(164);
+						assertThat(attachment.getName()).isEqualTo("test.pdf");
+						assertThat(attachment.getExtension()).isEqualTo("pdf");
+						assertThat(attachment.getMimeType()).isEqualTo("application/pdf");
+					});
 			});
 	}
+
 }

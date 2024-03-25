@@ -73,17 +73,20 @@ public final class OpenEMapper {
 			.withUsername(poster.getUsername())
 			.withUserId(String.valueOf(poster.getUserID())));
 
-		ofNullable(externalMessage.getAttachments()).ifPresent(attachments -> entity
-			.withAttachments(attachments.stream()
+		final var builtEntity = entity.build();
+
+		ofNullable(externalMessage.getAttachments()).ifPresent(attachments -> builtEntity
+			.setAttachments(attachments.stream()
 				.map(attachment -> MessageAttachmentEntity.builder()
 					.withAttachmentId(attachment.getAttachmentID())
+					.withMessage(builtEntity)
 					.withName(attachment.getFileName())
 					.withMimeType(getMimeType(attachment.getFileName()))
 					.withExtension(getFileExtension(attachment.getFileName()))
 					.build())
 				.toList()));
 
-		return entity.build();
+		return builtEntity;
 	}
 
 	private static String getMimeType(final String file) {
