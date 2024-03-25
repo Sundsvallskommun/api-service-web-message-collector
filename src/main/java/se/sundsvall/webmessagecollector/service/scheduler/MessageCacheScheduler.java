@@ -3,6 +3,8 @@ package se.sundsvall.webmessagecollector.service.scheduler;
 import static java.util.Optional.ofNullable;
 
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.Optional;
 
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -29,6 +31,7 @@ class MessageCacheScheduler {
 	@Scheduled(cron = "${scheduler.cron}")
 	@SchedulerLock(name = "cacheMessages", lockAtMostFor = "${scheduler.lock-at-most-for}")
 	public void cacheMessages() {
+		LOG.info("Caching messages");
 		Arrays.stream(ofNullable(messageCacheProperties.familyId()).orElse("")
 				.split(","))
 			.filter(StringUtils::isNotBlank)
@@ -39,7 +42,9 @@ class MessageCacheScheduler {
 	private void fetchMessages(final String familyId) {
 		try {
 			final var messages = messageCacheService.fetchMessages(familyId);
-			messages.forEach(message -> message.getAttachments().forEach(messageCacheService::fetchAttachment));
+			messages.forEach(message -> Optional.ofNullable(message.getAttachments())
+				.orElse(Collections.emptyList())
+				.forEach(messageCacheService::fetchAttachment));
 		} catch (final Exception e) {
 			LOG.error("Unable to process messages for familyId {}", familyId, e);
 		}
