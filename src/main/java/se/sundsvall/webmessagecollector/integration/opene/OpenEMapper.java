@@ -4,9 +4,12 @@ import static java.util.Collections.emptyList;
 import static java.util.Optional.ofNullable;
 
 import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
-import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeFormatterBuilder;
@@ -91,8 +94,9 @@ public final class OpenEMapper {
 
 	private static String getMimeType(final String file) {
 		try {
-			return Files.probeContentType(Path.of(file));
-		} catch (final IOException e) {
+			final String encodedFile = URLEncoder.encode(file, StandardCharsets.ISO_8859_1);
+			return Files.probeContentType(Paths.get(new URI("file:///" + encodedFile)));
+		} catch (final IOException | URISyntaxException e) {
 			throw Problem.valueOf(Status.INTERNAL_SERVER_ERROR, "Unable to determine mime type for file %s".formatted(file));
 		}
 
