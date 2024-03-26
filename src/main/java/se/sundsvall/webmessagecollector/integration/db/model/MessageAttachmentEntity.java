@@ -1,6 +1,7 @@
 package se.sundsvall.webmessagecollector.integration.db.model;
 
 import java.sql.Blob;
+import java.util.Objects;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -14,12 +15,14 @@ import jakarta.persistence.Table;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
-import lombok.Data;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 @Entity
 @Table(name = "message_attachment")
-@Data
+@Getter
+@Setter
 @Builder(setterPrefix = "with")
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -41,5 +44,31 @@ public class MessageAttachmentEntity {
 	@ManyToOne
 	@JoinColumn(name = "message_id", foreignKey = @ForeignKey(name = "FK_message_attachment_message_id"))
 	private MessageEntity message;
+
+	@Override
+	public boolean equals(final Object o) {
+		if (this == o) return true;
+		if (o == null || getClass() != o.getClass()) return false;
+		final MessageAttachmentEntity that = (MessageAttachmentEntity) o;
+		return Objects.equals(attachmentId, that.attachmentId) && Objects.equals(name, that.name) && Objects.equals(extension, that.extension) && Objects.equals(mimeType, that.mimeType) && Objects.equals(file, that.file) && Objects.equals(message, that.message);
+	}
+
+	@Override
+	public int hashCode() {
+		return Objects.hash(attachmentId, name, extension, mimeType, file, message);
+	}
+
+	@Override
+	public String toString() {
+		final long messageId = message != null ? message.getId() : 0;
+		return "MessageAttachmentEntity{" +
+			"attachmentId=" + attachmentId +
+			", name='" + name + '\'' +
+			", extension='" + extension + '\'' +
+			", mimeType='" + mimeType + '\'' +
+			", file=" + file +
+			", message.id=" + messageId +
+			'}';
+	}
 
 }
