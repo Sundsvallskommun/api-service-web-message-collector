@@ -2,6 +2,7 @@ package se.sundsvall.webmessagecollector.integration.db.model;
 
 import java.sql.Blob;
 import java.util.Objects;
+import java.util.Optional;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -60,7 +61,10 @@ public class MessageAttachmentEntity {
 
 	@Override
 	public String toString() {
-		final long messageId = message != null ? message.getId() : 0;
+		final long messageId = Optional.ofNullable(message)
+			.map(MessageEntity::getId)
+			.orElse(0);
+
 		return "MessageAttachmentEntity{" +
 			"attachmentId=" + attachmentId +
 			", name='" + name + '\'' +
