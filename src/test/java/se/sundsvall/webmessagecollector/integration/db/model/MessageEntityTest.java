@@ -18,6 +18,7 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
 import se.sundsvall.webmessagecollector.api.model.Direction;
+import se.sundsvall.webmessagecollector.integration.opene.model.Scope;
 
 class MessageEntityTest {
 
@@ -51,6 +52,7 @@ class MessageEntityTest {
 		final var userId = "userId";
 		final var username = "username";
 		final var attachments = List.of(MessageAttachmentEntity.builder().build());
+		final var scope = Scope.INTERNAL;
 
 		final var bean = MessageEntity.builder()
 			.withDirection(direction)
@@ -66,6 +68,7 @@ class MessageEntityTest {
 			.withUserId(userId)
 			.withUsername(username)
 			.withAttachments(attachments)
+			.withScope(scope)
 			.build();
 
 		assertThat(bean.getDirection()).isEqualTo(direction);
@@ -81,6 +84,7 @@ class MessageEntityTest {
 		assertThat(bean.getUserId()).isEqualTo(userId);
 		assertThat(bean.getUsername()).isEqualTo(username);
 		assertThat(bean.getAttachments()).isSameAs(attachments);
+		assertThat(bean.getScope()).isEqualTo(scope);
 	}
 
 }

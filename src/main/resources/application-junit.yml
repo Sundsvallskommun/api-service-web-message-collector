@@ -1,13 +1,20 @@
 integration:
   open-e:
-    base-url: base-url
-    password: somePassword
+    internal:
+      url: base-url
+    external:
+      url: base-url
     username: someUsername
     connect-timeout: 15
     read-timeout: 20
+    internal-password: someInternalPassword
+    external-password: someExternalPassword
 
 scheduler:
-  familyId: someFamilyId
+  familyIds:
+    internal:
+      - 123
+      - 456
 
 spring:
   datasource:
@@ -32,4 +39,3 @@ spring:
             scripts:
               action: create
               create-target: target/database/generated-schema.sql
-    

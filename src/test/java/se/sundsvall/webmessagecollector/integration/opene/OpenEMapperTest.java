@@ -16,6 +16,7 @@ import org.zalando.problem.ThrowableProblem;
 import se.sundsvall.dept44.test.annotation.resource.Load;
 import se.sundsvall.dept44.test.extension.ResourceLoaderExtension;
 import se.sundsvall.webmessagecollector.api.model.Direction;
+import se.sundsvall.webmessagecollector.integration.opene.model.Scope;
 
 @ExtendWith(ResourceLoaderExtension.class)
 @ActiveProfiles("junit")
@@ -25,7 +26,7 @@ class OpenEMapperTest {
 	void mapWhenInputIsNull() {
 		final var familyId = "familyId";
 
-		assertThat(toMessageEntities(null, familyId)).isEmpty();
+		assertThat(toMessageEntities(null, familyId, Scope.EXTERNAL)).isEmpty();
 	}
 
 	@Test
@@ -33,7 +34,7 @@ class OpenEMapperTest {
 		final var familyId = "123";
 		final var bytes = "{this is not a valid xml}".getBytes(ISO_8859_1);
 
-		final var e = assertThrows(ThrowableProblem.class, () -> toMessageEntities(bytes, familyId));
+		final var e = assertThrows(ThrowableProblem.class, () -> toMessageEntities(bytes, familyId, Scope.EXTERNAL));
 
 		assertThat(e.getStatus()).isEqualTo(Status.INTERNAL_SERVER_ERROR);
 		assertThat(e.getMessage()).isEqualToIgnoringNewLines(
@@ -45,7 +46,7 @@ class OpenEMapperTest {
 		final var familyId = "123";
 		final var bytes = input.getBytes(ISO_8859_1);
 
-		assertThat(toMessageEntities(bytes, familyId)).isEmpty();
+		assertThat(toMessageEntities(bytes, familyId, Scope.INTERNAL)).isEmpty();
 	}
 
 	@Test
@@ -53,7 +54,7 @@ class OpenEMapperTest {
 		final var familyId = "123";
 		final var bytes = input.getBytes(ISO_8859_1);
 
-		final var result = toMessageEntities(bytes, familyId);
+		final var result = toMessageEntities(bytes, familyId, Scope.INTERNAL);
 
 		assertThat(result).hasSize(1)
 			.allSatisfy(entity -> {
@@ -69,6 +70,7 @@ class OpenEMapperTest {
 				assertThat(entity.getSent()).isEqualTo(LocalDateTime.of(2022, 5, 25, 11, 20));
 				assertThat(entity.getUserId()).isEqualTo("1");
 				assertThat(entity.getUsername()).isEqualTo("userName_1");
+				assertThat(entity.getScope()).isEqualTo(Scope.INTERNAL);
 				assertThat(entity.getAttachments()).hasSize(1)
 					.allSatisfy(attachment -> {
 						assertThat(attachment.getAttachmentId()).isEqualTo(164);

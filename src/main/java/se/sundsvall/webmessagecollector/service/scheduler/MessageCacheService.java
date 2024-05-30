@@ -20,7 +20,8 @@ import se.sundsvall.webmessagecollector.integration.db.MessageRepository;
 import se.sundsvall.webmessagecollector.integration.db.model.ExecutionInformationEntity;
 import se.sundsvall.webmessagecollector.integration.db.model.MessageAttachmentEntity;
 import se.sundsvall.webmessagecollector.integration.db.model.MessageEntity;
-import se.sundsvall.webmessagecollector.integration.opene.OpenEClient;
+import se.sundsvall.webmessagecollector.integration.opene.OpenEIntegration;
+import se.sundsvall.webmessagecollector.integration.opene.model.Scope;
 
 @Component
 public class MessageCacheService {
@@ -30,7 +31,7 @@ public class MessageCacheService {
 
 	private static final String DATE_TIME_FORMAT = "yyyy-MM-dd HH:mm";
 
-	private final OpenEClient openEClient;
+	private final OpenEIntegration openEIntegration;
 
 	private final MessageRepository messageRepository;
 
@@ -38,15 +39,15 @@ public class MessageCacheService {
 
 	private final ExecutionInformationRepository executionInformationRepository;
 
-	MessageCacheService(final OpenEClient openEClient, final MessageRepository messageRepository, final MessageAttachmentRepository messageAttachmentRepository, final ExecutionInformationRepository executionInformationRepository) {
-		this.openEClient = openEClient;
+	MessageCacheService(final OpenEIntegration openEIntegration, final MessageRepository messageRepository, final MessageAttachmentRepository messageAttachmentRepository, final ExecutionInformationRepository executionInformationRepository) {
+		this.openEIntegration = openEIntegration;
 		this.messageRepository = messageRepository;
 		this.messageAttachmentRepository = messageAttachmentRepository;
 		this.executionInformationRepository = executionInformationRepository;
 	}
 
 	@Transactional
-	public List<MessageEntity> fetchMessages(final String familyId) {
+	public List<MessageEntity> fetchMessages(final Scope scope, final String familyId) {
 		// Fetch info regarding last execution for fetching familyId (or initiate entity if no info exists)
 		final var executionInfo = executionInformationRepository.findById(familyId).orElse(initiateExecutionInfo(familyId));
 		// Calculate timestamp from when messages should be fetched
@@ -54,8 +55,8 @@ public class MessageCacheService {
 		// Update timestamp for last execution
 		executionInfo.setLastSuccessfulExecution(OffsetDateTime.now());
 
-		final var bytes = openEClient.getMessages(familyId, fromTimestamp, "");
-		final var messages = toMessageEntities(bytes, familyId);
+		final var bytes = openEIntegration.getMessages(scope, familyId, fromTimestamp, "");
+		final var messages = toMessageEntities(bytes, familyId, scope);
 		messageRepository.saveAllAndFlush(messages);
 
 		executionInformationRepository.save(executionInfo);
@@ -63,9 +64,9 @@ public class MessageCacheService {
 	}
 
 	@Transactional
-	public void fetchAttachment(final MessageAttachmentEntity attachmentEntity) {
+	public void fetchAttachment(final Scope scope, final MessageAttachmentEntity attachmentEntity) {
 		try {
-			final var attachmentStream = openEClient.getAttachment(attachmentEntity.getAttachmentId());
+			final var attachmentStream = openEIntegration.getAttachment(scope, attachmentEntity.getAttachmentId());
 			if (attachmentStream != null) {
 				attachmentEntity.setFile(new SerialBlob(attachmentStream));
 				messageAttachmentRepository.saveAndFlush(attachmentEntity);

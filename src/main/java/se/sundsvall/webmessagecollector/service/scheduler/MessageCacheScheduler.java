@@ -1,16 +1,16 @@
 package se.sundsvall.webmessagecollector.service.scheduler;
 
-import static java.util.Optional.ofNullable;
+import static java.util.Collections.emptyMap;
 
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.Optional;
 
-import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
+
+import se.sundsvall.webmessagecollector.integration.opene.model.Scope;
 
 import net.javacrumbs.shedlock.spring.annotation.SchedulerLock;
 
@@ -32,19 +32,20 @@ class MessageCacheScheduler {
 	@SchedulerLock(name = "cacheMessages", lockAtMostFor = "${scheduler.lock-at-most-for}")
 	public void cacheMessages() {
 		LOG.info("Caching messages");
-		Arrays.stream(ofNullable(messageCacheProperties.familyId()).orElse("")
-				.split(","))
-			.filter(StringUtils::isNotBlank)
-			.map(String::trim)
-			.forEach(this::fetchMessages);
+
+		Optional.ofNullable(messageCacheProperties.familyIds())
+			.orElse(emptyMap())
+			.forEach((scope, familyIds) -> familyIds.forEach(familyId -> fetchMessages(scope, familyId)));
 	}
 
-	private void fetchMessages(final String familyId) {
+	private void fetchMessages(final String scope, final String familyId) {
+
+		final var scopeEnum = Scope.fromString(scope);
 		try {
-			final var messages = messageCacheService.fetchMessages(familyId);
-			messages.forEach(message -> Optional.ofNullable(message.getAttachments())
-				.orElse(Collections.emptyList())
-				.forEach(messageCacheService::fetchAttachment));
+			messageCacheService.fetchMessages(scopeEnum, familyId)
+				.forEach(message -> Optional.ofNullable(message.getAttachments())
+					.orElse(Collections.emptyList())
+					.forEach(attachmentEntity -> messageCacheService.fetchAttachment(scopeEnum, attachmentEntity)));
 		} catch (final Exception e) {
 			LOG.error("Unable to process messages for familyId {}", familyId, e);
 		}
