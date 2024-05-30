@@ -61,7 +61,7 @@ class MessageCacheServiceTest {
 		""";
 
 	@Mock
-	private OpenEIntegration openEClientMock;
+	private OpenEIntegration openEIntegrationMock;
 
 	@Mock
 	private MessageRepository messageRepositoryMock;
@@ -94,12 +94,12 @@ class MessageCacheServiceTest {
 		final var lastExecuted = OffsetDateTime.now().minusHours(RandomUtils.nextInt());
 
 		when(executionInformationRepositoryMock.findById(familyId)).thenReturn(Optional.of(ExecutionInformationEntity.builder().withFamilyId(familyId).withLastSuccessfulExecution(lastExecuted).build()));
-		when(openEClientMock.getMessages(any(), any(), any(), any())).thenReturn(RESPONSE.getBytes());
+		when(openEIntegrationMock.getMessages(any(), any(), any(), any())).thenReturn(RESPONSE.getBytes());
 		// Act
 		service.fetchMessages(Scope.INTERNAL, familyId);
 
 		// Assert and verify
-		verify(openEClientMock).getMessages(Scope.INTERNAL, familyId, lastExecuted.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm")), "");
+		verify(openEIntegrationMock).getMessages(Scope.INTERNAL, familyId, lastExecuted.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm")), "");
 		verify(messageRepositoryMock).saveAllAndFlush(messageEntityCaptor.capture());
 		verify(executionInformationRepositoryMock).save(executionInformationEntityCaptor.capture());
 		assertThat(messageEntityCaptor.getValue().getFirst()).satisfies(entity -> {
@@ -135,13 +135,13 @@ class MessageCacheServiceTest {
 		final var familyId = "123";
 
 		when(executionInformationRepositoryMock.findById(familyId)).thenReturn(Optional.empty());
-		when(openEClientMock.getMessages(any(), any(), any(), any())).thenReturn(RESPONSE.getBytes());
+		when(openEIntegrationMock.getMessages(any(), any(), any(), any())).thenReturn(RESPONSE.getBytes());
 
 		// Act
 		service.fetchMessages(Scope.INTERNAL, familyId);
 
 		// Assert and verify
-		verify(openEClientMock).getMessages(eq(Scope.INTERNAL), eq(familyId), fromTimeStampCaptor.capture(), eq(""));
+		verify(openEIntegrationMock).getMessages(eq(Scope.INTERNAL), eq(familyId), fromTimeStampCaptor.capture(), eq(""));
 		verify(messageRepositoryMock).saveAllAndFlush(messageEntityCaptor.capture());
 		verify(executionInformationRepositoryMock).save(executionInformationEntityCaptor.capture());
 		assertThat(LocalDateTime.parse(fromTimeStampCaptor.getValue(), DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm")))
@@ -179,13 +179,13 @@ class MessageCacheServiceTest {
 			.withName("someFile.pdf")
 			.build();
 		final var attachment = "attachment".getBytes();
-		when(openEClientMock.getAttachment(Scope.INTERNAL, 123)).thenReturn(attachment);
+		when(openEIntegrationMock.getAttachment(Scope.INTERNAL, 123)).thenReturn(attachment);
 
 		// Act
 		service.fetchAttachment(Scope.INTERNAL, attachmentEntity);
 
 		// Assert
-		verify(openEClientMock).getAttachment(Scope.INTERNAL, 123);
+		verify(openEIntegrationMock).getAttachment(Scope.INTERNAL, 123);
 		verify(messageAttachmentRepositoryMock).saveAndFlush(messageAttachmentEntityCaptor.capture());
 		assertThat(messageAttachmentEntityCaptor.getValue()).satisfies(entity -> {
 			assertThat(entity.getAttachmentId()).isEqualTo(123);
@@ -207,13 +207,13 @@ class MessageCacheServiceTest {
 			.withMimeType("application/pdf")
 			.withName("someFile.pdf")
 			.build();
-		when(openEClientMock.getAttachment(Scope.INTERNAL, attachmentId)).thenReturn(null);
+		when(openEIntegrationMock.getAttachment(Scope.INTERNAL, attachmentId)).thenReturn(null);
 
 		// Act
 		service.fetchAttachment(Scope.INTERNAL, attachmentEntity);
 
 		// Assert
-		verify(openEClientMock).getAttachment(Scope.INTERNAL, attachmentId);
+		verify(openEIntegrationMock).getAttachment(Scope.INTERNAL, attachmentId);
 		verifyNoInteractions(messageAttachmentRepositoryMock);
 	}
 
