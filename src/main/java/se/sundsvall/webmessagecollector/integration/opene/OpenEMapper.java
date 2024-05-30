@@ -25,6 +25,7 @@ import se.sundsvall.webmessagecollector.integration.db.model.MessageAttachmentEn
 import se.sundsvall.webmessagecollector.integration.db.model.MessageEntity;
 import se.sundsvall.webmessagecollector.integration.opene.model.ExternalMessage;
 import se.sundsvall.webmessagecollector.integration.opene.model.Messages;
+import se.sundsvall.webmessagecollector.integration.opene.model.Scope;
 
 public final class OpenEMapper {
 
@@ -41,7 +42,7 @@ public final class OpenEMapper {
 		// Intentionally Empty
 	}
 
-	public static List<MessageEntity> toMessageEntities(final byte[] errands, final String familyId) {
+	public static List<MessageEntity> toMessageEntities(final byte[] errands, final String familyId, final Scope scope) {
 
 		if (errands == null) {
 			return emptyList();
@@ -53,16 +54,17 @@ public final class OpenEMapper {
 				.orElse(emptyList())
 				.stream()
 				.filter(externalMessage -> !externalMessage.isPostedByManager())
-				.map(externalMessage -> toMessageEntity(familyId, externalMessage))
+				.map(externalMessage -> toMessageEntity(familyId, externalMessage, scope))
 				.toList();
 		} catch (final Exception e) {
 			throw Problem.valueOf(Status.INTERNAL_SERVER_ERROR, "%s occurred when parsing open-e messages for familyId %s. Message is: %s".formatted(e.getClass().getSimpleName(), familyId, e.getMessage()));
 		}
 	}
 
-	private static MessageEntity toMessageEntity(final String familyId, final ExternalMessage externalMessage) {
+	private static MessageEntity toMessageEntity(final String familyId, final ExternalMessage externalMessage, final Scope scope) {
 		final var builder = MessageEntity.builder()
 			.withFamilyId(familyId)
+			.withScope(scope)
 			.withDirection(externalMessage.isPostedByManager() ? Direction.OUTBOUND : Direction.INBOUND)
 			.withMessageId(String.valueOf(externalMessage.getMessageID()))
 			.withExternalCaseId(String.valueOf(externalMessage.getFlowInstanceID()))

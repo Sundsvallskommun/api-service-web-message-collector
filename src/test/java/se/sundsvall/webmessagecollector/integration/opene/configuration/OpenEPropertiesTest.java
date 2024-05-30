@@ -21,6 +21,8 @@ class OpenEPropertiesTest {
 		assertThat(properties.connectTimeout()).isEqualTo(15);
 		assertThat(properties.readTimeout()).isEqualTo(20);
 		assertThat(properties.username()).isEqualTo("someUsername");
-		assertThat(properties.password()).isEqualTo("somePassword");
+		assertThat(properties.internalPassword()).isEqualTo("someInternalPassword");
+		assertThat(properties.externalPassword()).isEqualTo("someExternalPassword");
 	}
+
 }

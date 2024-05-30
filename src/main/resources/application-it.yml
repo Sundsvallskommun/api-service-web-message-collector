@@ -1,10 +1,14 @@
 integration:
   open-e:
-    base-url: localhost:9090
-    password: somePassword
+    internal:
+      url: localhost:9090
+    external:
+      url: localhost:9091
     username: someUsername
     connect-timeout: 15
     read-timeout: 20
+    internal-password: someInternalPassword
+    external-password: someExternalPassword
 spring:
   datasource:
     driver-class-name: org.testcontainers.jdbc.ContainerDatabaseDriver

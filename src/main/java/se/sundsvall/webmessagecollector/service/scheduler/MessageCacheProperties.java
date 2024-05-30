@@ -1,7 +1,11 @@
 package se.sundsvall.webmessagecollector.service.scheduler;
 
+import java.util.List;
+import java.util.Map;
+
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
 @ConfigurationProperties(prefix = "scheduler")
-record MessageCacheProperties(String familyId) {
+record MessageCacheProperties(Map<String, List<String>> familyIds) {
+
 }
