@@ -19,12 +19,12 @@ class ExternalOpenEClientTest {
 		// Assert
 		assertThat(ExternalOpenEClient.class).hasAnnotation(FeignClient.class);
 		assertThat(ExternalOpenEClient.class.getAnnotation(FeignClient.class).url()).isEqualTo("${integration.open-e.external.url}");
-		assertThat(fetchMethod("getMessages").getAnnotation(GetMapping.class).path()).containsExactly("/api/messageapi/getmessages/family/{familyId}");
+		assertThat(fetchMethod().getAnnotation(GetMapping.class).path()).containsExactly("/api/messageapi/getmessages/family/{familyId}");
 	}
 
-	private Method fetchMethod(final String methodName) {
+	private Method fetchMethod() {
 		return Stream.of(ExternalOpenEClient.class.getMethods())
-			.filter(m -> methodName.equals(m.getName()))
+			.filter(m -> "getMessages".equals(m.getName()))
 			.findFirst()
 			.orElseThrow();
 	}

@@ -43,16 +43,19 @@ public class MessageDTO {
 	@Schema(description = "Firstname of the poster ", example = "Test")
 	private final String firstName;
 
-	@Schema(description = "If the message was utbound from a manager or inbound from a customer ", example = "Testorsson")
+	@Schema(description = "Lastname of the poster", example = "Testsson")
 	private final String lastName;
 
 	@Schema(description = "Email for the poster", example = "test@sundsvall.se")
 	private final String email;
 
-	@Schema(description = "If the message was utbound from a manager or inbound from a customer ", example = "177")
+	@Schema(description = "The userId for the poster", example = "123")
 	private final String userId;
 
 	@ArraySchema(schema = @Schema(description = "List of attachments for the message", example = "attachment1, attachment2"))
 	private final List<MessageAttachment> attachments;
+
+	@Schema(description = "The instance of the message", example = "external")
+	private final String instance;
 
 }

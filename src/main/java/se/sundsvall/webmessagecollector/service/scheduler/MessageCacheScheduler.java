@@ -10,7 +10,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
-import se.sundsvall.webmessagecollector.integration.opene.model.Scope;
+import se.sundsvall.webmessagecollector.integration.opene.model.Instance;
 
 import net.javacrumbs.shedlock.spring.annotation.SchedulerLock;
 
@@ -35,17 +35,17 @@ class MessageCacheScheduler {
 
 		Optional.ofNullable(messageCacheProperties.familyIds())
 			.orElse(emptyMap())
-			.forEach((scope, familyIds) -> familyIds.forEach(familyId -> fetchMessages(scope, familyId)));
+			.forEach((instance, familyIds) -> familyIds.forEach(familyId -> fetchMessages(instance, familyId)));
 	}
 
-	private void fetchMessages(final String scope, final String familyId) {
+	private void fetchMessages(final String instance, final String familyId) {
 
-		final var scopeEnum = Scope.fromString(scope);
+		final var instanceEnum = Instance.fromString(instance);
 		try {
-			messageCacheService.fetchMessages(scopeEnum, familyId)
+			messageCacheService.fetchMessages(instanceEnum, familyId)
 				.forEach(message -> Optional.ofNullable(message.getAttachments())
 					.orElse(Collections.emptyList())
-					.forEach(attachmentEntity -> messageCacheService.fetchAttachment(scopeEnum, attachmentEntity)));
+					.forEach(attachmentEntity -> messageCacheService.fetchAttachment(instanceEnum, attachmentEntity)));
 		} catch (final Exception e) {
 			LOG.error("Unable to process messages for familyId {}", familyId, e);
 		}

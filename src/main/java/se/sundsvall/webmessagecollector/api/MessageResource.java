@@ -14,7 +14,6 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.zalando.problem.Problem;
 import org.zalando.problem.violations.ConstraintViolationProblem;
@@ -43,12 +42,13 @@ public class MessageResource {
 		this.service = service;
 	}
 
-	@GetMapping(produces = APPLICATION_JSON_VALUE)
+	@GetMapping(value = "/{familyId}/{Instance}", produces = APPLICATION_JSON_VALUE)
 	@ApiResponse(responseCode = "200", description = "Successful Operation", useReturnTypeSchema = true)
 	@Operation(summary = "Get a list of messages related to a specific familyId", description = "Returns a list of messages found for the specified familyId")
 	public ResponseEntity<List<MessageDTO>> getMessages(
-		@Parameter(name = "familyid", description = "FamilyId to fetch messages for", example = "123", required = true) @RequestParam("familyid") final String familyId) {
-		return ResponseEntity.ok(service.getMessages(familyId));
+		@Parameter(name = "familyId", description = "FamilyId to fetch messages for", example = "123", required = true) @PathVariable("familyId") final String familyId,
+		@Parameter(name = "Instance", description = "Instance to fetch messages for", example = "INTERNAL", required = true) @PathVariable("Instance") final String instance) {
+		return ResponseEntity.ok(service.getMessages(familyId, instance));
 	}
 
 	@DeleteMapping

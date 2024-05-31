@@ -2,6 +2,8 @@ package se.sundsvall.webmessagecollector.api.model;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import java.util.List;
+
 import org.junit.jupiter.api.Test;
 
 class MessageDTOTest {
@@ -20,6 +22,8 @@ class MessageDTOTest {
 		final var sent = "sent";
 		final var userId = "userId";
 		final var username = "username";
+		final var instance = "instance";
+		final var attachments = List.of(MessageAttachment.builder().build());
 
 		final var bean = MessageDTO.builder()
 			.withDirection(direction)
@@ -34,8 +38,11 @@ class MessageDTOTest {
 			.withSent(sent)
 			.withUserId(userId)
 			.withUsername(username)
+			.withInstance(instance)
+			.withAttachments(attachments)
 			.build();
 
+		assertThat(bean).isNotNull().hasNoNullFieldsOrProperties();
 		assertThat(bean.getDirection()).isEqualTo(direction);
 		assertThat(bean.getEmail()).isEqualTo(email);
 		assertThat(bean.getExternalCaseId()).isEqualTo(externalCaseId);
@@ -48,5 +55,8 @@ class MessageDTOTest {
 		assertThat(bean.getSent()).isEqualTo(sent);
 		assertThat(bean.getUserId()).isEqualTo(userId);
 		assertThat(bean.getUsername()).isEqualTo(username);
+		assertThat(bean.getInstance()).isEqualTo(instance);
+		assertThat(bean.getAttachments()).isSameAs(attachments);
 	}
+
 }

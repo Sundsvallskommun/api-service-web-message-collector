@@ -13,7 +13,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import se.sundsvall.webmessagecollector.integration.opene.model.Scope;
+import se.sundsvall.webmessagecollector.integration.opene.model.Instance;
 
 @ExtendWith(MockitoExtension.class)
 class OpenEIntegrationTest {
@@ -31,7 +31,7 @@ class OpenEIntegrationTest {
 	void getInternalMessages() {
 
 		// Arrange
-		final var scope = Scope.INTERNAL;
+		final var instance = Instance.INTERNAL;
 		final var familyId = "123";
 		final var fromDate = LocalDate.now().minusDays(30).toString();
 		final var toDate = LocalDate.now().toString();
@@ -39,7 +39,7 @@ class OpenEIntegrationTest {
 		when(internalOpenEClient.getMessages(familyId, fromDate, toDate)).thenReturn(new byte[0]);
 
 		// Act
-		final var result = openEIntegration.getMessages(scope, familyId, fromDate, toDate);
+		final var result = openEIntegration.getMessages(instance, familyId, fromDate, toDate);
 
 		// Assert
 		assertThat(result).isNotNull();
@@ -51,7 +51,7 @@ class OpenEIntegrationTest {
 	void getExternalMessages() {
 
 		// Arrange
-		final var scope = Scope.EXTERNAL;
+		final var instance = Instance.EXTERNAL;
 		final var familyId = "123";
 		final var fromDate = LocalDate.now().minusDays(30).toString();
 		final var toDate = LocalDate.now().toString();
@@ -59,7 +59,7 @@ class OpenEIntegrationTest {
 		when(externalOpenEClient.getMessages(familyId, fromDate, toDate)).thenReturn(new byte[0]);
 
 		// Act
-		final var result = openEIntegration.getMessages(scope, familyId, fromDate, toDate);
+		final var result = openEIntegration.getMessages(instance, familyId, fromDate, toDate);
 
 		// Assert
 		assertThat(result).isNotNull();
@@ -72,13 +72,13 @@ class OpenEIntegrationTest {
 	void getInternalAttachment() {
 
 		// Arrange
-		final var scope = Scope.INTERNAL;
+		final var instance = Instance.INTERNAL;
 		final var attachmentId = 123;
 
 		when(internalOpenEClient.getAttachment(attachmentId)).thenReturn(new byte[0]);
 
 		// Act
-		final var result = openEIntegration.getAttachment(scope, attachmentId);
+		final var result = openEIntegration.getAttachment(instance, attachmentId);
 
 		// Assert
 		assertThat(result).isNotNull();
@@ -90,13 +90,13 @@ class OpenEIntegrationTest {
 	void getExternalAttachment() {
 
 		// Arrange
-		final var scope = Scope.EXTERNAL;
+		final var instance = Instance.EXTERNAL;
 		final var attachmentId = 123;
 
 		when(externalOpenEClient.getAttachment(attachmentId)).thenReturn(new byte[0]);
 
 		// Act
-		final var result = openEIntegration.getAttachment(scope, attachmentId);
+		final var result = openEIntegration.getAttachment(instance, attachmentId);
 
 		// Assert
 		assertThat(result).isNotNull();

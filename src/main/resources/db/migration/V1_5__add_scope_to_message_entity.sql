@@ -1,2 +1,2 @@
 alter table message
-    add column scope enum ('INTERNAL','EXTERNAL');
+    add column instance enum ('INTERNAL','EXTERNAL');
