@@ -14,7 +14,7 @@ import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 
 import se.sundsvall.webmessagecollector.api.model.Direction;
-import se.sundsvall.webmessagecollector.integration.opene.model.Scope;
+import se.sundsvall.webmessagecollector.integration.opene.model.Instance;
 
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -58,7 +58,7 @@ public class MessageEntity {
 	private String userId;
 
 	@Enumerated(EnumType.STRING)
-	private Scope scope;
+	private Instance instance;
 
 	@OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, mappedBy = "message")
 	private List<MessageAttachmentEntity> attachments;

@@ -24,8 +24,8 @@ import se.sundsvall.webmessagecollector.api.model.Direction;
 import se.sundsvall.webmessagecollector.integration.db.model.MessageAttachmentEntity;
 import se.sundsvall.webmessagecollector.integration.db.model.MessageEntity;
 import se.sundsvall.webmessagecollector.integration.opene.model.ExternalMessage;
+import se.sundsvall.webmessagecollector.integration.opene.model.Instance;
 import se.sundsvall.webmessagecollector.integration.opene.model.Messages;
-import se.sundsvall.webmessagecollector.integration.opene.model.Scope;
 
 public final class OpenEMapper {
 
@@ -42,7 +42,7 @@ public final class OpenEMapper {
 		// Intentionally Empty
 	}
 
-	public static List<MessageEntity> toMessageEntities(final byte[] errands, final String familyId, final Scope scope) {
+	public static List<MessageEntity> toMessageEntities(final byte[] errands, final String familyId, final Instance instance) {
 
 		if (errands == null) {
 			return emptyList();
@@ -54,42 +54,45 @@ public final class OpenEMapper {
 				.orElse(emptyList())
 				.stream()
 				.filter(externalMessage -> !externalMessage.isPostedByManager())
-				.map(externalMessage -> toMessageEntity(familyId, externalMessage, scope))
+				.map(externalMessage -> toMessageEntity(familyId, externalMessage, instance))
 				.toList();
 		} catch (final Exception e) {
 			throw Problem.valueOf(Status.INTERNAL_SERVER_ERROR, "%s occurred when parsing open-e messages for familyId %s. Message is: %s".formatted(e.getClass().getSimpleName(), familyId, e.getMessage()));
 		}
 	}
 
-	private static MessageEntity toMessageEntity(final String familyId, final ExternalMessage externalMessage, final Scope scope) {
+	private static MessageEntity toMessageEntity(final String familyId, final ExternalMessage externalMessage, final Instance instance) {
+
 		final var builder = MessageEntity.builder()
 			.withFamilyId(familyId)
-			.withScope(scope)
+			.withInstance(instance)
 			.withDirection(externalMessage.isPostedByManager() ? Direction.OUTBOUND : Direction.INBOUND)
 			.withMessageId(String.valueOf(externalMessage.getMessageID()))
 			.withExternalCaseId(String.valueOf(externalMessage.getFlowInstanceID()))
 			.withMessage(externalMessage.getMessage())
 			.withSent(LocalDateTime.parse(externalMessage.getAdded(), formatter));
 
-		ofNullable(externalMessage.getPoster()).ifPresent(poster -> builder
-			.withEmail(poster.getEmail())
-			.withFirstName(poster.getFirstname())
-			.withLastName(poster.getLastname())
-			.withUsername(poster.getUsername())
-			.withUserId(String.valueOf(poster.getUserID())));
+		ofNullable(externalMessage.getPoster())
+			.ifPresent(poster -> builder
+				.withEmail(poster.getEmail())
+				.withFirstName(poster.getFirstname())
+				.withLastName(poster.getLastname())
+				.withUsername(poster.getUsername())
+				.withUserId(String.valueOf(poster.getUserID())));
 
 		final var entity = builder.build();
 
-		ofNullable(externalMessage.getAttachments()).ifPresent(attachments -> entity
-			.setAttachments(attachments.stream()
-				.map(attachment -> MessageAttachmentEntity.builder()
-					.withAttachmentId(attachment.getAttachmentID())
-					.withMessage(entity)
-					.withName(attachment.getFileName())
-					.withMimeType(getMimeType(attachment.getFileName()))
-					.withExtension(getFileExtension(attachment.getFileName()))
-					.build())
-				.toList()));
+		ofNullable(externalMessage.getAttachments())
+			.ifPresent(attachments -> entity
+				.setAttachments(attachments.stream()
+					.map(attachment -> MessageAttachmentEntity.builder()
+						.withAttachmentId(attachment.getAttachmentID())
+						.withMessage(entity)
+						.withName(attachment.getFileName())
+						.withMimeType(getMimeType(attachment.getFileName()))
+						.withExtension(getFileExtension(attachment.getFileName()))
+						.build())
+					.toList()));
 
 		return entity;
 	}

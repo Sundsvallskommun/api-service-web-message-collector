@@ -17,7 +17,7 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
 class ExecutionInformationEntityTest {
-	
+
 	@BeforeAll
 	static void setup() {
 		registerValueGenerator(() -> OffsetDateTime.now().plusDays((new Random().nextInt())), OffsetDateTime.class);
@@ -46,4 +46,5 @@ class ExecutionInformationEntityTest {
 		assertThat(bean.getFamilyId()).isEqualTo(familyId);
 		assertThat(bean.getLastSuccessfulExecution()).isEqualTo(lastSuccessfulExecution);
 	}
+
 }

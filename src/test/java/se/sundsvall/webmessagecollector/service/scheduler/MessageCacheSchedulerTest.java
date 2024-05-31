@@ -25,7 +25,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.zalando.problem.Problem;
 import org.zalando.problem.Status;
 
-import se.sundsvall.webmessagecollector.integration.opene.model.Scope;
+import se.sundsvall.webmessagecollector.integration.opene.model.Instance;
 
 @ExtendWith(MockitoExtension.class)
 class MessageCacheSchedulerTest {
@@ -67,7 +67,7 @@ class MessageCacheSchedulerTest {
 
 		// Assert and verify
 		verify(messageCachePropertiesMock).familyIds();
-		verify(messageCacheServiceMock, times(2)).fetchMessages(eq(Scope.INTERNAL), familyIdCaptor.capture());
+		verify(messageCacheServiceMock, times(2)).fetchMessages(eq(Instance.INTERNAL), familyIdCaptor.capture());
 		verifyNoMoreInteractions(messageCachePropertiesMock, messageCacheServiceMock);
 		assertThat(familyIdCaptor.getAllValues()).hasSize(2)
 			.containsExactly("123", "456");
@@ -77,14 +77,14 @@ class MessageCacheSchedulerTest {
 	void cacheMessagesOneThrowsException() {
 		// Arrange
 		when(messageCachePropertiesMock.familyIds()).thenReturn(Map.of("INTERNAL", List.of("123", "456")));
-		doThrow(Problem.valueOf(Status.INTERNAL_SERVER_ERROR, "Test")).when(messageCacheServiceMock).fetchMessages(eq(Scope.INTERNAL), anyString());
+		doThrow(Problem.valueOf(Status.INTERNAL_SERVER_ERROR, "Test")).when(messageCacheServiceMock).fetchMessages(eq(Instance.INTERNAL), anyString());
 
 		// Act
 		scheduler.cacheMessages();
 
 		// Assert and verify
 		verify(messageCachePropertiesMock).familyIds();
-		verify(messageCacheServiceMock, times(2)).fetchMessages(eq(Scope.INTERNAL), familyIdCaptor.capture());
+		verify(messageCacheServiceMock, times(2)).fetchMessages(eq(Instance.INTERNAL), familyIdCaptor.capture());
 		verifyNoMoreInteractions(messageCachePropertiesMock, messageCacheServiceMock);
 		assertThat(familyIdCaptor.getAllValues()).hasSize(2)
 			.containsExactly("123", "456");

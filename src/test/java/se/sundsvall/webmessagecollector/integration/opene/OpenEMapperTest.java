@@ -16,7 +16,7 @@ import org.zalando.problem.ThrowableProblem;
 import se.sundsvall.dept44.test.annotation.resource.Load;
 import se.sundsvall.dept44.test.extension.ResourceLoaderExtension;
 import se.sundsvall.webmessagecollector.api.model.Direction;
-import se.sundsvall.webmessagecollector.integration.opene.model.Scope;
+import se.sundsvall.webmessagecollector.integration.opene.model.Instance;
 
 @ExtendWith(ResourceLoaderExtension.class)
 @ActiveProfiles("junit")
@@ -26,7 +26,7 @@ class OpenEMapperTest {
 	void mapWhenInputIsNull() {
 		final var familyId = "familyId";
 
-		assertThat(toMessageEntities(null, familyId, Scope.EXTERNAL)).isEmpty();
+		assertThat(toMessageEntities(null, familyId, Instance.EXTERNAL)).isEmpty();
 	}
 
 	@Test
@@ -34,7 +34,7 @@ class OpenEMapperTest {
 		final var familyId = "123";
 		final var bytes = "{this is not a valid xml}".getBytes(ISO_8859_1);
 
-		final var e = assertThrows(ThrowableProblem.class, () -> toMessageEntities(bytes, familyId, Scope.EXTERNAL));
+		final var e = assertThrows(ThrowableProblem.class, () -> toMessageEntities(bytes, familyId, Instance.EXTERNAL));
 
 		assertThat(e.getStatus()).isEqualTo(Status.INTERNAL_SERVER_ERROR);
 		assertThat(e.getMessage()).isEqualToIgnoringNewLines(
@@ -42,11 +42,11 @@ class OpenEMapperTest {
 	}
 
 	@Test
-	void mapWhenExternalMessagesAreNull(@Load(value = "/emptymessages.xml") final String input) {
+	void mapWhenExternalMessagesAreNull(@Load(value = "/empty-messages.xml") final String input) {
 		final var familyId = "123";
 		final var bytes = input.getBytes(ISO_8859_1);
 
-		assertThat(toMessageEntities(bytes, familyId, Scope.INTERNAL)).isEmpty();
+		assertThat(toMessageEntities(bytes, familyId, Instance.INTERNAL)).isEmpty();
 	}
 
 	@Test
@@ -54,7 +54,7 @@ class OpenEMapperTest {
 		final var familyId = "123";
 		final var bytes = input.getBytes(ISO_8859_1);
 
-		final var result = toMessageEntities(bytes, familyId, Scope.INTERNAL);
+		final var result = toMessageEntities(bytes, familyId, Instance.INTERNAL);
 
 		assertThat(result).hasSize(1)
 			.allSatisfy(entity -> {
@@ -70,7 +70,7 @@ class OpenEMapperTest {
 				assertThat(entity.getSent()).isEqualTo(LocalDateTime.of(2022, 5, 25, 11, 20));
 				assertThat(entity.getUserId()).isEqualTo("1");
 				assertThat(entity.getUsername()).isEqualTo("userName_1");
-				assertThat(entity.getScope()).isEqualTo(Scope.INTERNAL);
+				assertThat(entity.getInstance()).isEqualTo(Instance.INTERNAL);
 				assertThat(entity.getAttachments()).hasSize(1)
 					.allSatisfy(attachment -> {
 						assertThat(attachment.getAttachmentId()).isEqualTo(164);

@@ -1,24 +1,25 @@
 [
   {
+    "id": 1,
+    "direction": "INBOUND",
+    "familyId": "123",
+    "externalCaseId": "223",
+    "message": "Hello World",
+    "messageId": "1",
+    "sent": "2023-02-23T17:26:23.458389",
+    "username": "test",
+    "firstName": "Test",
+    "lastName": "Testorsson",
+    "email": "test@sundsvall.se",
+    "userId": "testId",
     "attachments": [
       {
         "attachmentId": 1,
         "name": "test_image.png",
-        "mimeType": "image/png",
-        "extension": "png"
+        "extension": "png",
+        "mimeType": "image/png"
       }
     ],
-    "direction": "INBOUND",
-    "email": "test@sundsvall.se",
-    "externalCaseId": "223",
-    "familyId": "123",
-    "firstName": "Test",
-    "id": 1,
-    "lastName": "Testorsson",
-    "message": "Hello World",
-    "messageId": "1",
-    "sent": "2023-02-23T17:26:23.458389",
-    "userId": "testId",
-    "username": "test"
+    "instance": "INTERNAL"
   }
 ]

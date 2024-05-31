@@ -17,20 +17,21 @@ final class MessageMapper {
 
 	static MessageDTO toMessageDTO(final MessageEntity entity) {
 		return ofNullable(entity)
-			.map(e -> MessageDTO.builder()
-				.withId(e.getId())
-				.withFamilyId(e.getFamilyId())
-				.withDirection(e.getDirection())
-				.withMessageId(e.getMessageId())
-				.withExternalCaseId(e.getExternalCaseId())
-				.withMessage(e.getMessage())
-				.withSent(String.valueOf(e.getSent()))
-				.withEmail(e.getEmail())
-				.withFirstName(e.getFirstName())
-				.withLastName(e.getLastName())
-				.withUsername(e.getUsername())
-				.withUserId(e.getUserId())
-				.withAttachments(toMessageAttachmentDTOs(e.getAttachments()))
+			.map(nonNullEntity -> MessageDTO.builder()
+				.withId(nonNullEntity.getId())
+				.withFamilyId(nonNullEntity.getFamilyId())
+				.withDirection(nonNullEntity.getDirection())
+				.withMessageId(nonNullEntity.getMessageId())
+				.withExternalCaseId(nonNullEntity.getExternalCaseId())
+				.withMessage(nonNullEntity.getMessage())
+				.withSent(String.valueOf(nonNullEntity.getSent()))
+				.withEmail(nonNullEntity.getEmail())
+				.withFirstName(nonNullEntity.getFirstName())
+				.withLastName(nonNullEntity.getLastName())
+				.withUsername(nonNullEntity.getUsername())
+				.withUserId(nonNullEntity.getUserId())
+				.withAttachments(toMessageAttachmentDTOs(nonNullEntity.getAttachments()))
+				.withInstance(String.valueOf(nonNullEntity.getInstance()))
 				.build())
 			.orElse(null);
 	}
@@ -44,11 +45,11 @@ final class MessageMapper {
 
 	static MessageAttachment toMessageAttachmentDTO(final MessageAttachmentEntity entity) {
 		return ofNullable(entity)
-			.map(e -> MessageAttachment.builder()
-				.withAttachmentId(e.getAttachmentId())
-				.withExtension(e.getExtension())
-				.withMimeType(e.getMimeType())
-				.withName(e.getName())
+			.map(nonNullEntity -> MessageAttachment.builder()
+				.withAttachmentId(nonNullEntity.getAttachmentId())
+				.withExtension(nonNullEntity.getExtension())
+				.withMimeType(nonNullEntity.getMimeType())
+				.withName(nonNullEntity.getName())
 				.build())
 			.orElse(null);
 	}
