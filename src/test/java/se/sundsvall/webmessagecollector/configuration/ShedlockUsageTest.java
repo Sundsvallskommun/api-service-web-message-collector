@@ -10,7 +10,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.Objects;
 import java.util.Set;
 
 import org.junit.jupiter.api.Test;
@@ -71,7 +70,8 @@ class ShedlockUsageTest {
 				// move to the upper class in the hierarchy in search for more methods
 				klazz = klazz.getSuperclass();
 			}
-			return Map.of(Objects.requireNonNull(candidate.getBeanClassName()), methods);
+			assertThat(candidate.getBeanClassName()).isNotEmpty();
+			return Map.of(candidate.getBeanClassName(), methods);
 		} catch (final ClassNotFoundException e) {
 			fail("Couldn't traverse class methods as class %s could not be found".formatted(candidate.getBeanClassName()));
 			return Collections.emptyMap();
