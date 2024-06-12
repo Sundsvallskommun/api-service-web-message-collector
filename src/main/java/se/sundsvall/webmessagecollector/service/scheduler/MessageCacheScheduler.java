@@ -31,11 +31,12 @@ class MessageCacheScheduler {
 	@Scheduled(cron = "${scheduler.cron}")
 	@SchedulerLock(name = "cacheMessages", lockAtMostFor = "${scheduler.lock-at-most-for}")
 	public void cacheMessages() {
-		LOG.info("Caching messages");
+		LOG.info("Caching messages started");
 
 		Optional.ofNullable(messageCacheProperties.familyIds())
 			.orElse(emptyMap())
 			.forEach((instance, familyIds) -> familyIds.forEach(familyId -> fetchMessages(instance, familyId)));
+	LOG.info("Caching messages finished");
 	}
 
 	private void fetchMessages(final String instance, final String familyId) {
