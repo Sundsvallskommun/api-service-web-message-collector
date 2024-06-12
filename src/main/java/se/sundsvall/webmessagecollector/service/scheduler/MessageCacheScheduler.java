@@ -5,13 +5,12 @@ import static java.util.Collections.emptyMap;
 import java.util.Collections;
 import java.util.Optional;
 
-import org.apache.juli.logging.Log;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
-import se.sundsvall.webmessagecollector.integration.opene.model.Scope;
+import se.sundsvall.webmessagecollector.integration.opene.model.Instance;
 
 import net.javacrumbs.shedlock.spring.annotation.SchedulerLock;
 
@@ -32,25 +31,22 @@ class MessageCacheScheduler {
 	@Scheduled(cron = "${scheduler.cron}")
 	@SchedulerLock(name = "cacheMessages", lockAtMostFor = "${scheduler.lock-at-most-for}")
 	public void cacheMessages() {
-		LOG.info("Caching messages Started");
+		LOG.info("Caching messages started");
 
 		Optional.ofNullable(messageCacheProperties.familyIds())
 			.orElse(emptyMap())
-			.forEach((scope, familyIds) -> familyIds.forEach(familyId -> fetchMessages(scope, familyId)));
-
-		LOG.info("Caching messages Finished");
+			.forEach((instance, familyIds) -> familyIds.forEach(familyId -> fetchMessages(instance, familyId)));
+	LOG.info("Caching messages finished");
 	}
 
+	private void fetchMessages(final String instance, final String familyId) {
 
-
-	private void fetchMessages(final String scope, final String familyId) {
-
-		final var scopeEnum = Scope.fromString(scope);
+		final var instanceEnum = Instance.fromString(instance);
 		try {
-			messageCacheService.fetchMessages(scopeEnum, familyId)
+			messageCacheService.fetchMessages(instanceEnum, familyId)
 				.forEach(message -> Optional.ofNullable(message.getAttachments())
 					.orElse(Collections.emptyList())
-					.forEach(attachmentEntity -> messageCacheService.fetchAttachment(scopeEnum, attachmentEntity)));
+					.forEach(attachmentEntity -> messageCacheService.fetchAttachment(instanceEnum, attachmentEntity)));
 		} catch (final Exception e) {
 			LOG.error("Unable to process messages for familyId {}", familyId, e);
 		}

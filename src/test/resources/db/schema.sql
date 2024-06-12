@@ -18,7 +18,7 @@
         user_id varchar(255),
         username varchar(255),
         direction enum ('INBOUND','OUTBOUND'),
-        scope enum ('EXTERNAL','INTERNAL'),
+        instance enum ('EXTERNAL','INTERNAL'),
         primary key (id)
     ) engine=InnoDB;
 

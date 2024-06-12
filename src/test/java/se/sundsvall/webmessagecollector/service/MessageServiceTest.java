@@ -30,6 +30,7 @@ import se.sundsvall.webmessagecollector.integration.db.MessageAttachmentReposito
 import se.sundsvall.webmessagecollector.integration.db.MessageRepository;
 import se.sundsvall.webmessagecollector.integration.db.model.MessageAttachmentEntity;
 import se.sundsvall.webmessagecollector.integration.db.model.MessageEntity;
+import se.sundsvall.webmessagecollector.integration.opene.model.Instance;
 
 @ExtendWith(MockitoExtension.class)
 class MessageServiceTest {
@@ -75,27 +76,27 @@ class MessageServiceTest {
 			.withAttachments(List.of(MessageAttachmentEntity.builder().build()))
 			.build();
 		// Mock
-		when(messageRepositoryMock.findAllByFamilyId("someFamilyId"))
+		when(messageRepositoryMock.findAllByFamilyIdAndInstance("someFamilyId", Instance.INTERNAL))
 			.thenReturn(List.of(entity, MessageEntity.builder().build()));
 		// Act
-		final var result = service.getMessages("someFamilyId");
+		final var result = service.getMessages("someFamilyId", Instance.INTERNAL.name());
 		// Assert
 		assertThat(result).isNotNull().hasSize(2);
 		assertThat(result.getFirst()).hasNoNullFieldsOrProperties();
 		assertThat(result.getFirst()).usingRecursiveComparison()
 			.isEqualTo(MessageMapper.toMessageDTO(entity));
 		// Verify
-		verify(messageRepositoryMock).findAllByFamilyId("someFamilyId");
+		verify(messageRepositoryMock).findAllByFamilyIdAndInstance("someFamilyId", Instance.INTERNAL);
 		verifyNoMoreInteractions(messageRepositoryMock);
 	}
 
 	@Test
 	void getMessages_EmptyList() {
 		// Act
-		final var result = service.getMessages("someFamilyId");
+		final var result = service.getMessages("someFamilyId", Instance.EXTERNAL.name());
 		// Assert & Verify
 		assertThat(result).isNotNull().isEmpty();
-		verify(messageRepositoryMock).findAllByFamilyId("someFamilyId");
+		verify(messageRepositoryMock).findAllByFamilyIdAndInstance("someFamilyId", Instance.EXTERNAL);
 		verifyNoMoreInteractions(messageRepositoryMock);
 	}
 

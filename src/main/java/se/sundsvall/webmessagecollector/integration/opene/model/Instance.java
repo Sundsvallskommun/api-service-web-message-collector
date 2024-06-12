@@ -2,14 +2,14 @@ package se.sundsvall.webmessagecollector.integration.opene.model;
 
 import java.util.Optional;
 
-public enum Scope {
+public enum Instance {
 	INTERNAL, EXTERNAL;
 
-	public static Scope fromString(final String scope) {
-		return Optional.ofNullable(scope)
-			.map(nonNullScope -> {
+	public static Instance fromString(final String instance) {
+		return Optional.ofNullable(instance)
+			.map(nonNullInstance -> {
 				try {
-					return Scope.valueOf(nonNullScope.toUpperCase());
+					return Instance.valueOf(nonNullInstance.toUpperCase());
 				} catch (final IllegalArgumentException e) {
 					return null;
 				}

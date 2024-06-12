@@ -10,8 +10,6 @@ import java.util.List;
 
 import jakarta.servlet.http.HttpServletResponse;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StreamUtils;
 import org.zalando.problem.Problem;
@@ -20,11 +18,10 @@ import org.zalando.problem.Status;
 import se.sundsvall.webmessagecollector.api.model.MessageDTO;
 import se.sundsvall.webmessagecollector.integration.db.MessageAttachmentRepository;
 import se.sundsvall.webmessagecollector.integration.db.MessageRepository;
+import se.sundsvall.webmessagecollector.integration.opene.model.Instance;
 
 @Service
 public class MessageService {
-
-	private static final Logger log = LoggerFactory.getLogger(MessageService.class);
 
 	private final MessageRepository repository;
 
@@ -35,8 +32,8 @@ public class MessageService {
 		this.attachmentRepository = attachmentRepository;
 	}
 
-	public List<MessageDTO> getMessages(final String familyId) {
-		return toMessageDTOs(repository.findAllByFamilyId(familyId));
+	public List<MessageDTO> getMessages(final String familyId, final String instance) {
+		return toMessageDTOs(repository.findAllByFamilyIdAndInstance(familyId, Instance.fromString(instance)));
 	}
 
 	public void getMessageAttachmentStreamed(final int attachmentID, final HttpServletResponse response) {

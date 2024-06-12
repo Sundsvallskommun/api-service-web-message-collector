@@ -39,7 +39,7 @@ class MessageResourceTest {
 	@Test
 	void getMessages() {
 		// Arrange & Mock
-		when(serviceMock.getMessages(anyString())).thenReturn(List.of(MessageDTO.builder()
+		when(serviceMock.getMessages(anyString(), anyString())).thenReturn(List.of(MessageDTO.builder()
 			.withId(1)
 			.withMessageId("someMessageId")
 			.withMessage("someMessage")
@@ -52,12 +52,13 @@ class MessageResourceTest {
 			.withUsername("someUsername")
 			.withEmail("someEmail")
 			.withUserId("someUserid")
+			.withInstance("someInstance")
 			.withAttachments(List.of(MessageAttachment.builder().build()))
 			.build()));
 
 		// Act
 		final var response = webTestClient.get()
-			.uri(PATH + "?familyid=123")
+			.uri(PATH + "/123/external")
 			.exchange()
 			.expectStatus().isOk()
 			.expectBodyList(MessageDTO.class)
@@ -65,11 +66,10 @@ class MessageResourceTest {
 			.getResponseBody();
 
 		// Assert and verify
-		assertThat(response).isNotNull().hasSize(1).allSatisfy(message -> {
-			assertThat(message).hasNoNullFieldsOrProperties();
-		});
+		assertThat(response).isNotNull().hasSize(1)
+			.allSatisfy(message -> assertThat(message).hasNoNullFieldsOrProperties());
 
-		verify(serviceMock).getMessages(anyString());
+		verify(serviceMock).getMessages(anyString(), anyString());
 		verifyNoMoreInteractions(serviceMock);
 	}
 

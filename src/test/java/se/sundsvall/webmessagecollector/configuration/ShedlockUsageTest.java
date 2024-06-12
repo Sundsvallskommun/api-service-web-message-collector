@@ -1,7 +1,7 @@
 package se.sundsvall.webmessagecollector.configuration;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.Assert.fail;
+import static org.junit.jupiter.api.Assertions.fail;
 import static org.zalando.fauxpas.FauxPas.throwingFunction;
 
 import java.lang.reflect.Method;
@@ -34,7 +34,7 @@ class ShedlockUsageTest {
 			.forEach(set -> this.verifyAnnotations(hasEnableSchedulerLock, set));
 	}
 
-	private boolean hasEnableSchedulerLock(Set<BeanDefinition> candidates) {
+	private boolean hasEnableSchedulerLock(final Set<BeanDefinition> candidates) {
 		return candidates.stream()
 			.map(BeanDefinition::getBeanClassName)
 			.map(throwingFunction(Class::forName))
@@ -42,7 +42,7 @@ class ShedlockUsageTest {
 			.anyMatch(matches -> matches.length > 0);
 	}
 
-	private void verifyAnnotations(boolean hasEnableSchedulerLockAnnotation, Entry<String, List<Method>> entrySet) {
+	private void verifyAnnotations(final boolean hasEnableSchedulerLockAnnotation, final Entry<String, List<Method>> entrySet) {
 		entrySet.getValue().forEach(method -> {
 			// Verify that method annotated with Scheduled is also annotated with SchedulerLock
 			assertThat(method.isAnnotationPresent(SchedulerLock.class))
@@ -70,10 +70,12 @@ class ShedlockUsageTest {
 				// move to the upper class in the hierarchy in search for more methods
 				klazz = klazz.getSuperclass();
 			}
+			assertThat(candidate.getBeanClassName()).isNotEmpty();
 			return Map.of(candidate.getBeanClassName(), methods);
-		} catch (ClassNotFoundException e) {
+		} catch (final ClassNotFoundException e) {
 			fail("Couldn't traverse class methods as class %s could not be found".formatted(candidate.getBeanClassName()));
 			return Collections.emptyMap();
 		}
 	}
+
 }
