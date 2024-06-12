@@ -17,6 +17,8 @@ import java.time.temporal.ChronoField;
 import java.util.List;
 
 import com.fasterxml.jackson.dataformat.xml.XmlMapper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.zalando.problem.Problem;
 import org.zalando.problem.Status;
 
@@ -28,6 +30,8 @@ import se.sundsvall.webmessagecollector.integration.opene.model.Messages;
 import se.sundsvall.webmessagecollector.integration.opene.model.Scope;
 
 public final class OpenEMapper {
+
+	private static final Logger LOG = LoggerFactory.getLogger(OpenEMapper.class);
 
 	private static final DateTimeFormatter formatter = new DateTimeFormatterBuilder()
 		.appendPattern("yyyy-MM-dd")
@@ -45,6 +49,7 @@ public final class OpenEMapper {
 	public static List<MessageEntity> toMessageEntities(final byte[] errands, final String familyId, final Scope scope) {
 
 		if (errands == null) {
+			LOG.info("No messages found for familyId {}", familyId);
 			return emptyList();
 		}
 

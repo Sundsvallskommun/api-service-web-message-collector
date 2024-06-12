@@ -5,6 +5,7 @@ import static java.util.Collections.emptyMap;
 import java.util.Collections;
 import java.util.Optional;
 
+import org.apache.juli.logging.Log;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -31,12 +32,16 @@ class MessageCacheScheduler {
 	@Scheduled(cron = "${scheduler.cron}")
 	@SchedulerLock(name = "cacheMessages", lockAtMostFor = "${scheduler.lock-at-most-for}")
 	public void cacheMessages() {
-		LOG.info("Caching messages");
+		LOG.info("Caching messages Started");
 
 		Optional.ofNullable(messageCacheProperties.familyIds())
 			.orElse(emptyMap())
 			.forEach((scope, familyIds) -> familyIds.forEach(familyId -> fetchMessages(scope, familyId)));
+
+		LOG.info("Caching messages Finished");
 	}
+
+
 
 	private void fetchMessages(final String scope, final String familyId) {
 
