@@ -15,24 +15,14 @@ import feign.soap.SOAPErrorDecoder;
 
 public class ExternalOpenEConfiguration {
 
-
-	static final JAXBContextFactory JAXB_FACTORY = new JAXBContextFactory.Builder().build();
-
-	static final SOAPEncoder.Builder SOAP_ENCODER_BUILDER = new SOAPEncoder.Builder()
-		.withFormattedOutput(false)
-		.withJAXBContextFactory(JAXB_FACTORY)
-		.withSOAPProtocol(SOAPConstants.SOAP_1_1_PROTOCOL)
-		.withWriteXmlDeclaration(true);
-
 	public static final String OEP_EXTERNAL_CLIENT = "oep-external";
+
 	@Bean
 	FeignBuilderCustomizer externalFeignBuilderCustomizer(final OpenEProperties properties) {
 		return FeignMultiCustomizer.create()
-			.withDecoder(new SOAPDecoder(JAXB_FACTORY))
-			.withEncoder(SOAP_ENCODER_BUILDER.build())
 			.withErrorDecoder(new SOAPErrorDecoder())
-			.withRequestInterceptor(new BasicAuthRequestInterceptor(properties.username(), properties.externalPassword()))
 			.withRequestTimeoutsInSeconds(properties.connectTimeout(), properties.readTimeout())
+			.withRequestInterceptor(new BasicAuthRequestInterceptor(properties.username(), properties.externalPassword()))
 			.composeCustomizersToOne();
 	}
 
