@@ -28,15 +28,11 @@ public class MessageCacheService {
 
 	private static final Logger LOG = LoggerFactory.getLogger(MessageCacheService.class);
 
-
-	private static final String DATE_TIME_FORMAT = "yyyy-MM-dd HH:mm";
+	private static final DateTimeFormatter DATE_TIME_FORMAT = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
 
 	private final OpenEIntegration openEIntegration;
-
 	private final MessageRepository messageRepository;
-
 	private final MessageAttachmentRepository messageAttachmentRepository;
-
 	private final ExecutionInformationRepository executionInformationRepository;
 
 	MessageCacheService(final OpenEIntegration openEIntegration, final MessageRepository messageRepository, final MessageAttachmentRepository messageAttachmentRepository, final ExecutionInformationRepository executionInformationRepository) {
@@ -47,32 +43,33 @@ public class MessageCacheService {
 	}
 
 	@Transactional
-	public List<MessageEntity> fetchMessages(final Instance instance, final String familyId) {
+	public List<MessageEntity> fetchMessages(final String municipalityId, final Instance instance, final String familyId) {
 		// Fetch info regarding last execution for fetching familyId (or initiate entity if no info exists)
-		final var executionInfo = executionInformationRepository.findById(familyId).orElse(initiateExecutionInfo(familyId));
+		var executionInfo = executionInformationRepository.findById(familyId).orElse(initiateExecutionInfo(familyId));
 		// Calculate timestamp from when messages should be fetched
-		final var fromTimestamp = executionInfo.getLastSuccessfulExecution().format(DateTimeFormatter.ofPattern(DATE_TIME_FORMAT));
-		// Update timestamp for last execution
-		executionInfo.setLastSuccessfulExecution(OffsetDateTime.now());
+		var fromTimestamp = executionInfo.getLastSuccessfulExecution().format(DATE_TIME_FORMAT);
 
-		final var bytes = openEIntegration.getMessages(instance, familyId, fromTimestamp, "");
-		final var messages = toMessageEntities(bytes, familyId, instance);
+		var bytes = openEIntegration.getMessages(municipalityId, instance, familyId, fromTimestamp, "");
+		var messages = toMessageEntities(bytes, familyId, instance);
 		messageRepository.saveAllAndFlush(messages);
+
+		// Update timestamp for last successful execution
+		executionInfo.setLastSuccessfulExecution(OffsetDateTime.now());
 
 		executionInformationRepository.save(executionInfo);
 		return messages;
 	}
 
 	@Transactional
-	public void fetchAttachment(final Instance instance, final MessageAttachmentEntity attachmentEntity) {
+	public void fetchAttachment(final String municipalityId, final Instance instance, final MessageAttachmentEntity attachmentEntity) {
 		try {
-			final var attachmentStream = openEIntegration.getAttachment(instance, attachmentEntity.getAttachmentId());
+			var attachmentStream = openEIntegration.getAttachment(municipalityId, instance, attachmentEntity.getAttachmentId());
 			if (attachmentStream != null) {
 				attachmentEntity.setFile(new SerialBlob(attachmentStream));
 				messageAttachmentRepository.saveAndFlush(attachmentEntity);
 			}
-		} catch (final SQLException e) {
-			LOG.error("Unable to fetch Attachment ", e);
+		} catch (SQLException e) {
+			LOG.error("Unable to fetch attachment ", e);
 		}
 	}
 
@@ -82,5 +79,4 @@ public class MessageCacheService {
 			.withLastSuccessfulExecution(OffsetDateTime.now().minusHours(1)) // minusHours(1) is a safety for not missing any messages on the first execution run
 			.build();
 	}
-
 }

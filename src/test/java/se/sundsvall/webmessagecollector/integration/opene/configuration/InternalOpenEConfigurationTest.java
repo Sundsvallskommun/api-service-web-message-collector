@@ -40,7 +40,7 @@ class InternalOpenEConfigurationTest {
 	private ArgumentCaptor<RequestInterceptor> requestInterceptorCaptor;
 
 	@InjectMocks
-	private InternalOpenEConfiguration configuration;
+	private OpenEConfiguration configuration;
 
 	@Test
 	void testInternalFeignBuilderCustomizer() {

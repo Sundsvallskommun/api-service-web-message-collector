@@ -34,6 +34,8 @@ public class MessageEntity {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Integer id;
 
+	private String municipalityId;
+
 	@Enumerated(EnumType.STRING)
 	private Direction direction;
 
