@@ -1,55 +1,77 @@
 package se.sundsvall.webmessagecollector.service.scheduler;
 
-import static java.util.Collections.emptyMap;
+import static java.util.Collections.emptyList;
+import static java.util.Optional.ofNullable;
+import static se.sundsvall.webmessagecollector.integration.opene.model.Instance.EXTERNAL;
+import static se.sundsvall.webmessagecollector.integration.opene.model.Instance.INTERNAL;
 
-import java.util.Collections;
+import java.time.Duration;
+import java.time.Instant;
 import java.util.Optional;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.scheduling.TaskScheduler;
+import org.springframework.scheduling.support.CronTrigger;
 import org.springframework.stereotype.Component;
 
+import se.sundsvall.webmessagecollector.integration.opene.configuration.OpenEProperties;
 import se.sundsvall.webmessagecollector.integration.opene.model.Instance;
 
-import net.javacrumbs.shedlock.spring.annotation.SchedulerLock;
+import net.javacrumbs.shedlock.core.DefaultLockManager;
+import net.javacrumbs.shedlock.core.DefaultLockingTaskExecutor;
+import net.javacrumbs.shedlock.core.LockConfiguration;
+import net.javacrumbs.shedlock.core.LockProvider;
+import net.javacrumbs.shedlock.spring.LockableTaskScheduler;
 
 @Component
-class MessageCacheScheduler {
+public class MessageCacheScheduler {
 
-	private static final Logger LOG = LoggerFactory.getLogger(MessageCacheScheduler.class);
+    private static final Logger LOG = LoggerFactory.getLogger(MessageCacheScheduler.class);
 
-	private final MessageCacheProperties messageCacheProperties;
+    MessageCacheScheduler(final OpenEProperties openEProperties, final MessageCacheService messageCacheService, final TaskScheduler taskScheduler, final LockProvider lockProvider) {
+        var executor = new DefaultLockingTaskExecutor(lockProvider);
 
-	private final MessageCacheService messageCacheService;
+        openEProperties.environments().forEach((municipalityId, environment) -> {
+            var lockConfiguration = new LockConfiguration(Instant.now(), "lock-" + municipalityId, environment.scheduler().lockAtMostFor(), Duration.ZERO);
+            var lockManager = new DefaultLockManager(executor, lockConfigurationExtractor -> Optional.of(lockConfiguration));
+            var cronTrigger = new CronTrigger(environment.scheduler().cron());
+            var lockableTaskScheduler = new LockableTaskScheduler(taskScheduler, lockManager);
+            var task = new CacheMessagesTask(messageCacheService, municipalityId, environment);
 
-	MessageCacheScheduler(final MessageCacheService messageCacheService, final MessageCacheProperties messageCacheProperties) {
-		this.messageCacheService = messageCacheService;
-		this.messageCacheProperties = messageCacheProperties;
-	}
+            lockableTaskScheduler.schedule(task, cronTrigger);
+        });
+    }
 
-	@Scheduled(cron = "${scheduler.cron}")
-	@SchedulerLock(name = "cacheMessages", lockAtMostFor = "${scheduler.lock-at-most-for}")
-	public void cacheMessages() {
-		LOG.info("Caching messages started");
+    record CacheMessagesTask(MessageCacheService messageCacheService, String municipalityId, OpenEProperties.OpenEEnvironment environment) implements Runnable {
 
-		Optional.ofNullable(messageCacheProperties.familyIds())
-			.orElse(emptyMap())
-			.forEach((instance, familyIds) -> familyIds.forEach(familyId -> fetchMessages(instance, familyId)));
-	LOG.info("Caching messages finished");
-	}
+        @Override
+        public void run() {
+            LOG.info("Message caching for municipalityId {} started", municipalityId);
 
-	private void fetchMessages(final String instance, final String familyId) {
+            // Cache messages from the external instance, if it is configured
+            ofNullable(environment.external())
+                .map(OpenEProperties.OpenEEnvironment.OpenEInstance::familyIds)
+                .orElse(emptyList())
+                .forEach(familyId -> fetchMessages(municipalityId, EXTERNAL, familyId));
 
-		final var instanceEnum = Instance.fromString(instance);
-		try {
-			messageCacheService.fetchMessages(instanceEnum, familyId)
-				.forEach(message -> Optional.ofNullable(message.getAttachments())
-					.orElse(Collections.emptyList())
-					.forEach(attachmentEntity -> messageCacheService.fetchAttachment(instanceEnum, attachmentEntity)));
-		} catch (final Exception e) {
-			LOG.error("Unable to process messages for familyId {}", familyId, e);
-		}
-	}
+            // Cache messages from the internal instance, if it is configured
+            ofNullable(environment.internal())
+                .map(OpenEProperties.OpenEEnvironment.OpenEInstance::familyIds)
+                .orElse(emptyList())
+                .forEach(familyId -> fetchMessages(municipalityId, INTERNAL, familyId));
 
+            LOG.info("Message caching for municipalityId {} finished", municipalityId);
+        }
+
+        private void fetchMessages(final String municipalityId, final Instance instance, final String familyId) {
+            try {
+                messageCacheService.fetchMessages(municipalityId, instance, familyId)
+                    .forEach(message -> ofNullable(message.getAttachments()).orElse(emptyList())
+                        .forEach(attachmentEntity -> messageCacheService.fetchAttachment(municipalityId, instance, attachmentEntity)));
+            } catch (Exception e) {
+                LOG.error("Unable to process messages for familyId {} (municipalityId: {}, {})", familyId, municipalityId, instance, e);
+            }
+        }
+    }
 }

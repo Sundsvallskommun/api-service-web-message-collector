@@ -28,6 +28,9 @@ public class ExecutionInformationEntity {
 	@Column(name = "family_id", unique = true)
 	private String familyId;
 
+	@Column(name = "municipality_id", length = 4, nullable = false)
+	private String municipalityId;
+
 	@Column(name = "last_successful_execution")
 	@TimeZoneStorage(TimeZoneStorageType.NORMALIZE)
 	private OffsetDateTime lastSuccessfulExecution;

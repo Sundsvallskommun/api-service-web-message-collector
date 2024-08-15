@@ -19,6 +19,7 @@ final class MessageMapper {
 		return ofNullable(entity)
 			.map(nonNullEntity -> MessageDTO.builder()
 				.withId(nonNullEntity.getId())
+				.withMunicipalityId(nonNullEntity.getMunicipalityId())
 				.withFamilyId(nonNullEntity.getFamilyId())
 				.withDirection(nonNullEntity.getDirection())
 				.withMessageId(nonNullEntity.getMessageId())

@@ -7,30 +7,21 @@ import se.sundsvall.webmessagecollector.integration.opene.model.Instance;
 @Component
 public class OpenEIntegration {
 
-	private final InternalOpenEClient internalOpenEClient;
+	private final OpenEClientFactory clientFactory;
 
-	private final ExternalOpenEClient externalOpenEClient;
-
-	public OpenEIntegration(final InternalOpenEClient internalOpenEClient, final ExternalOpenEClient externalOpenEClient) {
-		this.internalOpenEClient = internalOpenEClient;
-		this.externalOpenEClient = externalOpenEClient;
+	public OpenEIntegration(final OpenEClientFactory clientFactory) {
+		this.clientFactory = clientFactory;
 	}
 
-	public byte[] getMessages(final Instance instance, final String familyId, final String fromDate, final String toDate) {
+	public byte[] getMessages(final String municipalityId, final Instance instance, final String familyId, final String fromDate, final String toDate) {
+		var client = clientFactory.getClient(municipalityId, instance);
 
-		return switch (instance) {
-			case INTERNAL -> internalOpenEClient.getMessages(familyId, fromDate, toDate);
-			case EXTERNAL -> externalOpenEClient.getMessages(familyId, fromDate, toDate);
-		};
+		return client.getMessages(familyId, fromDate, toDate);
 	}
 
-	public byte[] getAttachment(final Instance instance, final int attachmentId) {
+	public byte[] getAttachment(final String municipalityId, final Instance instance, final int attachmentId) {
+		var client = clientFactory.getClient(municipalityId, instance);
 
-		return switch (instance) {
-			case INTERNAL -> internalOpenEClient.getAttachment(attachmentId);
-			case EXTERNAL -> externalOpenEClient.getAttachment(attachmentId);
-		};
+		return client.getAttachment(attachmentId);
 	}
-
-
 }

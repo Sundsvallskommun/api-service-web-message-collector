@@ -14,15 +14,6 @@ openapi:
   title: ${spring.application.name}
   version: '@project.version@'
 
-integration:
-  open-e:
-    connect-timeout: 5
-    read-timeout: 60
-
-scheduler:
-  cron: "-"
-  lock-at-most-for: PT2M
-
 logging:
   level:
     root: INFO

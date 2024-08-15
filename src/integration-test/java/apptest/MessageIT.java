@@ -17,17 +17,17 @@ import se.sundsvall.dept44.test.AbstractAppTest;
 import se.sundsvall.dept44.test.annotation.wiremock.WireMockAppTestSuite;
 import se.sundsvall.webmessagecollector.Application;
 
-@WireMockAppTestSuite(files = "classpath:/MessagingIT/", classes = Application.class)
+@WireMockAppTestSuite(files = "classpath:/MessageIT/", classes = Application.class)
 @Sql({
 	"/db/scripts/truncate.sql",
 	"/db/scripts/testdata-it.sql"
 })
-class MessagingIT extends AbstractAppTest {
+class MessageIT extends AbstractAppTest {
 
 	@Test
 	void test1_getAllMessages() {
 		setupCall()
-			.withServicePath("/messages/123/internal")
+			.withServicePath("/1984/messages/123/internal")
 			.withHttpMethod(HttpMethod.GET)
 			.withExpectedResponseStatus(HttpStatus.OK)
 			.withExpectedResponse("expected.json")
@@ -37,7 +37,7 @@ class MessagingIT extends AbstractAppTest {
 	@Test
 	void test2_deleteMessages() {
 		setupCall()
-			.withServicePath("/messages")
+			.withServicePath("/1984/messages")
 			.withHttpMethod(HttpMethod.DELETE)
 			.withRequest(new Gson().toJson(List.of("1")))
 			.withExpectedResponseStatus(HttpStatus.NO_CONTENT)
@@ -47,7 +47,7 @@ class MessagingIT extends AbstractAppTest {
 	@Test
 	void test3_getAttachment() throws IOException {
 		setupCall()
-			.withServicePath("/messages/attachments/1")
+			.withServicePath("/1984/messages/attachments/1")
 			.withHttpMethod(HttpMethod.GET)
 			.withExpectedResponseStatus(OK)
 			.withExpectedResponseHeader(CONTENT_TYPE, List.of(IMAGE_PNG_VALUE))
@@ -58,10 +58,9 @@ class MessagingIT extends AbstractAppTest {
 	@Test
 	void test4_deleteAttachment() {
 		setupCall()
-			.withServicePath("/messages/attachments/1")
+			.withServicePath("/1984/messages/attachments/1")
 			.withHttpMethod(HttpMethod.DELETE)
 			.withExpectedResponseStatus(HttpStatus.NO_CONTENT)
 			.sendRequestAndVerifyResponse();
 	}
-
 }

@@ -27,14 +27,11 @@ class MessagesTest {
 
 	@Test
 	void gettersAndSetters() {
-		// Arrange
-		final var externalMessages = List.of(new ExternalMessage());
+		var externalMessages = List.of(new ExternalMessage());
 
-		// Act
-		final var messages = new Messages();
+		var messages = new Messages();
 		messages.setExternalMessages(externalMessages);
 
-		// Assert
 		assertThat(messages.getExternalMessages()).isSameAs(externalMessages);
 	}
 

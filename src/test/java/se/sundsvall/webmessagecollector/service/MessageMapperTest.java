@@ -15,6 +15,8 @@ class MessageMapperTest {
 
 	private static final Direction DIRECTION = Direction.INBOUND;
 
+	private static final String MUNICIPALITY_ID = "municipalityId";
+
 	private static final String EMAIL = "email";
 
 	private static final String EXTERNAL_CASE_ID = "externalCaseId";
@@ -40,9 +42,10 @@ class MessageMapperTest {
 	@Test
 	void toDTO() {
 		// Act
-		final var bean = MessageMapper.toMessageDTO(createEntity());
+		var bean = MessageMapper.toMessageDTO(createEntity());
 
 		// Assert
+		assertThat(bean.getMunicipalityId()).isEqualTo(MUNICIPALITY_ID);
 		assertThat(bean.getDirection()).isEqualTo(DIRECTION);
 		assertThat(bean.getEmail()).isEqualTo(EMAIL);
 		assertThat(bean.getExternalCaseId()).isEqualTo(EXTERNAL_CASE_ID);
@@ -59,21 +62,18 @@ class MessageMapperTest {
 
 	@Test
 	void toDTOFromNull() {
-		// Act and assert
 		assertThat(MessageMapper.toMessageDTO(null)).isNull();
 	}
 
 	@Test
 	void toDTOs() {
-		// Arrange
-		final var arrayList = new ArrayList<>(List.of(createEntity(), createEntity()));
+		var arrayList = new ArrayList<>(List.of(createEntity(), createEntity()));
 		arrayList.addFirst(null);
 
-		// Act
-		final var beans = MessageMapper.toMessageDTOs(arrayList);
+		var beans = MessageMapper.toMessageDTOs(arrayList);
 
-		// Assert
 		assertThat(beans).isNotNull().hasSize(2).allSatisfy(bean -> {
+			assertThat(bean.getMunicipalityId()).isEqualTo(MUNICIPALITY_ID);
 			assertThat(bean.getDirection()).isEqualTo(DIRECTION);
 			assertThat(bean.getEmail()).isEqualTo(EMAIL);
 			assertThat(bean.getExternalCaseId()).isEqualTo(EXTERNAL_CASE_ID);
@@ -91,12 +91,12 @@ class MessageMapperTest {
 
 	@Test
 	void toDTOsFromNull() {
-		// Act and assert
 		assertThat(MessageMapper.toMessageDTOs(null)).isEmpty();
 	}
 
 	private MessageEntity createEntity() {
 		return MessageEntity.builder()
+			.withMunicipalityId(MUNICIPALITY_ID)
 			.withDirection(DIRECTION)
 			.withEmail(EMAIL)
 			.withExternalCaseId(EXTERNAL_CASE_ID)
@@ -111,5 +111,4 @@ class MessageMapperTest {
 			.withUsername(USERNAME)
 			.build();
 	}
-
 }

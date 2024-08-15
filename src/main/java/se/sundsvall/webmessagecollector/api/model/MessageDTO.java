@@ -22,6 +22,9 @@ public class MessageDTO {
 		"case-data/e-service.", example = "INBOUND")
 	private final Direction direction;
 
+	@Schema(description = "The municipality id", example = "2281")
+	private final String municipalityId;
+
 	@Schema(description = "What E-service the message was found in", example = "501")
 	private final String familyId;
 
