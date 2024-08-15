@@ -12,6 +12,6 @@ import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
 @CircuitBreaker(name = "messageRepository")
 public interface MessageRepository extends JpaRepository<MessageEntity, Integer> {
 
-	List<MessageEntity> findAllByFamilyIdAndInstance(String familyId, Instance instance);
+	List<MessageEntity> findAllByMunicipalityIdAndFamilyIdAndInstance(String municipalityId, String familyId, Instance instance);
 
 }

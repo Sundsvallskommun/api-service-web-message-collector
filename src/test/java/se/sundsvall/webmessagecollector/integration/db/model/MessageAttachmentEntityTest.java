@@ -17,7 +17,6 @@ import org.junit.jupiter.api.Test;
 
 class MessageAttachmentEntityTest {
 
-
 	@Test
 	void bean() {
 		MatcherAssert.assertThat(MessageAttachmentEntity.class, allOf(
@@ -28,18 +27,17 @@ class MessageAttachmentEntityTest {
 			hasValidBeanToStringExcluding("message")));
 	}
 
-
 	@Test
 	void builder() throws SQLException {
 		// Arrange
-		final var attachmentId = 1;
-		final var name = "fileName";
-		final var file = new SerialBlob(new byte[0]);
-		final var mimeType = "text/plain";
-		final var extension = "txt";
-		final var message = new MessageEntity();
+		var attachmentId = 1;
+		var name = "fileName";
+		var file = new SerialBlob(new byte[0]);
+		var mimeType = "text/plain";
+		var extension = "txt";
+		var message = new MessageEntity();
 		// Act
-		final var result = MessageAttachmentEntity.builder()
+		var result = MessageAttachmentEntity.builder()
 			.withFile(file)
 			.withAttachmentId(attachmentId)
 			.withName(name)
@@ -62,5 +60,4 @@ class MessageAttachmentEntityTest {
 		assertThat(MessageAttachmentEntity.builder().build()).hasAllNullFieldsOrProperties();
 		assertThat(new MessageAttachmentEntity()).hasAllNullFieldsOrProperties();
 	}
-
 }

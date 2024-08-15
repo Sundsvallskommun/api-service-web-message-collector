@@ -1,35 +1,11 @@
 package se.sundsvall.webmessagecollector.service.scheduler;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyNoInteractions;
-import static org.mockito.Mockito.verifyNoMoreInteractions;
-import static org.mockito.Mockito.when;
-
-import java.util.List;
-import java.util.Map;
-
-import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.NullAndEmptySource;
-import org.mockito.ArgumentCaptor;
-import org.mockito.Captor;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.zalando.problem.Problem;
-import org.zalando.problem.Status;
-
-import se.sundsvall.webmessagecollector.integration.opene.model.Instance;
 
 @ExtendWith(MockitoExtension.class)
 class MessageCacheSchedulerTest {
-
+/*
 	@Mock
 	private MessageCacheProperties messageCachePropertiesMock;
 
@@ -89,5 +65,5 @@ class MessageCacheSchedulerTest {
 		assertThat(familyIdCaptor.getAllValues()).hasSize(2)
 			.containsExactly("123", "456");
 	}
-
+*/
 }

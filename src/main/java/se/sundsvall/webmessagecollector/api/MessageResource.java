@@ -50,7 +50,7 @@ class MessageResource {
 			@Parameter(name = "municipalityId", description = "Municipality Id", example = "2281", required = true) @PathVariable("municipalityId") @ValidMunicipalityId final String municipalityId,
 			@Parameter(name = "familyId", description = "FamilyId to fetch messages for", example = "123", required = true) @PathVariable("familyId") final String familyId,
 			@Parameter(name = "Instance", description = "Instance to fetch messages for", example = "INTERNAL", required = true) @PathVariable("Instance") final String instance) {
-		return ResponseEntity.ok(service.getMessages(familyId, instance));
+		return ResponseEntity.ok(service.getMessages(municipalityId, familyId, instance));
 	}
 
 	@DeleteMapping

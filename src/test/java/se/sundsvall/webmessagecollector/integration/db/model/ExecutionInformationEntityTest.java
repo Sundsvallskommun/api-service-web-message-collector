@@ -35,16 +35,18 @@ class ExecutionInformationEntityTest {
 
 	@Test
 	void testBuildPattern() {
-		final var familyId = "123";
-		final var lastSuccessfulExecution = OffsetDateTime.now();
+		var municipalityId = "1984";
+		var familyId = "123";
+		var lastSuccessfulExecution = OffsetDateTime.now();
 
-		final var bean = ExecutionInformationEntity.builder()
+		var bean = ExecutionInformationEntity.builder()
+			.withMunicipalityId(municipalityId)
 			.withFamilyId(familyId)
 			.withLastSuccessfulExecution(lastSuccessfulExecution)
 			.build();
 
+		assertThat(bean.getMunicipalityId()).isEqualTo(municipalityId);
 		assertThat(bean.getFamilyId()).isEqualTo(familyId);
 		assertThat(bean.getLastSuccessfulExecution()).isEqualTo(lastSuccessfulExecution);
 	}
-
 }

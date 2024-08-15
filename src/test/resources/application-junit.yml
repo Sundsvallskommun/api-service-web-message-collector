@@ -1,0 +1,49 @@
+integration:
+  open-e:
+    environments:
+      1984:
+        scheduler:
+          enabled: true
+          cron: '0 */5 * * * *'
+          lock-at-most-for: PT3M
+        internal:
+          base-url: internal-base-url
+          username: someInternalUsername
+          password: someInternalPassword
+          familyIds:
+            - 123
+            - 456
+          connect-timeout: 15
+          read-timeout: 20
+        external:
+          base-url: external-base-url
+          username: someExternalUsername
+          password: someExternalPassword
+          familyIds:
+            - 789
+          connect-timeout: 16
+          read-timeout: 21
+
+spring:
+  datasource:
+    driver-class-name: org.testcontainers.jdbc.ContainerDatabaseDriver
+    url: jdbc:tc:mariadb:10.6.14:///
+  flyway:
+    enabled: true
+  jpa:
+    properties:
+      hibernate:
+        format_sql: true
+        hbm2ddl:
+          schema-generation:
+            script:
+              append: false
+      jakarta:
+        persistence:
+          schema-generation:
+            create-source: metadata
+            database:
+              action: none
+            scripts:
+              action: create
+              create-target: target/database/generated-schema.sql

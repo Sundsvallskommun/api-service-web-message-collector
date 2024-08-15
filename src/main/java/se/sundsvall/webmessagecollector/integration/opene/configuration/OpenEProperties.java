@@ -30,6 +30,9 @@ public record OpenEProperties(Map<String, OpenEEnvironment> environments) {
 
         public record SchedulerProperties(
 
+            @DefaultValue("true")
+            boolean enabled,
+
             @NotBlank
             String cron,
 

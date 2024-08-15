@@ -33,8 +33,8 @@ public class MessageService {
 		this.attachmentRepository = attachmentRepository;
 	}
 
-	public List<MessageDTO> getMessages(final String familyId, final String instance) {
-		return toMessageDTOs(repository.findAllByFamilyIdAndInstance(familyId, Instance.fromString(instance)));
+	public List<MessageDTO> getMessages(final String municipalityId, final String familyId, final String instance) {
+		return toMessageDTOs(repository.findAllByMunicipalityIdAndFamilyIdAndInstance(municipalityId, familyId, Instance.fromString(instance)));
 	}
 
 	public void getMessageAttachmentStreamed(final int attachmentID, final HttpServletResponse response) {

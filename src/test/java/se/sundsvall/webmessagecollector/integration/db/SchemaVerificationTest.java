@@ -29,12 +29,12 @@ class SchemaVerificationTest {
 	@Test
 	void verifySchemaUpdates() throws IOException, URISyntaxException {
 
-		final var storedSchema = getResourceString();
-		final var generatedSchema = Files.readString(Path.of(generatedSchemaFile));
+		var storedSchema = getResourceString();
+		var generatedSchema = Files.readString(Path.of(generatedSchemaFile));
 
-		assertThat(storedSchema)
+		assertThat(generatedSchema)
 			.as(String.format("Please reflect modifications to entities in file: %s", STORED_SCHEMA_FILE))
-			.isEqualToNormalizingWhitespace(generatedSchema);
+			.isEqualToNormalizingWhitespace(storedSchema);
 	}
 
 	private String getResourceString() throws IOException, URISyntaxException {

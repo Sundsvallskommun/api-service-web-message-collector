@@ -24,17 +24,17 @@ class OpenEMapperTest {
 
 	@Test
 	void mapWhenInputIsNull() {
-		final var familyId = "familyId";
+		var familyId = "familyId";
 
 		assertThat(toMessageEntities(null, familyId, Instance.EXTERNAL)).isEmpty();
 	}
 
 	@Test
 	void mapWithNonValidXML() {
-		final var familyId = "123";
-		final var bytes = "{this is not a valid xml}".getBytes(ISO_8859_1);
+		var familyId = "123";
+		var bytes = "{this is not a valid xml}".getBytes(ISO_8859_1);
 
-		final var e = assertThrows(ThrowableProblem.class, () -> toMessageEntities(bytes, familyId, Instance.EXTERNAL));
+		var e = assertThrows(ThrowableProblem.class, () -> toMessageEntities(bytes, familyId, Instance.EXTERNAL));
 
 		assertThat(e.getStatus()).isEqualTo(Status.INTERNAL_SERVER_ERROR);
 		assertThat(e.getMessage()).isEqualToIgnoringNewLines(
@@ -43,18 +43,18 @@ class OpenEMapperTest {
 
 	@Test
 	void mapWhenExternalMessagesAreNull(@Load(value = "/empty-messages.xml") final String input) {
-		final var familyId = "123";
-		final var bytes = input.getBytes(ISO_8859_1);
+		var familyId = "123";
+		var bytes = input.getBytes(ISO_8859_1);
 
 		assertThat(toMessageEntities(bytes, familyId, Instance.INTERNAL)).isEmpty();
 	}
 
 	@Test
 	void mapMessagesWithValidXML(@Load("/messages.xml") final String input) {
-		final var familyId = "123";
-		final var bytes = input.getBytes(ISO_8859_1);
+		var familyId = "123";
+		var bytes = input.getBytes(ISO_8859_1);
 
-		final var result = toMessageEntities(bytes, familyId, Instance.INTERNAL);
+		var result = toMessageEntities(bytes, familyId, Instance.INTERNAL);
 
 		assertThat(result).hasSize(1)
 			.allSatisfy(entity -> {

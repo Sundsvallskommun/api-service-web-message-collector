@@ -1,0 +1,29 @@
+integration:
+  open-e:
+    environments:
+      1984:
+        scheduler:
+          enabled: true
+          cron: '0 */5 * * * *'
+          lock-at-most-for: PT2M
+        internal:
+          base-url: internal-base-url
+          username: someInternalUsername
+          password: someInternalPassword
+          familyIds:
+            - 123
+            - 456
+
+spring:
+  datasource:
+    driver-class-name: org.testcontainers.jdbc.ContainerDatabaseDriver
+    url: jdbc:tc:mariadb:10.6.14:///
+  flyway:
+    enabled: true
+  jpa:
+    properties:
+      jakarta:
+        persistence:
+          schema-generation:
+            database:
+              action: validate
