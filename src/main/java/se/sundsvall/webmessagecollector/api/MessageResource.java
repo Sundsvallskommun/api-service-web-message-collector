@@ -1,8 +1,11 @@
 package se.sundsvall.webmessagecollector.api;
 
+import static com.nimbusds.jose.HeaderParameterNames.CONTENT_TYPE;
 import static org.springframework.http.MediaType.ALL_VALUE;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static org.springframework.http.MediaType.APPLICATION_PROBLEM_JSON_VALUE;
+import static org.springframework.http.ResponseEntity.noContent;
+import static org.springframework.http.ResponseEntity.ok;
 
 import java.util.List;
 
@@ -50,7 +53,7 @@ class MessageResource {
 			@Parameter(name = "municipalityId", description = "Municipality Id", example = "2281", required = true) @PathVariable("municipalityId") @ValidMunicipalityId final String municipalityId,
 			@Parameter(name = "familyId", description = "FamilyId to fetch messages for", example = "123", required = true) @PathVariable("familyId") final String familyId,
 			@Parameter(name = "Instance", description = "Instance to fetch messages for", example = "INTERNAL", required = true) @PathVariable("Instance") final String instance) {
-		return ResponseEntity.ok(service.getMessages(municipalityId, familyId, instance));
+		return ok(service.getMessages(municipalityId, familyId, instance));
 	}
 
 	@DeleteMapping
@@ -60,7 +63,8 @@ class MessageResource {
 			@Parameter(name = "municipalityId", description = "Municipality Id", example = "2281", required = true) @PathVariable("municipalityId") @ValidMunicipalityId final String municipalityId,
 			@RequestBody final List<Integer> ids) {
 		service.deleteMessages(ids);
-		return ResponseEntity.noContent().build();
+
+		return noContent().header(CONTENT_TYPE, ALL_VALUE).build();
 	}
 
 	@GetMapping(value = "attachments/{attachmentId}", produces = {ALL_VALUE, APPLICATION_PROBLEM_JSON_VALUE})
@@ -79,6 +83,7 @@ class MessageResource {
 			@Parameter(name = "municipalityId", description = "Municipality Id", example = "2281", required = true) @PathVariable("municipalityId") @ValidMunicipalityId final String municipalityId,
 			@Parameter(name = "attachmentId", description = "Id of the attachment to delete", example = "123", required = true) @PathVariable("attachmentId") final int attachmentId) {
 		service.deleteAttachment(attachmentId);
-		return ResponseEntity.noContent().build();
+
+		return noContent().header(CONTENT_TYPE, ALL_VALUE).build();
 	}
 }
