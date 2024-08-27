@@ -7,71 +7,80 @@ import static se.sundsvall.webmessagecollector.integration.opene.model.Instance.
 
 import java.time.Duration;
 import java.time.Instant;
-import java.util.Optional;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.scheduling.TaskScheduler;
-import org.springframework.scheduling.support.CronTrigger;
 import org.springframework.stereotype.Component;
 
 import se.sundsvall.webmessagecollector.integration.opene.configuration.OpenEProperties;
 import se.sundsvall.webmessagecollector.integration.opene.model.Instance;
 
-import net.javacrumbs.shedlock.core.DefaultLockManager;
-import net.javacrumbs.shedlock.core.DefaultLockingTaskExecutor;
-import net.javacrumbs.shedlock.core.LockConfiguration;
 import net.javacrumbs.shedlock.core.LockProvider;
-import net.javacrumbs.shedlock.spring.LockableTaskScheduler;
 
 @Component
 public class MessageCacheScheduler {
 
-    private static final Logger LOG = LoggerFactory.getLogger(MessageCacheScheduler.class);
+	private static final Logger LOG = LoggerFactory.getLogger(MessageCacheScheduler.class);
 
-    MessageCacheScheduler(final OpenEProperties openEProperties, final MessageCacheService messageCacheService, final TaskScheduler taskScheduler, final LockProvider lockProvider) {
-        var executor = new DefaultLockingTaskExecutor(lockProvider);
+	private final MessageCacheService messageCacheService;
+	private final MessageCacheFactory messageCacheFactory;
+	private final TaskScheduler taskScheduler;
+	private final LockProvider lockProvider;
 
-        openEProperties.environments().forEach((municipalityId, environment) -> {
-            var lockConfiguration = new LockConfiguration(Instant.now(), "lock-" + municipalityId, environment.scheduler().lockAtMostFor(), Duration.ZERO);
-            var lockManager = new DefaultLockManager(executor, lockConfigurationExtractor -> Optional.of(lockConfiguration));
-            var cronTrigger = new CronTrigger(environment.scheduler().cron());
-            var lockableTaskScheduler = new LockableTaskScheduler(taskScheduler, lockManager);
-            var task = new CacheMessagesTask(messageCacheService, municipalityId, environment);
+	MessageCacheScheduler(final OpenEProperties openEProperties, final MessageCacheService messageCacheService, final MessageCacheFactory messageCacheFactory, final TaskScheduler taskScheduler, final LockProvider lockProvider) {
+		this.messageCacheService = messageCacheService;
+		this.messageCacheFactory = messageCacheFactory;
+		this.taskScheduler = taskScheduler;
+		this.lockProvider = lockProvider;
+		initializeEnvironments(openEProperties);
+	}
 
-            lockableTaskScheduler.schedule(task, cronTrigger);
-        });
-    }
+	void initializeEnvironments(final OpenEProperties openEProperties) {
+		openEProperties.environments().forEach(this::scheduleTasks);
+	}
 
-    record CacheMessagesTask(MessageCacheService messageCacheService, String municipalityId, OpenEProperties.OpenEEnvironment environment) implements Runnable {
+	void scheduleTasks(final String municipalityId, final OpenEProperties.OpenEEnvironment environment) {
+		var lockConfiguration = messageCacheFactory.createLockConfiguration(Instant.now(), "lock-" + municipalityId, environment.scheduler().lockAtMostFor(), Duration.ZERO);
 
-        @Override
-        public void run() {
-            LOG.info("Message caching for municipalityId {} started", municipalityId);
+		var executor = messageCacheFactory.createDefaultLockingTaskExecutor(lockProvider);
+		var lockManager = messageCacheFactory.createDefaultLockManager(executor, messageCacheFactory.createLockConfigurationExtractor(lockConfiguration));
+		var cronTrigger = messageCacheFactory.createCronTrigger(environment.scheduler().cron());
+		var lockableTaskScheduler = messageCacheFactory.createLockableTaskScheduler(taskScheduler, lockManager);
+		var task = messageCacheFactory.createCacheMessagesTask(messageCacheService, municipalityId, environment);
+		lockableTaskScheduler.schedule(task, cronTrigger);
+	}
 
-            // Cache messages from the external instance, if it is configured
-            ofNullable(environment.external())
-                .map(OpenEProperties.OpenEEnvironment.OpenEInstance::familyIds)
-                .orElse(emptyList())
-                .forEach(familyId -> fetchMessages(municipalityId, EXTERNAL, familyId));
+	record CacheMessagesTask(MessageCacheService messageCacheService, String municipalityId,
+	                         OpenEProperties.OpenEEnvironment environment) implements Runnable {
 
-            // Cache messages from the internal instance, if it is configured
-            ofNullable(environment.internal())
-                .map(OpenEProperties.OpenEEnvironment.OpenEInstance::familyIds)
-                .orElse(emptyList())
-                .forEach(familyId -> fetchMessages(municipalityId, INTERNAL, familyId));
+		@Override
+		public void run() {
+			LOG.info("Message caching for municipalityId {} started", municipalityId);
 
-            LOG.info("Message caching for municipalityId {} finished", municipalityId);
-        }
+			// Cache messages from the external instance, if it is configured
+			ofNullable(environment.external())
+				.map(OpenEProperties.OpenEEnvironment.OpenEInstance::familyIds)
+				.orElse(emptyList())
+				.forEach(familyId -> fetchMessages(municipalityId, EXTERNAL, familyId));
 
-        private void fetchMessages(final String municipalityId, final Instance instance, final String familyId) {
-            try {
-                messageCacheService.fetchMessages(municipalityId, instance, familyId)
-                    .forEach(message -> ofNullable(message.getAttachments()).orElse(emptyList())
-                        .forEach(attachmentEntity -> messageCacheService.fetchAttachment(municipalityId, instance, attachmentEntity)));
-            } catch (Exception e) {
-                LOG.error("Unable to process messages for familyId {} (municipalityId: {}, {})", familyId, municipalityId, instance, e);
-            }
-        }
-    }
+			// Cache messages from the internal instance, if it is configured
+			ofNullable(environment.internal())
+				.map(OpenEProperties.OpenEEnvironment.OpenEInstance::familyIds)
+				.orElse(emptyList())
+				.forEach(familyId -> fetchMessages(municipalityId, INTERNAL, familyId));
+
+			LOG.info("Message caching for municipalityId {} finished", municipalityId);
+		}
+
+		private void fetchMessages(final String municipalityId, final Instance instance, final String familyId) {
+			try {
+				messageCacheService.fetchMessages(municipalityId, instance, familyId)
+					.forEach(message -> ofNullable(message.getAttachments()).orElse(emptyList())
+						.forEach(attachmentEntity -> messageCacheService.fetchAttachment(municipalityId, instance, attachmentEntity)));
+			} catch (Exception e) {
+				LOG.error("Unable to process messages for familyId {} (municipalityId: {}, {})", familyId, municipalityId, instance, e);
+			}
+		}
+	}
 }
