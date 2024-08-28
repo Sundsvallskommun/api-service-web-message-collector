@@ -8,6 +8,8 @@ import static se.sundsvall.webmessagecollector.integration.opene.model.Instance.
 import java.time.Duration;
 import java.time.Instant;
 import java.util.Optional;
+import java.util.function.Consumer;
+import java.util.function.UnaryOperator;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -27,51 +29,61 @@ import net.javacrumbs.shedlock.spring.LockableTaskScheduler;
 @Component
 public class MessageCacheScheduler {
 
-    private static final Logger LOG = LoggerFactory.getLogger(MessageCacheScheduler.class);
+	private static final Logger LOG = LoggerFactory.getLogger(MessageCacheScheduler.class);
 
-    MessageCacheScheduler(final OpenEProperties openEProperties, final MessageCacheService messageCacheService, final TaskScheduler taskScheduler, final LockProvider lockProvider) {
-        var executor = new DefaultLockingTaskExecutor(lockProvider);
+	MessageCacheScheduler(final OpenEProperties openEProperties, final MessageCacheService messageCacheService, final TaskScheduler taskScheduler, final LockProvider lockProvider) {
+		var executor = new DefaultLockingTaskExecutor(lockProvider);
 
-        openEProperties.environments().forEach((municipalityId, environment) -> {
-            var lockConfiguration = new LockConfiguration(Instant.now(), "lock-" + municipalityId, environment.scheduler().lockAtMostFor(), Duration.ZERO);
-            var lockManager = new DefaultLockManager(executor, lockConfigurationExtractor -> Optional.of(lockConfiguration));
-            var cronTrigger = new CronTrigger(environment.scheduler().cron());
-            var lockableTaskScheduler = new LockableTaskScheduler(taskScheduler, lockManager);
-            var task = new CacheMessagesTask(messageCacheService, municipalityId, environment);
+		openEProperties.environments().forEach((municipalityId, environment) -> {
+			var lockConfiguration = new LockConfiguration(Instant.now(), "lock-" + municipalityId, environment.scheduler().lockAtMostFor(), Duration.ZERO);
+			var lockManager = new DefaultLockManager(executor, lockConfigurationExtractor -> Optional.of(lockConfiguration));
+			var cronTrigger = new CronTrigger(environment.scheduler().cron());
+			var lockableTaskScheduler = new LockableTaskScheduler(taskScheduler, lockManager);
+			var task = new CacheMessagesTask(messageCacheService, municipalityId, environment);
 
-            lockableTaskScheduler.schedule(task, cronTrigger);
-        });
-    }
+			lockableTaskScheduler.schedule(task, cronTrigger);
+		});
+	}
 
-    record CacheMessagesTask(MessageCacheService messageCacheService, String municipalityId, OpenEProperties.OpenEEnvironment environment) implements Runnable {
+	record CacheMessagesTask(MessageCacheService messageCacheService, String municipalityId,
+	                         OpenEProperties.OpenEEnvironment environment) implements Runnable {
 
-        @Override
-        public void run() {
-            LOG.info("Message caching for municipalityId {} started", municipalityId);
+		@Override
+		public void run() {
+			LOG.info("Message caching for municipalityId {} started", municipalityId);
 
-            // Cache messages from the external instance, if it is configured
-            ofNullable(environment.external())
-                .map(OpenEProperties.OpenEEnvironment.OpenEInstance::familyIds)
-                .orElse(emptyList())
-                .forEach(familyId -> fetchMessages(municipalityId, EXTERNAL, familyId));
+			// Cache messages from the external instance, if it is configured
+			ofNullable(environment.external())
+				.map(peek(instance -> LOG.info("Handling external openE instance for municipalityId {} and familyIds {}", municipalityId, instance.familyIds())))
+				.map(OpenEProperties.OpenEEnvironment.OpenEInstance::familyIds)
+				.orElse(emptyList())
+				.forEach(familyId -> fetchMessages(municipalityId, EXTERNAL, familyId));
 
-            // Cache messages from the internal instance, if it is configured
-            ofNullable(environment.internal())
-                .map(OpenEProperties.OpenEEnvironment.OpenEInstance::familyIds)
-                .orElse(emptyList())
-                .forEach(familyId -> fetchMessages(municipalityId, INTERNAL, familyId));
+			// Cache messages from the internal instance, if it is configured
+			ofNullable(environment.internal())
+				.map(peek(instance -> LOG.info("Handling internal openE instance for municipalityId {} and familyIds {}", municipalityId, instance.familyIds())))
+				.map(OpenEProperties.OpenEEnvironment.OpenEInstance::familyIds)
+				.orElse(emptyList())
+				.forEach(familyId -> fetchMessages(municipalityId, INTERNAL, familyId));
 
-            LOG.info("Message caching for municipalityId {} finished", municipalityId);
-        }
+			LOG.info("Message caching for municipalityId {} finished", municipalityId);
+		}
 
-        private void fetchMessages(final String municipalityId, final Instance instance, final String familyId) {
-            try {
-                messageCacheService.fetchMessages(municipalityId, instance, familyId)
-                    .forEach(message -> ofNullable(message.getAttachments()).orElse(emptyList())
-                        .forEach(attachmentEntity -> messageCacheService.fetchAttachment(municipalityId, instance, attachmentEntity)));
-            } catch (Exception e) {
-                LOG.error("Unable to process messages for familyId {} (municipalityId: {}, {})", familyId, municipalityId, instance, e);
-            }
-        }
-    }
+		private void fetchMessages(final String municipalityId, final Instance instance, final String familyId) {
+			try {
+				messageCacheService.fetchMessages(municipalityId, instance, familyId)
+					.forEach(message -> ofNullable(message.getAttachments()).orElse(emptyList())
+						.forEach(attachmentEntity -> messageCacheService.fetchAttachment(municipalityId, instance, attachmentEntity)));
+			} catch (Exception e) {
+				LOG.error("Unable to process messages for familyId {} (municipalityId: {}, {})", familyId, municipalityId, instance, e);
+			}
+		}
+
+		static <T> UnaryOperator<T> peek(final Consumer<T> c) {
+			return x -> {
+				c.accept(x);
+				return x;
+			};
+		}
+	}
 }
