@@ -28,7 +28,7 @@ import se.sundsvall.webmessagecollector.service.MessageService;
 @ActiveProfiles("junit")
 class MessageResourceTest {
 
-	private static final String PATH = "/messages";
+	private static final String PATH = "/1984/messages";
 
 	@MockBean
 	private MessageService serviceMock;
@@ -38,9 +38,9 @@ class MessageResourceTest {
 
 	@Test
 	void getMessages() {
-		// Arrange & Mock
-		when(serviceMock.getMessages(anyString(), anyString())).thenReturn(List.of(MessageDTO.builder()
+		when(serviceMock.getMessages(anyString(), anyString(), anyString())).thenReturn(List.of(MessageDTO.builder()
 			.withId(1)
+			.withMunicipalityId("someMunicipalityId")
 			.withMessageId("someMessageId")
 			.withMessage("someMessage")
 			.withExternalCaseId("someExternalCaseId")
@@ -56,8 +56,7 @@ class MessageResourceTest {
 			.withAttachments(List.of(MessageAttachment.builder().build()))
 			.build()));
 
-		// Act
-		final var response = webTestClient.get()
+		var response = webTestClient.get()
 			.uri(PATH + "/123/external")
 			.exchange()
 			.expectStatus().isOk()
@@ -65,17 +64,15 @@ class MessageResourceTest {
 			.returnResult()
 			.getResponseBody();
 
-		// Assert and verify
 		assertThat(response).isNotNull().hasSize(1)
 			.allSatisfy(message -> assertThat(message).hasNoNullFieldsOrProperties());
 
-		verify(serviceMock).getMessages(anyString(), anyString());
+		verify(serviceMock).getMessages(anyString(), anyString(), anyString());
 		verifyNoMoreInteractions(serviceMock);
 	}
 
 	@Test
 	void deleteMessages() {
-		// Act
 		webTestClient.method(DELETE)
 			.uri(PATH)
 			.bodyValue(List.of(1, 2, 3))
@@ -83,23 +80,19 @@ class MessageResourceTest {
 			.expectStatus().isNoContent()
 			.expectBody().isEmpty();
 
-		// Assert and verify
 		verify(serviceMock).deleteMessages(List.of(1, 2, 3));
 		verifyNoMoreInteractions(serviceMock);
 	}
 
 	@Test
 	void deleteAttachment() {
-		// Act
 		webTestClient.method(DELETE)
 			.uri(PATH + "/attachments/1")
 			.exchange()
 			.expectStatus().isNoContent()
 			.expectBody().isEmpty();
 
-		// Assert and verify
 		verify(serviceMock).deleteAttachment(1);
 		verifyNoMoreInteractions(serviceMock);
 	}
-
 }

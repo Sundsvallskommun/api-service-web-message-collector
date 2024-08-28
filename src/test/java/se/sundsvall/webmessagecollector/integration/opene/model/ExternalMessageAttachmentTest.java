@@ -25,16 +25,13 @@ class ExternalMessageAttachmentTest {
 
 	@Test
 	void gettersAndSetters() {
-		// Arrange
-		final var attachmentID = 123;
-		final var fileName = "someFileName";
+		var attachmentID = 123;
+		var fileName = "someFileName";
 
-		// Act
-		final var externalMessageAttachment = new ExternalMessageAttachment();
+		var externalMessageAttachment = new ExternalMessageAttachment();
 		externalMessageAttachment.setAttachmentID(attachmentID);
 		externalMessageAttachment.setFileName(fileName);
 
-		// Assert
 		assertThat(externalMessageAttachment.getAttachmentID()).isEqualTo(attachmentID);
 		assertThat(externalMessageAttachment.getFileName()).isEqualTo(fileName);
 	}

@@ -1,6 +1,7 @@
 [
   {
     "id": 1,
+    "municipalityId": "1984",
     "direction": "INBOUND",
     "familyId": "123",
     "externalCaseId": "223",

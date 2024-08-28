@@ -27,25 +27,22 @@ class ExternalMessageTest {
 
 	@Test
 	void gettersAndSetters() {
-		// Arrange
-		final var messageID = 123;
-		final var message = "someMessage";
-		final var poster = new Poster();
-		final var added = "someAdded";
-		final var flowInstanceID = 123;
-		final var attachments = List.of(new ExternalMessageAttachment());
+		var messageId = 123;
+		var message = "someMessage";
+		var poster = new Poster();
+		var added = "someAdded";
+		var flowInstanceID = 123;
+		var attachments = List.of(new ExternalMessageAttachment());
 
-		// Act
-		final var externalMessage = new ExternalMessage();
-		externalMessage.setMessageID(messageID);
+		var externalMessage = new ExternalMessage();
+		externalMessage.setMessageID(messageId);
 		externalMessage.setMessage(message);
 		externalMessage.setPoster(poster);
 		externalMessage.setAdded(added);
 		externalMessage.setFlowInstanceID(flowInstanceID);
 		externalMessage.setAttachments(attachments);
 
-		// Assert
-		assertThat(externalMessage.getMessageID()).isEqualTo(messageID);
+		assertThat(externalMessage.getMessageID()).isEqualTo(messageId);
 		assertThat(externalMessage.getMessage()).isEqualTo(message);
 		assertThat(externalMessage.getPoster()).isSameAs(poster);
 		assertThat(externalMessage.getAdded()).isEqualTo(added);

@@ -39,22 +39,24 @@ class MessageEntityTest {
 
 	@Test
 	void testBuildPattern() {
-		final var direction = Direction.OUTBOUND;
-		final var email = "email";
-		final var externalCaseId = "123";
-		final var familyId = "234";
-		final var firstName = "firstName";
-		final var id = 345;
-		final var lastName = "lastName";
-		final var message = "message";
-		final var messageId = "456";
-		final var sent = LocalDateTime.now();
-		final var userId = "userId";
-		final var username = "username";
-		final var attachments = List.of(MessageAttachmentEntity.builder().build());
-		final var instance = Instance.INTERNAL;
+		var direction = Direction.OUTBOUND;
+		var email = "email";
+		var externalCaseId = "123";
+		var municipalityId = "1984";
+		var familyId = "234";
+		var firstName = "firstName";
+		var id = 345;
+		var lastName = "lastName";
+		var message = "message";
+		var messageId = "456";
+		var sent = LocalDateTime.now();
+		var userId = "userId";
+		var username = "username";
+		var attachments = List.of(MessageAttachmentEntity.builder().build());
+		var instance = Instance.INTERNAL;
 
-		final var bean = MessageEntity.builder()
+		var bean = MessageEntity.builder()
+			.withMunicipalityId(municipalityId)
 			.withDirection(direction)
 			.withEmail(email)
 			.withExternalCaseId(externalCaseId)
@@ -71,6 +73,7 @@ class MessageEntityTest {
 			.withInstance(instance)
 			.build();
 
+		assertThat(bean.getMunicipalityId()).isEqualTo(municipalityId);
 		assertThat(bean.getDirection()).isEqualTo(direction);
 		assertThat(bean.getEmail()).isEqualTo(email);
 		assertThat(bean.getExternalCaseId()).isEqualTo(externalCaseId);
@@ -86,5 +89,4 @@ class MessageEntityTest {
 		assertThat(bean.getAttachments()).isSameAs(attachments);
 		assertThat(bean.getInstance()).isEqualTo(instance);
 	}
-
 }

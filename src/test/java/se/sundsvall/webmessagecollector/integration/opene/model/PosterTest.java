@@ -25,22 +25,19 @@ class PosterTest {
 
 	@Test
 	void gettersAndSetters() {
-		// Arrange
-		final var userID = 123;
-		final var username = "someUsername";
-		final var firstname = "someFirstname";
-		final var lastname = "someLastname";
-		final var email = "someEmail";
+		var userID = 123;
+		var username = "someUsername";
+		var firstname = "someFirstname";
+		var lastname = "someLastname";
+		var email = "someEmail";
 
-		// Act
-		final var poster = new Poster();
+		var poster = new Poster();
 		poster.setUserID(userID);
 		poster.setUsername(username);
 		poster.setFirstname(firstname);
 		poster.setLastname(lastname);
 		poster.setEmail(email);
 
-		// Assert
 		assertThat(poster.getUserID()).isEqualTo(userID);
 		assertThat(poster.getUsername()).isEqualTo(username);
 		assertThat(poster.getFirstname()).isEqualTo(firstname);
@@ -48,12 +45,10 @@ class PosterTest {
 		assertThat(poster.getEmail()).isEqualTo(email);
 	}
 
-
 	@Test
 	void noDirtOnCreatedBean() {
 
 		assertThat(new Poster()).hasAllNullFieldsOrPropertiesExcept("userID").satisfies(
 			poster -> assertThat(poster.getUserID()).isZero());
 	}
-
 }

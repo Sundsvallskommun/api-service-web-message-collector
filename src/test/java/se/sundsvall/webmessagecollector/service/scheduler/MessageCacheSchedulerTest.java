@@ -1,93 +1,72 @@
 package se.sundsvall.webmessagecollector.service.scheduler;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
+import static se.sundsvall.webmessagecollector.integration.opene.model.Instance.EXTERNAL;
+import static se.sundsvall.webmessagecollector.integration.opene.model.Instance.INTERNAL;
 
 import java.util.List;
-import java.util.Map;
 
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.NullAndEmptySource;
-import org.mockito.ArgumentCaptor;
-import org.mockito.Captor;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.zalando.problem.Problem;
-import org.zalando.problem.Status;
 
-import se.sundsvall.webmessagecollector.integration.opene.model.Instance;
+import se.sundsvall.webmessagecollector.integration.db.model.MessageAttachmentEntity;
+import se.sundsvall.webmessagecollector.integration.db.model.MessageEntity;
+import se.sundsvall.webmessagecollector.integration.opene.configuration.OpenEProperties;
 
 @ExtendWith(MockitoExtension.class)
 class MessageCacheSchedulerTest {
 
-	@Mock
-	private MessageCacheProperties messageCachePropertiesMock;
+    @Nested
+    class CacheMessagesTaskTest {
 
-	@Mock
-	private MessageCacheService messageCacheServiceMock;
+        private static final String MUNICIPALITY_ID = "1984";
 
-	@InjectMocks
-	private MessageCacheScheduler scheduler;
+        private MessageCacheService messageCacheServiceMock;
+        private MessageEntity messageEntityMock;
+        private OpenEProperties.OpenEEnvironment.OpenEInstance externalInstanceMock;
+        private OpenEProperties.OpenEEnvironment.OpenEInstance internalInstanceMock;
+        private OpenEProperties.OpenEEnvironment openEEnvironmentMock;
+        private MessageCacheScheduler.CacheMessagesTask cacheMessagesTask;
 
-	@Captor
-	private ArgumentCaptor<String> familyIdCaptor;
+        @BeforeEach
+        void setUp() {
+            messageCacheServiceMock = mock(MessageCacheService.class);
+            messageEntityMock = mock(MessageEntity.class);
+            externalInstanceMock = mock(OpenEProperties.OpenEEnvironment.OpenEInstance.class);
+            internalInstanceMock = mock(OpenEProperties.OpenEEnvironment.OpenEInstance.class);
+            openEEnvironmentMock = mock(OpenEProperties.OpenEEnvironment.class);
 
-	@ParameterizedTest
-	@NullAndEmptySource
-	void cacheMessagesWhenNoFamilyIdsDefined(final Map<String, List<String>> familyIds) {
-		// Arrange
-		when(messageCachePropertiesMock.familyIds()).thenReturn(familyIds);
+            cacheMessagesTask = new MessageCacheScheduler.CacheMessagesTask(messageCacheServiceMock, MUNICIPALITY_ID, openEEnvironmentMock);
+        }
 
-		// Act
-		scheduler.cacheMessages();
+        @Test
+        void run() {
+            when(openEEnvironmentMock.external()).thenReturn(externalInstanceMock);
+            when(openEEnvironmentMock.internal()).thenReturn(internalInstanceMock);
+            when(externalInstanceMock.familyIds()).thenReturn(List.of("123", "456"));
+            when(internalInstanceMock.familyIds()).thenReturn(List.of("789"));
+            when(messageCacheServiceMock.fetchMessages(any(), any(), any())).thenReturn(List.of(messageEntityMock));
+            when(messageEntityMock.getAttachments()).thenReturn(List.of(MessageAttachmentEntity.builder().build()));
 
-		// Assert and verify
-		verify(messageCachePropertiesMock).familyIds();
-		verifyNoMoreInteractions(messageCachePropertiesMock);
-		verifyNoInteractions(messageCacheServiceMock);
-	}
+            cacheMessagesTask.run();
 
-	@Test
-	void cacheMessages() {
-		// Arrange
-		when(messageCachePropertiesMock.familyIds()).thenReturn(Map.of("INTERNAL", List.of("123", "456")));
-
-		// Act
-		scheduler.cacheMessages();
-
-		// Assert and verify
-		verify(messageCachePropertiesMock).familyIds();
-		verify(messageCacheServiceMock, times(2)).fetchMessages(eq(Instance.INTERNAL), familyIdCaptor.capture());
-		verifyNoMoreInteractions(messageCachePropertiesMock, messageCacheServiceMock);
-		assertThat(familyIdCaptor.getAllValues()).hasSize(2)
-			.containsExactly("123", "456");
-	}
-
-	@Test
-	void cacheMessagesOneThrowsException() {
-		// Arrange
-		when(messageCachePropertiesMock.familyIds()).thenReturn(Map.of("INTERNAL", List.of("123", "456")));
-		doThrow(Problem.valueOf(Status.INTERNAL_SERVER_ERROR, "Test")).when(messageCacheServiceMock).fetchMessages(eq(Instance.INTERNAL), anyString());
-
-		// Act
-		scheduler.cacheMessages();
-
-		// Assert and verify
-		verify(messageCachePropertiesMock).familyIds();
-		verify(messageCacheServiceMock, times(2)).fetchMessages(eq(Instance.INTERNAL), familyIdCaptor.capture());
-		verifyNoMoreInteractions(messageCachePropertiesMock, messageCacheServiceMock);
-		assertThat(familyIdCaptor.getAllValues()).hasSize(2)
-			.containsExactly("123", "456");
-	}
-
+            verify(messageCacheServiceMock, times(2)).fetchMessages(eq(MUNICIPALITY_ID), eq(EXTERNAL), any());
+            verify(messageCacheServiceMock, times(1)).fetchMessages(eq(MUNICIPALITY_ID), eq(INTERNAL), any());
+            verify(messageCacheServiceMock, times(3)).fetchAttachment(eq(MUNICIPALITY_ID), any(), any());
+            verify(externalInstanceMock).familyIds();
+            verify(internalInstanceMock).familyIds();
+            verify(openEEnvironmentMock).external();
+            verify(openEEnvironmentMock).internal();
+            verifyNoMoreInteractions(messageCacheServiceMock, externalInstanceMock, internalInstanceMock, openEEnvironmentMock);
+        }
+    }
 }

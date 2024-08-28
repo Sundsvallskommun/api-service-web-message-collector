@@ -2,6 +2,7 @@ package se.sundsvall.webmessagecollector.service;
 
 import static org.springframework.http.HttpHeaders.CONTENT_DISPOSITION;
 import static org.springframework.http.HttpHeaders.CONTENT_TYPE;
+import static org.zalando.problem.Status.INTERNAL_SERVER_ERROR;
 import static se.sundsvall.webmessagecollector.service.MessageMapper.toMessageDTOs;
 
 import java.io.IOException;
@@ -32,24 +33,24 @@ public class MessageService {
 		this.attachmentRepository = attachmentRepository;
 	}
 
-	public List<MessageDTO> getMessages(final String familyId, final String instance) {
-		return toMessageDTOs(repository.findAllByFamilyIdAndInstance(familyId, Instance.fromString(instance)));
+	public List<MessageDTO> getMessages(final String municipalityId, final String familyId, final String instance) {
+		return toMessageDTOs(repository.findAllByMunicipalityIdAndFamilyIdAndInstance(municipalityId, familyId, Instance.fromString(instance)));
 	}
 
 	public void getMessageAttachmentStreamed(final int attachmentID, final HttpServletResponse response) {
 		try {
-			final var attachmentEntity = attachmentRepository
+			var attachmentEntity = attachmentRepository
 				.findById(attachmentID)
 				.orElseThrow(() -> Problem.valueOf(Status.NOT_FOUND, "MessageAttachment not found"));
 
-			final var file = attachmentEntity.getFile();
+			var file = attachmentEntity.getFile();
 
 			response.addHeader(CONTENT_TYPE, attachmentEntity.getMimeType());
 			response.addHeader(CONTENT_DISPOSITION, "attachment; filename=\"" + attachmentEntity.getName() + "\"");
 			response.setContentLength((int) file.length());
 			StreamUtils.copy(file.getBinaryStream(), response.getOutputStream());
-		} catch (final IOException | SQLException e) {
-			throw Problem.valueOf(Status.INTERNAL_SERVER_ERROR, "%s occurred when copying file with attachment id '%s' to response: %s".formatted(e.getClass().getSimpleName(), attachmentID, e.getMessage()));
+		} catch (IOException | SQLException e) {
+			throw Problem.valueOf(INTERNAL_SERVER_ERROR, "%s occurred when copying file with attachment id '%s' to response: %s".formatted(e.getClass().getSimpleName(), attachmentID, e.getMessage()));
 		}
 	}
 
@@ -60,5 +61,4 @@ public class MessageService {
 	public void deleteMessages(final List<Integer> ids) {
 		repository.deleteAllById(ids);
 	}
-
 }

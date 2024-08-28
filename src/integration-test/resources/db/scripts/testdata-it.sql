@@ -1,6 +1,6 @@
-INSERT INTO message (id, external_case_id, family_id, message, message_id, direction, sent, email,
+INSERT INTO message (id, municipality_id, external_case_id, family_id, message, message_id, direction, sent, email,
                      first_name, last_name, user_id, username, instance)
-VALUES (1, '223', '123', 'Hello World', '1', 'INBOUND', '2023-02-23 17:26:23.458389',
+VALUES (1, 1984, '223', '123', 'Hello World', '1', 'INBOUND', '2023-02-23 17:26:23.458389',
         'test@sundsvall.se', 'Test', 'Testorsson', 'testId', 'test', 'INTERNAL');
 
 INSERT INTO message_attachment (attachment_id, message_id, name, extension, mime_type, file)
