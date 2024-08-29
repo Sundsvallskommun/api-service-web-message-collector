@@ -45,6 +45,7 @@ public class MessageCacheScheduler {
 		});
 	}
 
+
 	record CacheMessagesTask(MessageCacheService messageCacheService, String municipalityId,
 	                         OpenEProperties.OpenEEnvironment environment) implements Runnable {
 
