@@ -46,7 +46,7 @@ public final class OpenEMapper {
 		// Intentionally Empty
 	}
 
-	public static List<MessageEntity> toMessageEntities(final byte[] errands, final String familyId, final Instance instance) {
+	public static List<MessageEntity> toMessageEntities(final String municipalityId, final byte[] errands, final String familyId, final Instance instance) {
 
 		if (errands == null) {
 			LOG.info("No messages found for familyId {}", familyId);
@@ -59,14 +59,14 @@ public final class OpenEMapper {
 				.orElse(emptyList())
 				.stream()
 				.filter(externalMessage -> !externalMessage.isPostedByManager())
-				.map(externalMessage -> toMessageEntity(familyId, externalMessage, instance))
+				.map(externalMessage -> toMessageEntity(familyId, externalMessage, instance, municipalityId))
 				.toList();
 		} catch (final Exception e) {
 			throw Problem.valueOf(Status.INTERNAL_SERVER_ERROR, "%s occurred when parsing open-e messages for familyId %s. Message is: %s".formatted(e.getClass().getSimpleName(), familyId, e.getMessage()));
 		}
 	}
 
-	private static MessageEntity toMessageEntity(final String familyId, final ExternalMessage externalMessage, final Instance instance) {
+	private static MessageEntity toMessageEntity(final String familyId, final ExternalMessage externalMessage, final Instance instance, final String municipalityId) {
 
 		final var builder = MessageEntity.builder()
 			.withFamilyId(familyId)
@@ -75,6 +75,7 @@ public final class OpenEMapper {
 			.withMessageId(String.valueOf(externalMessage.getMessageID()))
 			.withExternalCaseId(String.valueOf(externalMessage.getFlowInstanceID()))
 			.withMessage(externalMessage.getMessage())
+			.withMunicipalityId(municipalityId)
 			.withSent(LocalDateTime.parse(externalMessage.getAdded(), formatter));
 
 		ofNullable(externalMessage.getPoster())
