@@ -26,7 +26,7 @@ class OpenEMapperTest {
 	void mapWhenInputIsNull() {
 		var familyId = "familyId";
 
-		assertThat(toMessageEntities(null, familyId, Instance.EXTERNAL)).isEmpty();
+		assertThat(toMessageEntities("2281", null, familyId, Instance.EXTERNAL)).isEmpty();
 	}
 
 	@Test
@@ -34,7 +34,7 @@ class OpenEMapperTest {
 		var familyId = "123";
 		var bytes = "{this is not a valid xml}".getBytes(ISO_8859_1);
 
-		var e = assertThrows(ThrowableProblem.class, () -> toMessageEntities(bytes, familyId, Instance.EXTERNAL));
+		var e = assertThrows(ThrowableProblem.class, () -> toMessageEntities("2281", bytes, familyId, Instance.EXTERNAL));
 
 		assertThat(e.getStatus()).isEqualTo(Status.INTERNAL_SERVER_ERROR);
 		assertThat(e.getMessage()).isEqualToIgnoringNewLines(
@@ -46,7 +46,7 @@ class OpenEMapperTest {
 		var familyId = "123";
 		var bytes = input.getBytes(ISO_8859_1);
 
-		assertThat(toMessageEntities(bytes, familyId, Instance.INTERNAL)).isEmpty();
+		assertThat(toMessageEntities("2281", bytes, familyId, Instance.INTERNAL)).isEmpty();
 	}
 
 	@Test
@@ -54,7 +54,7 @@ class OpenEMapperTest {
 		var familyId = "123";
 		var bytes = input.getBytes(ISO_8859_1);
 
-		var result = toMessageEntities(bytes, familyId, Instance.INTERNAL);
+		var result = toMessageEntities("2281", bytes, familyId, Instance.INTERNAL);
 
 		assertThat(result).hasSize(1)
 			.allSatisfy(entity -> {
@@ -64,6 +64,7 @@ class OpenEMapperTest {
 				assertThat(entity.getFamilyId()).isEqualTo(familyId);
 				assertThat(entity.getFirstName()).isEqualTo("firstName_1");
 				assertThat(entity.getId()).isNull();
+				assertThat(entity.getMunicipalityId()).isEqualTo("2281");
 				assertThat(entity.getLastName()).isEqualTo("lastName_1");
 				assertThat(entity.getMessage()).isEqualTo("Inbound message");
 				assertThat(entity.getMessageId()).isEqualTo("10");

@@ -50,7 +50,7 @@ public class MessageCacheService {
 		var fromTimestamp = executionInfo.getLastSuccessfulExecution().format(DATE_TIME_FORMAT);
 
 		var bytes = openEIntegration.getMessages(municipalityId, instance, familyId, fromTimestamp, "");
-		var messages = toMessageEntities(bytes, familyId, instance);
+		var messages = toMessageEntities(municipalityId, bytes, familyId, instance);
 		messageRepository.saveAllAndFlush(messages);
 
 		// Update timestamp for last successful execution
