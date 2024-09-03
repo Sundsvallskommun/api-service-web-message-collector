@@ -7,25 +7,28 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 
+import se.sundsvall.dept44.configuration.TruststoreConfiguration;
+
 import feign.Client;
 import feign.Logger;
 
-@SpringBootTest(classes = OpenEConfiguration.class)
+@SpringBootTest(classes = {TruststoreConfiguration.class, OpenEConfiguration.class})
 @ActiveProfiles("junit")
 class OpenEConfigurationTest {
 
-    @Autowired
-    private OpenEProperties openEProperties;
+	@Autowired
+	private OpenEProperties openEProperties;
 
-    @Autowired
-    private Logger.Level feignLoggerLevel;
-    @Autowired
-    private Client feignOkHttpClient;
+	@Autowired
+	private Logger.Level feignLoggerLevel;
 
-    @Test
-    void testAutowiring() {
-        assertThat(openEProperties).isNotNull();
-        assertThat(feignLoggerLevel).isNotNull();
-        assertThat(feignOkHttpClient).isNotNull();
-    }
+	@Autowired
+	private Client feignOkHttpClient;
+
+	@Test
+	void testAutowiring() {
+		assertThat(openEProperties).isNotNull();
+		assertThat(feignLoggerLevel).isNotNull();
+		assertThat(feignOkHttpClient).isNotNull();
+	}
 }
