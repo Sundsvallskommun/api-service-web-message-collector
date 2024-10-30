@@ -52,7 +52,7 @@ class OpenEIntegrationTest {
 
 	@Test
 	void getInternalMessages() {
-        var municipalityId = "1984";
+		var municipalityId = "1984";
 		var familyId = "123";
 		var instance = INTERNAL;
 		var fromDate = LocalDate.now().minusDays(30).toString();
@@ -72,7 +72,7 @@ class OpenEIntegrationTest {
 
 	@Test
 	void getExternalMessages() {
-        var municipalityId = "1984";
+		var municipalityId = "1984";
 		var familyId = "456";
 		var instance = EXTERNAL;
 		var fromDate = LocalDate.now().minusDays(30).toString();
@@ -92,7 +92,7 @@ class OpenEIntegrationTest {
 
 	@Test
 	void getInternalAttachment() {
-        var municipalityId = "1984";
+		var municipalityId = "1984";
 		var attachmentId = 123;
 		var instance = INTERNAL;
 
@@ -110,7 +110,7 @@ class OpenEIntegrationTest {
 
 	@Test
 	void getExternalAttachment() {
-        var municipalityId = "1984";
+		var municipalityId = "1984";
 		var attachmentId = 123;
 		var instance = EXTERNAL;
 

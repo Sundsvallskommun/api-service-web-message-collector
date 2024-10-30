@@ -12,7 +12,9 @@ import se.sundsvall.dept44.configuration.TruststoreConfiguration;
 import feign.Client;
 import feign.Logger;
 
-@SpringBootTest(classes = {TruststoreConfiguration.class, OpenEConfiguration.class})
+@SpringBootTest(classes = {
+	TruststoreConfiguration.class, OpenEConfiguration.class
+})
 @ActiveProfiles("junit")
 class OpenEConfigurationTest {
 

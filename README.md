@@ -16,7 +16,7 @@ dessa meddelanden och tillhandahåller dessa till intressenter.
 Konfiguration sker i filen `src/main/resources/application.properties` genom att sätta nedanstående
 properties till önskade värden:
 
-| Property                     | Beskrivning                                         |
+|           Property           |                     Beskrivning                     |
 |------------------------------|-----------------------------------------------------|
 | `spring.datasource.url`      | URL till databasen                                  |
 | `spring.datasource.username` | Användarnamn för databasen                          |
@@ -61,6 +61,6 @@ docker run -i --rm -p 8080:8080 evil.sundsvall.se/ms-web-message-collector:lates
 [![Vulnerabilities](https://sonarcloud.io/api/project_badges/measure?project=Sundsvallskommun_api-service-web-message-collector&metric=vulnerabilities)](https://sonarcloud.io/summary/overall?id=Sundsvallskommun_api-service-web-message-collector)
 [![Bugs](https://sonarcloud.io/api/project_badges/measure?project=Sundsvallskommun_api-service-web-message-collector&metric=bugs)](https://sonarcloud.io/summary/overall?id=Sundsvallskommun_api-service-web-message-collector)
 
-##  
+## 
 
 Copyright (c) 2021 Sundsvalls kommun
