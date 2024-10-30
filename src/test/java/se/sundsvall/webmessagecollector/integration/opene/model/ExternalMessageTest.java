@@ -57,8 +57,7 @@ class ExternalMessageTest {
 				assertThat(externalMessage.getMessageID()).isZero();
 				assertThat(externalMessage.getFlowInstanceID()).isZero();
 				assertThat(externalMessage.isPostedByManager()).isFalse();
-			}
-		);
+			});
 	}
 
 }

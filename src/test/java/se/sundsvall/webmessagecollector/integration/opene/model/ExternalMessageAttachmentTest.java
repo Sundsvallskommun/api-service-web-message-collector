@@ -36,12 +36,10 @@ class ExternalMessageAttachmentTest {
 		assertThat(externalMessageAttachment.getFileName()).isEqualTo(fileName);
 	}
 
-
 	@Test
 	void noDirtOnCreatedBean() {
 		assertThat(new ExternalMessageAttachment()).hasAllNullFieldsOrPropertiesExcept("attachmentID").satisfies(
-			externalMessageAttachment -> assertThat(externalMessageAttachment.getAttachmentID()).isZero()
-		);
+			externalMessageAttachment -> assertThat(externalMessageAttachment.getAttachmentID()).isZero());
 	}
 
 }

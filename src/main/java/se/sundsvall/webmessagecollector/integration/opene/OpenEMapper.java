@@ -118,5 +118,4 @@ public final class OpenEMapper {
 		return (dotIndex == -1) ? "" : file.substring(dotIndex + 1);
 	}
 
-
 }

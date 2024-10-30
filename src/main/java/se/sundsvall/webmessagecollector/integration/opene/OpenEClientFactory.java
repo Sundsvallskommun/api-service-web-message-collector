@@ -26,42 +26,40 @@ import feign.soap.SOAPErrorDecoder;
 @Component
 class OpenEClientFactory {
 
-    private static final Logger LOG = LoggerFactory.getLogger(OpenEClientFactory.class);
+	private static final Logger LOG = LoggerFactory.getLogger(OpenEClientFactory.class);
 
-    private final Map<ClientKey, OpenEClient> clients = new HashMap<>();
+	private final Map<ClientKey, OpenEClient> clients = new HashMap<>();
 
-    OpenEClientFactory(final ApplicationContext applicationContext, final OpenEProperties openEProperties) {
-        openEProperties.environments().forEach((municipalityId, environment) -> {
-            // Create a client for the external instance, if any
-            ofNullable(environment.external()).ifPresent(externalInstance ->
-                createClient(applicationContext, municipalityId, externalInstance, EXTERNAL));
+	OpenEClientFactory(final ApplicationContext applicationContext, final OpenEProperties openEProperties) {
+		openEProperties.environments().forEach((municipalityId, environment) -> {
+			// Create a client for the external instance, if any
+			ofNullable(environment.external()).ifPresent(externalInstance -> createClient(applicationContext, municipalityId, externalInstance, EXTERNAL));
 
-            // Create a client for the internal instance, if any
-            ofNullable(environment.internal()).ifPresent(internalInstance ->
-                createClient(applicationContext, municipalityId, internalInstance, INTERNAL));
-        });
-    }
+			// Create a client for the internal instance, if any
+			ofNullable(environment.internal()).ifPresent(internalInstance -> createClient(applicationContext, municipalityId, internalInstance, INTERNAL));
+		});
+	}
 
-    OpenEClient getClient(final String municipalityId, final Instance instance) {
-        return ofNullable(clients.get(new ClientKey(municipalityId, instance)))
-            .orElseThrow(() -> Problem.valueOf(INTERNAL_SERVER_ERROR, String.format("No %s OpenE client exists for municipalityId %s", instance, municipalityId)));
-    }
+	OpenEClient getClient(final String municipalityId, final Instance instance) {
+		return ofNullable(clients.get(new ClientKey(municipalityId, instance)))
+			.orElseThrow(() -> Problem.valueOf(INTERNAL_SERVER_ERROR, String.format("No %s OpenE client exists for municipalityId %s", instance, municipalityId)));
+	}
 
-    void createClient(final ApplicationContext applicationContext, final String municipalityId,
-            final OpenEProperties.OpenEEnvironment.OpenEInstance environment, final Instance instance) {
-        var clientName = "oep-%s-%s".formatted(instance.name().toLowerCase(), municipalityId);
-        var client = new FeignClientBuilder(applicationContext)
-            .forType(OpenEClient.class, clientName)
-            .customize(builder -> builder
-                .errorDecoder(new SOAPErrorDecoder())
-                .requestInterceptor(new BasicAuthRequestInterceptor(environment.username(), environment.password()))
-                .options(new Request.Options(environment.connectTimeout(), SECONDS, environment.readTimeout(), SECONDS, true)))
-            .url(environment.baseUrl())
-            .build();
-        clients.put(new ClientKey(municipalityId, instance), client);
+	void createClient(final ApplicationContext applicationContext, final String municipalityId,
+		final OpenEProperties.OpenEEnvironment.OpenEInstance environment, final Instance instance) {
+		var clientName = "oep-%s-%s".formatted(instance.name().toLowerCase(), municipalityId);
+		var client = new FeignClientBuilder(applicationContext)
+			.forType(OpenEClient.class, clientName)
+			.customize(builder -> builder
+				.errorDecoder(new SOAPErrorDecoder())
+				.requestInterceptor(new BasicAuthRequestInterceptor(environment.username(), environment.password()))
+				.options(new Request.Options(environment.connectTimeout(), SECONDS, environment.readTimeout(), SECONDS, true)))
+			.url(environment.baseUrl())
+			.build();
+		clients.put(new ClientKey(municipalityId, instance), client);
 
-        LOG.info("Created {} OpenE client for municipalityId {} ({})", instance, municipalityId, clientName);
-    }
+		LOG.info("Created {} OpenE client for municipalityId {} ({})", instance, municipalityId, clientName);
+	}
 
-    private record ClientKey(String municipalityId, Instance instance) { }
+	private record ClientKey(String municipalityId, Instance instance) {}
 }

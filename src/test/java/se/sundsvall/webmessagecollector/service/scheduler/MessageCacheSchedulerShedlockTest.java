@@ -1,6 +1,5 @@
 package se.sundsvall.webmessagecollector.service.scheduler;
 
-
 import static java.time.Clock.systemUTC;
 import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.assertj.core.api.Assertions.assertThat;

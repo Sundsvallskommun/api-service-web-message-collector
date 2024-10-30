@@ -48,10 +48,13 @@ public class MessageAttachmentEntity {
 
 	@Override
 	public boolean equals(final Object o) {
-		if (this == o) return true;
-		if (o == null || getClass() != o.getClass()) return false;
+		if (this == o)
+			return true;
+		if (o == null || getClass() != o.getClass())
+			return false;
 		final MessageAttachmentEntity that = (MessageAttachmentEntity) o;
-		return Objects.equals(attachmentId, that.attachmentId) && Objects.equals(name, that.name) && Objects.equals(extension, that.extension) && Objects.equals(mimeType, that.mimeType) && Objects.equals(file, that.file) && Objects.equals(message, that.message);
+		return Objects.equals(attachmentId, that.attachmentId) && Objects.equals(name, that.name) && Objects.equals(extension, that.extension) && Objects.equals(mimeType, that.mimeType) && Objects.equals(file, that.file) && Objects.equals(message,
+			that.message);
 	}
 
 	@Override

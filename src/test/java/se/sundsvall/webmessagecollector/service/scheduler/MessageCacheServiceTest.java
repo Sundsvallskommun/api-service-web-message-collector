@@ -42,21 +42,21 @@ class MessageCacheServiceTest {
 
 	private static final String RESPONSE = """
 			<Messages>
-		    <ExternalMessage>
-		        <postedByManager>false</postedByManager>
-		        <systemMessage>false</systemMessage>
-		        <readReceiptEnabled>false</readReceiptEnabled>
-		        <messageID>10</messageID>
-		        <message>Inbound message</message>
-		        <added>2022-05-25 11:20</added>
-		        <flowInstanceID>102251</flowInstanceID>
-		         <attachments>
-		            <ExternalMessageAttachment>
-		                <attachmentID>123</attachmentID>
-		                <filename>someFile.pdf</filename>
-		            </ExternalMessageAttachment>
-		        </attachments>
-		    </ExternalMessage>
+			<ExternalMessage>
+				<postedByManager>false</postedByManager>
+				<systemMessage>false</systemMessage>
+				<readReceiptEnabled>false</readReceiptEnabled>
+				<messageID>10</messageID>
+				<message>Inbound message</message>
+				<added>2022-05-25 11:20</added>
+				<flowInstanceID>102251</flowInstanceID>
+				<attachments>
+					<ExternalMessageAttachment>
+						<attachmentID>123</attachmentID>
+						<filename>someFile.pdf</filename>
+					</ExternalMessageAttachment>
+				</attachments>
+			</ExternalMessage>
 		</Messages>
 		""";
 
