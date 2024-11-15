@@ -45,7 +45,7 @@ public class MessageCacheService {
 	@Transactional
 	public List<MessageEntity> fetchMessages(final String municipalityId, final Instance instance, final String familyId) {
 		// Fetch info regarding last execution for fetching familyId (or initiate entity if no info exists)
-		var executionInfo = executionInformationRepository.findById(familyId).orElse(initiateExecutionInfo(familyId));
+		var executionInfo = executionInformationRepository.findById(familyId).orElse(initiateExecutionInfo(municipalityId, familyId));
 		// Calculate timestamp from when messages should be fetched
 		var fromTimestamp = executionInfo.getLastSuccessfulExecution().format(DATE_TIME_FORMAT);
 
@@ -73,8 +73,9 @@ public class MessageCacheService {
 		}
 	}
 
-	private ExecutionInformationEntity initiateExecutionInfo(final String familyId) {
+	private ExecutionInformationEntity initiateExecutionInfo(final String municipalityId, final String familyId) {
 		return ExecutionInformationEntity.builder()
+			.withMunicipalityId(municipalityId)
 			.withFamilyId(familyId)
 			.withLastSuccessfulExecution(OffsetDateTime.now().minusHours(1)) // minusHours(1) is a safety for not missing any messages on the first execution run
 			.build();

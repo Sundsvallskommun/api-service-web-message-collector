@@ -161,6 +161,7 @@ class MessageCacheServiceTest {
 			assertThat(entity.getUsername()).isNull();
 		});
 		assertThat(executionInformationEntityCaptor.getValue()).satisfies(entity -> {
+			assertThat(entity.getMunicipalityId()).isEqualTo(municipalityId);
 			assertThat(entity.getFamilyId()).isEqualTo(familyId);
 			assertThat(entity.getLastSuccessfulExecution()).isCloseTo(OffsetDateTime.now(), within(2, SECONDS));
 		});
