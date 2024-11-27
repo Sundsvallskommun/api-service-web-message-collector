@@ -103,12 +103,16 @@ Configuration is crucial for the application to run successfully. Ensure all nec
             lock-at-most-for: PT3M
           internal:
             base-url: https://someurl.se
+            username: your_username
+            password: your_password
             familyIds:
               - 123
             connect-timeout: 10
             read-timeout: 30
           external:
             base-url: https://someurl.se
+            username: your_username
+            password: your_password
             familyIds:
               - 456
             connect-timeout: 10
@@ -121,7 +125,9 @@ Configuration is crucial for the application to run successfully. Ensure all nec
     - **lock-at-most-for**: Defines the maximum duration for which the scheduler can hold a lock (`PT3M`), which is 3 minutes.
       The following configuration is divided into internal and external sections, allowing you to configure the retrieval of messages from two different Open-E platform instances.
   - **internal/external**:
-    - **base-url**: The base URL for internal connections (`https://someurl.se`).
+    - **base-url**: The base URL for the connection (`https://someurl.se`).
+    - **username**: The username for the connection (`your_username`).
+    - **password**: The password for the connection (`https://someurl.se`).
     - **familyIds**: A list of family IDs for internal use (`[123]`).
     - **connect-timeout**: The connection timeout duration in seconds (`10`).
     - **read-timeout**: The read timeout duration in seconds (`30`).
