@@ -11,7 +11,6 @@ import static se.sundsvall.webmessagecollector.integration.opene.model.Instance.
 import static se.sundsvall.webmessagecollector.integration.opene.model.Instance.INTERNAL;
 
 import java.time.LocalDate;
-
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;

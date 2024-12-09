@@ -10,21 +10,18 @@ import java.time.Instant;
 import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.function.UnaryOperator;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.scheduling.TaskScheduler;
-import org.springframework.scheduling.support.CronTrigger;
-import org.springframework.stereotype.Component;
-
-import se.sundsvall.webmessagecollector.integration.opene.configuration.OpenEProperties;
-import se.sundsvall.webmessagecollector.integration.opene.model.Instance;
-
 import net.javacrumbs.shedlock.core.DefaultLockManager;
 import net.javacrumbs.shedlock.core.DefaultLockingTaskExecutor;
 import net.javacrumbs.shedlock.core.LockConfiguration;
 import net.javacrumbs.shedlock.core.LockProvider;
 import net.javacrumbs.shedlock.spring.LockableTaskScheduler;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.scheduling.TaskScheduler;
+import org.springframework.scheduling.support.CronTrigger;
+import org.springframework.stereotype.Component;
+import se.sundsvall.webmessagecollector.integration.opene.configuration.OpenEProperties;
+import se.sundsvall.webmessagecollector.integration.opene.model.Instance;
 
 @Component
 public class MessageCacheScheduler {

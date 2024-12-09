@@ -6,22 +6,19 @@ import static org.zalando.problem.Status.INTERNAL_SERVER_ERROR;
 import static se.sundsvall.webmessagecollector.integration.opene.model.Instance.EXTERNAL;
 import static se.sundsvall.webmessagecollector.integration.opene.model.Instance.INTERNAL;
 
+import feign.Request;
+import feign.auth.BasicAuthRequestInterceptor;
+import feign.soap.SOAPErrorDecoder;
 import java.util.HashMap;
 import java.util.Map;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.cloud.openfeign.FeignClientBuilder;
 import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Component;
 import org.zalando.problem.Problem;
-
 import se.sundsvall.webmessagecollector.integration.opene.configuration.OpenEProperties;
 import se.sundsvall.webmessagecollector.integration.opene.model.Instance;
-
-import feign.Request;
-import feign.auth.BasicAuthRequestInterceptor;
-import feign.soap.SOAPErrorDecoder;
 
 @Component
 class OpenEClientFactory {

@@ -11,13 +11,11 @@ import static se.sundsvall.webmessagecollector.integration.opene.model.Instance.
 import static se.sundsvall.webmessagecollector.integration.opene.model.Instance.INTERNAL;
 
 import java.util.List;
-
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
-
 import se.sundsvall.webmessagecollector.integration.db.model.MessageAttachmentEntity;
 import se.sundsvall.webmessagecollector.integration.db.model.MessageEntity;
 import se.sundsvall.webmessagecollector.integration.opene.configuration.OpenEProperties;

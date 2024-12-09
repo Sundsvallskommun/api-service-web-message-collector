@@ -1,10 +1,8 @@
 package se.sundsvall.webmessagecollector.integration.opene.model;
 
-import java.util.List;
-
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlElementWrapper;
-
+import java.util.List;
 import lombok.Data;
 
 @Data
