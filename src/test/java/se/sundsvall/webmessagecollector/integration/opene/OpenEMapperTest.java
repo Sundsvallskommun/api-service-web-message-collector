@@ -6,13 +6,11 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static se.sundsvall.webmessagecollector.integration.opene.OpenEMapper.toMessageEntities;
 
 import java.time.LocalDateTime;
-
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.test.context.ActiveProfiles;
 import org.zalando.problem.Status;
 import org.zalando.problem.ThrowableProblem;
-
 import se.sundsvall.dept44.test.annotation.resource.Load;
 import se.sundsvall.dept44.test.extension.ResourceLoaderExtension;
 import se.sundsvall.webmessagecollector.api.model.Direction;

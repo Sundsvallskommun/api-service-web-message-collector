@@ -1,22 +1,26 @@
-[{
-	"lastName": "Testorsson",
-	"municipalityId": "1984",
-	"externalCaseId": "223",
-	"attachments": [{
-		"extension": "png",
-		"name": "test_image.png",
-		"attachmentId": 1,
-		"mimeType": "image/png"
-	}],
-	"instance": "INTERNAL",
-	"messageId": "1",
-	"message": "Hello World",
-	"sent": "2023-02-23T17:26:23.458389",
-	"userId": "testId",
-	"familyId": "123",
-	"firstName": "Test",
-	"id": 1,
-	"email": "test@sundsvall.se",
-	"direction": "INBOUND",
-	"username": "test"
-}]
+[
+	{
+		"lastName": "Testorsson",
+		"municipalityId": "1984",
+		"externalCaseId": "223",
+		"attachments": [
+			{
+				"extension": "png",
+				"name": "test_image.png",
+				"attachmentId": 1,
+				"mimeType": "image/png"
+			}
+		],
+		"instance": "INTERNAL",
+		"messageId": "1",
+		"message": "Hello World",
+		"sent": "2023-02-23T17:26:23.458389",
+		"userId": "testId",
+		"familyId": "123",
+		"firstName": "Test",
+		"id": 1,
+		"email": "test@sundsvall.se",
+		"direction": "INBOUND",
+		"username": "test"
+	}
+]
