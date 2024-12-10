@@ -9,9 +9,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.core.AllOf.allOf;
 
 import java.sql.SQLException;
-
 import javax.sql.rowset.serial.SerialBlob;
-
 import org.hamcrest.MatcherAssert;
 import org.junit.jupiter.api.Test;
 
