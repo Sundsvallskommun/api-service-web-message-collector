@@ -6,14 +6,11 @@ import java.sql.SQLException;
 import java.time.OffsetDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
-
 import javax.sql.rowset.serial.SerialBlob;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
-
 import se.sundsvall.webmessagecollector.integration.db.ExecutionInformationRepository;
 import se.sundsvall.webmessagecollector.integration.db.MessageAttachmentRepository;
 import se.sundsvall.webmessagecollector.integration.db.MessageRepository;

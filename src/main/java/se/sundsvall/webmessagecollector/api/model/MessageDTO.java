@@ -1,12 +1,10 @@
 package se.sundsvall.webmessagecollector.api.model;
 
-import java.util.List;
-
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
-
 import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import java.util.List;
 import lombok.Builder;
 import lombok.Getter;
 

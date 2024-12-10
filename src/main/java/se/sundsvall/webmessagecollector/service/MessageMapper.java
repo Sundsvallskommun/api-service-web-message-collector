@@ -5,7 +5,6 @@ import static java.util.Optional.ofNullable;
 
 import java.util.List;
 import java.util.Objects;
-
 import se.sundsvall.webmessagecollector.api.model.MessageAttachment;
 import se.sundsvall.webmessagecollector.api.model.MessageDTO;
 import se.sundsvall.webmessagecollector.integration.db.model.MessageAttachmentEntity;
