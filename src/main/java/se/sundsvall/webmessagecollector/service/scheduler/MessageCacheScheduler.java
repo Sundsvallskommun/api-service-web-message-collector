@@ -20,6 +20,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.scheduling.TaskScheduler;
 import org.springframework.scheduling.support.CronTrigger;
 import org.springframework.stereotype.Component;
+import se.sundsvall.webmessagecollector.integration.db.model.MessageEntity;
 import se.sundsvall.webmessagecollector.integration.opene.configuration.OpenEProperties;
 import se.sundsvall.webmessagecollector.integration.opene.model.Instance;
 
@@ -32,6 +33,10 @@ public class MessageCacheScheduler {
 		var executor = new DefaultLockingTaskExecutor(lockProvider);
 
 		openEProperties.environments().forEach((municipalityId, environment) -> {
+			// Ensure clockSkew does not cause message duplication. Add one extra minute to be safe.
+			if (environment.scheduler().clockSkew().plusMinutes(1).toMinutes() > environment.scheduler().keepDeletedAfterLastSuccessFor().toMinutes()) {
+				throw new IllegalArgumentException("Incompatible properties! scheduler.clockSkew cannot be greater than scheduler.keepDeletedAfterLastSuccessFor");
+			}
 			var lockConfiguration = new LockConfiguration(Instant.now(), "lock-" + municipalityId, environment.scheduler().lockAtMostFor(), Duration.ZERO);
 			var lockManager = new DefaultLockManager(executor, lockConfigurationExtractor -> Optional.of(lockConfiguration));
 			var cronTrigger = new CronTrigger(environment.scheduler().cron());
@@ -56,25 +61,46 @@ public class MessageCacheScheduler {
 				.map(peek(instance -> LOG.info("Handling external openE instance for municipalityId {} and familyIds {}", municipalityId, instance.familyIds())))
 				.map(OpenEProperties.OpenEEnvironment.OpenEInstance::familyIds)
 				.orElse(emptyList())
-				.forEach(familyId -> fetchMessages(municipalityId, EXTERNAL, familyId));
+				.forEach(familyId -> fetchMessages(municipalityId, EXTERNAL, familyId, environment.scheduler().clockSkew()));
 
 			// Cache messages from the internal instance, if it is configured
 			ofNullable(environment.internal())
 				.map(peek(instance -> LOG.info("Handling internal openE instance for municipalityId {} and familyIds {}", municipalityId, instance.familyIds())))
 				.map(OpenEProperties.OpenEEnvironment.OpenEInstance::familyIds)
 				.orElse(emptyList())
-				.forEach(familyId -> fetchMessages(municipalityId, INTERNAL, familyId));
+				.forEach(familyId -> fetchMessages(municipalityId, INTERNAL, familyId, environment.scheduler().clockSkew()));
+
+			// Retry messages stuck in status PROCESSING or with status FAILED_ATTACHMENTS
+			var retryableMessages = messageCacheService.getRetryableMessages(municipalityId);
+			if (!retryableMessages.isEmpty()) {
+				LOG.info("Retry fetching attachments for {} messages", retryableMessages.size());
+				retryableMessages.forEach(this::fetchAttachments);
+			}
+
+			// Clean up deleted messages
+			LOG.info("Checking for messages that can be permanently deleted");
+			messageCacheService.cleanUpDeletedMessages(environment.scheduler().keepDeletedAfterLastSuccessFor(), municipalityId);
 
 			LOG.info("Message caching for municipalityId {} finished", municipalityId);
 		}
 
-		private void fetchMessages(final String municipalityId, final Instance instance, final String familyId) {
+		private void fetchMessages(final String municipalityId, final Instance instance, final String familyId, final Duration clockSkew) {
 			try {
-				messageCacheService.fetchMessages(municipalityId, instance, familyId)
-					.forEach(message -> ofNullable(message.getAttachments()).orElse(emptyList())
-						.forEach(attachmentEntity -> messageCacheService.fetchAttachment(municipalityId, instance, attachmentEntity)));
+				messageCacheService.fetchAndSaveMessages(municipalityId, instance, familyId, clockSkew)
+					.forEach(this::fetchAttachments);
 			} catch (Exception e) {
 				LOG.error("Unable to process messages for familyId {} (municipalityId: {}, {})", familyId, municipalityId, instance, e);
+			}
+		}
+
+		private void fetchAttachments(MessageEntity message) {
+			try {
+				ofNullable(message.getAttachments()).orElse(emptyList())
+					.forEach(attachmentEntity -> messageCacheService.fetchAndSaveAttachment(message.getMunicipalityId(), message.getInstance(), attachmentEntity));
+				messageCacheService.complete(message);
+			} catch (Exception e) {
+				LOG.error(String.format("Unable to fetch attachment(s) for message with id '%s'", message.getId()), e);
+				messageCacheService.failedAttachments(message);
 			}
 		}
 

@@ -1,7 +1,13 @@
 INSERT INTO message (id, municipality_id, external_case_id, family_id, message, message_id, direction, sent, email,
-                     first_name, last_name, user_id, username, instance)
+                     first_name, last_name, user_id, username, instance, status, status_timestamp)
 VALUES (1, 1984, '223', '123', 'Hello World', '1', 'INBOUND', '2023-02-23 17:26:23.458389',
-        'test@sundsvall.se', 'Test', 'Testorsson', 'testId', 'test', 'INTERNAL');
+        'test@sundsvall.se', 'Test', 'Testorsson', 'testId', 'test', 'INTERNAL', 'COMPLETE', '2023-02-23 17:27:23.458389'),
+       (2, 1984, '232', '123', 'Hello World 2', '2', 'INBOUND', '2023-02-23 17:26:23.458389',
+        'test@sundsvall.se', 'Test', 'Testorsson', 'testId', 'test', 'INTERNAL', 'PROCESSING', '2023-02-23 17:27:23.458389'),
+       (3, 1984, '233', '123', 'Hello World 3', '3', 'INBOUND', '2023-02-23 17:26:23.458389',
+        'test@sundsvall.se', 'Test', 'Testorsson', 'testId', 'test', 'INTERNAL', 'DELETED', '2023-02-23 17:27:23.458389'),
+       (4, 1984, '234', '123', 'Hello World 4', '4', 'INBOUND', '2023-02-23 17:26:23.458389',
+               'test@sundsvall.se', 'Test', 'Testorsson', 'testId', 'test', 'INTERNAL', 'FAILED_ATTACHMENTS', '2023-02-23 17:27:23.458389');
 
 INSERT INTO message_attachment (attachment_id, message_id, name, extension, mime_type, file)
 VALUES (1, 1, 'test_image.png', 'png', 'image/png',

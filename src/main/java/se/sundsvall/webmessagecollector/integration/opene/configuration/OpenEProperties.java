@@ -28,7 +28,12 @@ public record OpenEProperties(Map<String, OpenEEnvironment> environments) {
 
 			@NotBlank String cron,
 
-			@DefaultValue("PT2M") Duration lockAtMostFor) {}
+			@DefaultValue("PT2M") Duration lockAtMostFor,
+
+			@DefaultValue("PT5M") Duration clockSkew,
+
+			@DefaultValue("PT3H") Duration keepDeletedAfterLastSuccessFor) {
+		}
 
 		public record OpenEInstance(
 
@@ -42,6 +47,7 @@ public record OpenEProperties(Map<String, OpenEEnvironment> environments) {
 
 			@DefaultValue("5") int connectTimeout,
 
-			@DefaultValue("60") int readTimeout) {}
+			@DefaultValue("60") int readTimeout) {
+		}
 	}
 }

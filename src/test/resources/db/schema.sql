@@ -10,6 +10,7 @@
         id integer not null auto_increment,
         municipality_id varchar(4) not null,
         sent datetime(6),
+        status_timestamp datetime(6) not null,
         email varchar(255),
         external_case_id varchar(255),
         family_id varchar(255),
@@ -21,6 +22,7 @@
         username varchar(255),
         direction enum ('INBOUND','OUTBOUND'),
         instance enum ('EXTERNAL','INTERNAL'),
+        status enum ('COMPLETE','DELETED','FAILED_ATTACHMENTS','PROCESSING'),
         primary key (id)
     ) engine=InnoDB;
 

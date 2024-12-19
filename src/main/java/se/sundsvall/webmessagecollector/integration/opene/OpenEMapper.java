@@ -23,6 +23,7 @@ import org.zalando.problem.Status;
 import se.sundsvall.webmessagecollector.api.model.Direction;
 import se.sundsvall.webmessagecollector.integration.db.model.MessageAttachmentEntity;
 import se.sundsvall.webmessagecollector.integration.db.model.MessageEntity;
+import se.sundsvall.webmessagecollector.integration.db.model.MessageStatus;
 import se.sundsvall.webmessagecollector.integration.opene.model.ExternalMessage;
 import se.sundsvall.webmessagecollector.integration.opene.model.Instance;
 import se.sundsvall.webmessagecollector.integration.opene.model.Messages;
@@ -74,7 +75,9 @@ public final class OpenEMapper {
 			.withExternalCaseId(String.valueOf(externalMessage.getFlowInstanceID()))
 			.withMessage(externalMessage.getMessage())
 			.withMunicipalityId(municipalityId)
-			.withSent(LocalDateTime.parse(externalMessage.getAdded(), formatter));
+			.withSent(LocalDateTime.parse(externalMessage.getAdded(), formatter))
+			.withStatus(MessageStatus.PROCESSING)
+			.withStatusTimestamp(LocalDateTime.now());
 
 		ofNullable(externalMessage.getPoster())
 			.ifPresent(poster -> builder

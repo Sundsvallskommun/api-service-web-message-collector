@@ -16,6 +16,7 @@ import org.zalando.problem.Status;
 import se.sundsvall.webmessagecollector.api.model.MessageDTO;
 import se.sundsvall.webmessagecollector.integration.db.MessageAttachmentRepository;
 import se.sundsvall.webmessagecollector.integration.db.MessageRepository;
+import se.sundsvall.webmessagecollector.integration.db.model.MessageStatus;
 import se.sundsvall.webmessagecollector.integration.opene.model.Instance;
 
 @Service
@@ -31,7 +32,7 @@ public class MessageService {
 	}
 
 	public List<MessageDTO> getMessages(final String municipalityId, final String familyId, final String instance) {
-		return toMessageDTOs(repository.findAllByMunicipalityIdAndFamilyIdAndInstance(municipalityId, familyId, Instance.fromString(instance)));
+		return toMessageDTOs(repository.findAllByMunicipalityIdAndFamilyIdAndInstanceAndStatus(municipalityId, familyId, Instance.fromString(instance), MessageStatus.COMPLETE));
 	}
 
 	public void getMessageAttachmentStreamed(final int attachmentID, final HttpServletResponse response) {
@@ -56,6 +57,8 @@ public class MessageService {
 	}
 
 	public void deleteMessages(final List<Integer> ids) {
-		repository.deleteAllById(ids);
+		var messages = repository.findAllById(ids);
+		messages.forEach(message -> message.setStatus(MessageStatus.DELETED));
+		repository.saveAll(messages);
 	}
 }

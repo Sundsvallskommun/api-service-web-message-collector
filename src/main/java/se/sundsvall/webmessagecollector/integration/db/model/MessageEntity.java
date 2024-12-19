@@ -61,6 +61,12 @@ public class MessageEntity {
 	@Enumerated(EnumType.STRING)
 	private Instance instance;
 
+	@Enumerated(EnumType.STRING)
+	private MessageStatus status;
+
+	@Column(name = "status_timestamp", nullable = false)
+	private LocalDateTime statusTimestamp;
+
 	@OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, mappedBy = "message")
 	private List<MessageAttachmentEntity> attachments;
 
