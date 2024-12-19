@@ -13,6 +13,7 @@ import static org.mockito.Mockito.verifyNoMoreInteractions;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.Map;
@@ -33,6 +34,7 @@ import se.sundsvall.webmessagecollector.integration.opene.model.Instance;
 	"integration.db.case-status.url=jdbc:tc:mariadb:10.6.4:////",
 	"integration.open-e.environments.2000.scheduler.enabled=true",
 	"integration.open-e.environments.2000.scheduler.cron=* * * * * *",
+	"integration.open-e.environments.2000.scheduler.clockSkew=PT22M",
 	"integration.open-e.environments.2000.internal.base-url=any-url",
 	"integration.open-e.environments.2000.internal.username=any-username",
 	"integration.open-e.environments.2000.internal.password=any-password",
@@ -57,7 +59,7 @@ class MessageCacheSchedulerShedlockTest {
 				await().forever()
 					.until(() -> false);
 				return null;
-			}).when(mockedBean).fetchMessages(any(), any(), any());
+			}).when(mockedBean).fetchAndSaveMessages(any(), any(), any(), any());
 
 			return mockedBean;
 		}
@@ -80,7 +82,7 @@ class MessageCacheSchedulerShedlockTest {
 			.untilAsserted(() -> assertThat(getLockedAt("lock-2000"))
 				.isCloseTo(LocalDateTime.now(systemUTC()), within(5, ChronoUnit.SECONDS)));
 
-		verify(messageCacheServiceMock, times(1)).fetchMessages("2000", Instance.INTERNAL, "123");
+		verify(messageCacheServiceMock, times(1)).fetchAndSaveMessages("2000", Instance.INTERNAL, "123", Duration.ofMinutes(22));
 		verifyNoMoreInteractions(messageCacheServiceMock);
 	}
 
