@@ -112,7 +112,7 @@ public class MessageCacheScheduler {
 					.forEach(attachmentEntity -> messageCacheService.fetchAndSaveAttachment(message.getMunicipalityId(), message.getInstance(), attachmentEntity));
 				messageCacheService.complete(message);
 			} catch (Exception e) {
-				LOG.error(String.format("Unable to fetch attachment(s) for message with id '%s'", message.getId()), e);
+				LOG.error("Unable to fetch attachment(s) for message with id '{}'", message.getId(), e);
 				messageCacheService.failedAttachments(message);
 				healthIndicator.setUnhealthy("Error fetching message attachments: " + e.getMessage());
 			}
