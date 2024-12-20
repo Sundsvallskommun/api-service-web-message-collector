@@ -20,6 +20,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.scheduling.TaskScheduler;
 import org.springframework.scheduling.support.CronTrigger;
 import org.springframework.stereotype.Component;
+import se.sundsvall.dept44.requestid.RequestId;
 import se.sundsvall.webmessagecollector.integration.db.model.MessageEntity;
 import se.sundsvall.webmessagecollector.integration.opene.configuration.OpenEProperties;
 import se.sundsvall.webmessagecollector.integration.opene.model.Instance;
@@ -29,7 +30,7 @@ public class MessageCacheScheduler {
 
 	private static final Logger LOG = LoggerFactory.getLogger(MessageCacheScheduler.class);
 
-	MessageCacheScheduler(final OpenEProperties openEProperties, final MessageCacheService messageCacheService, final TaskScheduler taskScheduler, final LockProvider lockProvider) {
+	MessageCacheScheduler(final OpenEProperties openEProperties, final MessageCacheService messageCacheService, final TaskScheduler taskScheduler, final LockProvider lockProvider, final MessageProcessingHealthIndicator healthIndicator) {
 		var executor = new DefaultLockingTaskExecutor(lockProvider);
 
 		openEProperties.environments().forEach((municipalityId, environment) -> {
@@ -41,47 +42,58 @@ public class MessageCacheScheduler {
 			var lockManager = new DefaultLockManager(executor, lockConfigurationExtractor -> Optional.of(lockConfiguration));
 			var cronTrigger = new CronTrigger(environment.scheduler().cron());
 			var lockableTaskScheduler = new LockableTaskScheduler(taskScheduler, lockManager);
-			var task = new CacheMessagesTask(messageCacheService, municipalityId, environment);
+			var task = new CacheMessagesTask(messageCacheService, municipalityId, environment, healthIndicator);
 
 			lockableTaskScheduler.schedule(task, cronTrigger);
 		});
 	}
 
 	record CacheMessagesTask(MessageCacheService messageCacheService, String municipalityId,
-		OpenEProperties.OpenEEnvironment environment)
+		OpenEProperties.OpenEEnvironment environment, MessageProcessingHealthIndicator healthIndicator)
 		implements
 		Runnable {
 
 		@Override
 		public void run() {
-			LOG.info("Message caching for municipalityId {} started", municipalityId);
+			try {
+				RequestId.init();
+				LOG.info("Message caching for municipalityId {} started", municipalityId);
+				healthIndicator.resetErrors();
 
-			// Cache messages from the external instance, if it is configured
-			ofNullable(environment.external())
-				.map(peek(instance -> LOG.info("Handling external openE instance for municipalityId {} and familyIds {}", municipalityId, instance.familyIds())))
-				.map(OpenEProperties.OpenEEnvironment.OpenEInstance::familyIds)
-				.orElse(emptyList())
-				.forEach(familyId -> fetchMessages(municipalityId, EXTERNAL, familyId, environment.scheduler().clockSkew()));
+				// Cache messages from the external instance, if it is configured
+				ofNullable(environment.external())
+					.map(peek(instance -> LOG.info("Handling external openE instance for municipalityId {} and familyIds {}", municipalityId, instance.familyIds())))
+					.map(OpenEProperties.OpenEEnvironment.OpenEInstance::familyIds)
+					.orElse(emptyList())
+					.forEach(familyId -> fetchMessages(municipalityId, EXTERNAL, familyId, environment.scheduler().clockSkew()));
 
-			// Cache messages from the internal instance, if it is configured
-			ofNullable(environment.internal())
-				.map(peek(instance -> LOG.info("Handling internal openE instance for municipalityId {} and familyIds {}", municipalityId, instance.familyIds())))
-				.map(OpenEProperties.OpenEEnvironment.OpenEInstance::familyIds)
-				.orElse(emptyList())
-				.forEach(familyId -> fetchMessages(municipalityId, INTERNAL, familyId, environment.scheduler().clockSkew()));
+				// Cache messages from the internal instance, if it is configured
+				ofNullable(environment.internal())
+					.map(peek(instance -> LOG.info("Handling internal openE instance for municipalityId {} and familyIds {}", municipalityId, instance.familyIds())))
+					.map(OpenEProperties.OpenEEnvironment.OpenEInstance::familyIds)
+					.orElse(emptyList())
+					.forEach(familyId -> fetchMessages(municipalityId, INTERNAL, familyId, environment.scheduler().clockSkew()));
 
-			// Retry messages stuck in status PROCESSING or with status FAILED_ATTACHMENTS
-			var retryableMessages = messageCacheService.getRetryableMessages(municipalityId);
-			if (!retryableMessages.isEmpty()) {
-				LOG.info("Retry fetching attachments for {} messages", retryableMessages.size());
-				retryableMessages.forEach(this::fetchAttachments);
+				// Retry messages stuck in status PROCESSING or with status FAILED_ATTACHMENTS
+				var retryableMessages = messageCacheService.getRetryableMessages(municipalityId);
+				if (!retryableMessages.isEmpty()) {
+					LOG.info("Retry fetching attachments for {} messages", retryableMessages.size());
+					retryableMessages.forEach(this::fetchAttachments);
+				}
+
+				// Clean up deleted messages
+				LOG.info("Checking for messages that can be permanently deleted");
+				messageCacheService.cleanUpDeletedMessages(environment.scheduler().keepDeletedAfterLastSuccessFor(), municipalityId);
+
+				if (!healthIndicator.hasErrors()) {
+					healthIndicator.setHealthy();
+				}
+			} catch (Exception e) {
+				healthIndicator.setUnhealthy("Error running scheduled task: " + e.getMessage());
+			} finally {
+				LOG.info("Message caching for municipalityId {} finished", municipalityId);
+				RequestId.reset();
 			}
-
-			// Clean up deleted messages
-			LOG.info("Checking for messages that can be permanently deleted");
-			messageCacheService.cleanUpDeletedMessages(environment.scheduler().keepDeletedAfterLastSuccessFor(), municipalityId);
-
-			LOG.info("Message caching for municipalityId {} finished", municipalityId);
 		}
 
 		private void fetchMessages(final String municipalityId, final Instance instance, final String familyId, final Duration clockSkew) {
@@ -90,6 +102,7 @@ public class MessageCacheScheduler {
 					.forEach(this::fetchAttachments);
 			} catch (Exception e) {
 				LOG.error("Unable to process messages for familyId {} (municipalityId: {}, {})", familyId, municipalityId, instance, e);
+				healthIndicator.setUnhealthy("Error fetching messages: " + e.getMessage());
 			}
 		}
 
@@ -101,6 +114,7 @@ public class MessageCacheScheduler {
 			} catch (Exception e) {
 				LOG.error(String.format("Unable to fetch attachment(s) for message with id '%s'", message.getId()), e);
 				messageCacheService.failedAttachments(message);
+				healthIndicator.setUnhealthy("Error fetching message attachments: " + e.getMessage());
 			}
 		}
 

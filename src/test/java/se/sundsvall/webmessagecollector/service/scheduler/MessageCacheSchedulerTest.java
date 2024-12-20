@@ -1,10 +1,12 @@
 package se.sundsvall.webmessagecollector.service.scheduler;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.ArgumentMatchers.same;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
@@ -41,6 +43,7 @@ class MessageCacheSchedulerTest {
 		private MessageAttachmentEntity messageAttachmentEntityExternalMock;
 		private MessageAttachmentEntity messageAttachmentEntityRetryMock;
 		private MessageCacheScheduler.CacheMessagesTask cacheMessagesTask;
+		private MessageProcessingHealthIndicator healthIndicatorMock;
 
 		@BeforeEach
 		void setUp() {
@@ -52,8 +55,9 @@ class MessageCacheSchedulerTest {
 			messageAttachmentEntityInternalMock = mock(MessageAttachmentEntity.class);
 			messageAttachmentEntityExternalMock = mock(MessageAttachmentEntity.class);
 			messageAttachmentEntityRetryMock = mock(MessageAttachmentEntity.class);
+			healthIndicatorMock = spy(MessageProcessingHealthIndicator.class);
 
-			cacheMessagesTask = new MessageCacheScheduler.CacheMessagesTask(messageCacheServiceMock, MUNICIPALITY_ID, openEEnvironmentMock);
+			cacheMessagesTask = new MessageCacheScheduler.CacheMessagesTask(messageCacheServiceMock, MUNICIPALITY_ID, openEEnvironmentMock, healthIndicatorMock);
 		}
 
 		@Test
@@ -83,6 +87,7 @@ class MessageCacheSchedulerTest {
 
 			cacheMessagesTask.run();
 
+			assertThat(healthIndicatorMock.health().getStatus().getCode()).isEqualTo("UP");
 			verify(messageCacheServiceMock).fetchAndSaveMessages(eq(MUNICIPALITY_ID), eq(EXTERNAL), eq("123"), same(clockSkew));
 			verify(messageCacheServiceMock).fetchAndSaveMessages(eq(MUNICIPALITY_ID), eq(EXTERNAL), eq("456"), same(clockSkew));
 			verify(messageCacheServiceMock).fetchAndSaveMessages(eq(MUNICIPALITY_ID), eq(INTERNAL), eq("789"), same(clockSkew));
@@ -98,7 +103,11 @@ class MessageCacheSchedulerTest {
 			verify(openEEnvironmentMock).external();
 			verify(openEEnvironmentMock).internal();
 			verify(messageCacheServiceMock).cleanUpDeletedMessages(keepDeletedAfterLastSuccessFor, MUNICIPALITY_ID);
-			verifyNoMoreInteractions(messageCacheServiceMock, externalInstanceMock, internalInstanceMock, openEEnvironmentMock);
+			verify(healthIndicatorMock).resetErrors();
+			verify(healthIndicatorMock).hasErrors();
+			verify(healthIndicatorMock).setHealthy();
+			verify(healthIndicatorMock).health();
+			verifyNoMoreInteractions(messageCacheServiceMock, externalInstanceMock, internalInstanceMock, openEEnvironmentMock, healthIndicatorMock);
 		}
 
 		@Test
@@ -127,6 +136,7 @@ class MessageCacheSchedulerTest {
 
 			cacheMessagesTask.run();
 
+			assertThat(healthIndicatorMock.health().getStatus().getCode()).isEqualTo("RESTRICTED");
 			verify(messageCacheServiceMock).fetchAndSaveMessages(eq(MUNICIPALITY_ID), eq(EXTERNAL), eq("123"), same(clockSkew));
 			verify(messageCacheServiceMock).fetchAndSaveMessages(eq(MUNICIPALITY_ID), eq(EXTERNAL), eq("456"), same(clockSkew));
 			verify(messageCacheServiceMock).fetchAndSaveMessages(eq(MUNICIPALITY_ID), eq(INTERNAL), eq("789"), same(clockSkew));
@@ -140,7 +150,12 @@ class MessageCacheSchedulerTest {
 			verify(openEEnvironmentMock).internal();
 			verify(messageCacheServiceMock).getRetryableMessages(MUNICIPALITY_ID);
 			verify(messageCacheServiceMock).cleanUpDeletedMessages(keepDeletedAfterLastSuccessFor, MUNICIPALITY_ID);
-			verifyNoMoreInteractions(messageCacheServiceMock, externalInstanceMock, internalInstanceMock, openEEnvironmentMock);
+			verify(healthIndicatorMock).resetErrors();
+			verify(healthIndicatorMock).hasErrors();
+			verify(healthIndicatorMock, times(3)).setUnhealthy("Error fetching message attachments: ERROR!");
+			verify(healthIndicatorMock, times(3)).setUnhealthy();
+			verify(healthIndicatorMock).health();
+			verifyNoMoreInteractions(messageCacheServiceMock, externalInstanceMock, internalInstanceMock, openEEnvironmentMock, healthIndicatorMock);
 
 		}
 	}
