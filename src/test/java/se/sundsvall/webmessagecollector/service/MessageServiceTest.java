@@ -4,6 +4,7 @@ import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
@@ -21,6 +22,8 @@ import java.util.Optional;
 import org.apache.commons.io.IOUtils;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
+import org.mockito.Captor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -31,6 +34,7 @@ import se.sundsvall.webmessagecollector.integration.db.MessageAttachmentReposito
 import se.sundsvall.webmessagecollector.integration.db.MessageRepository;
 import se.sundsvall.webmessagecollector.integration.db.model.MessageAttachmentEntity;
 import se.sundsvall.webmessagecollector.integration.db.model.MessageEntity;
+import se.sundsvall.webmessagecollector.integration.db.model.MessageStatus;
 import se.sundsvall.webmessagecollector.integration.opene.model.Instance;
 
 @ExtendWith(MockitoExtension.class)
@@ -48,6 +52,8 @@ class MessageServiceTest {
 	private ServletOutputStream servletOutputStreamMock;
 	@Mock
 	private Blob blobMock;
+	@Captor
+	ArgumentCaptor<List<MessageEntity>> messagesCaptor;
 
 	@InjectMocks
 	private MessageService service;
@@ -71,7 +77,7 @@ class MessageServiceTest {
 			.withAttachments(List.of(MessageAttachmentEntity.builder().build()))
 			.build();
 
-		when(messageRepositoryMock.findAllByMunicipalityIdAndFamilyIdAndInstance("someMunicipalityId", "someFamilyId", Instance.INTERNAL))
+		when(messageRepositoryMock.findAllByMunicipalityIdAndFamilyIdAndInstanceAndStatus("someMunicipalityId", "someFamilyId", Instance.INTERNAL, MessageStatus.COMPLETE))
 			.thenReturn(List.of(entity, MessageEntity.builder().build()));
 
 		var result = service.getMessages("someMunicipalityId", "someFamilyId", Instance.INTERNAL.name());
@@ -81,7 +87,7 @@ class MessageServiceTest {
 		assertThat(result.getFirst()).usingRecursiveComparison()
 			.isEqualTo(MessageMapper.toMessageDTO(entity));
 		// Verify
-		verify(messageRepositoryMock).findAllByMunicipalityIdAndFamilyIdAndInstance("someMunicipalityId", "someFamilyId", Instance.INTERNAL);
+		verify(messageRepositoryMock).findAllByMunicipalityIdAndFamilyIdAndInstanceAndStatus("someMunicipalityId", "someFamilyId", Instance.INTERNAL, MessageStatus.COMPLETE);
 		verifyNoMoreInteractions(messageRepositoryMock);
 	}
 
@@ -90,17 +96,25 @@ class MessageServiceTest {
 		var result = service.getMessages("someMunicipalityId", "someFamilyId", Instance.EXTERNAL.name());
 
 		assertThat(result).isNotNull().isEmpty();
-		verify(messageRepositoryMock).findAllByMunicipalityIdAndFamilyIdAndInstance("someMunicipalityId", "someFamilyId", Instance.EXTERNAL);
+		verify(messageRepositoryMock).findAllByMunicipalityIdAndFamilyIdAndInstanceAndStatus("someMunicipalityId", "someFamilyId", Instance.EXTERNAL, MessageStatus.COMPLETE);
 		verifyNoMoreInteractions(messageRepositoryMock);
 	}
 
 	@Test
 	void deleteMessages() {
 		var list = List.of(1, 2);
+		var messageMock1 = mock(MessageEntity.class);
+		var messageMock2 = mock(MessageEntity.class);
+
+		when(messageRepositoryMock.findAllById(any())).thenReturn(List.of(messageMock1, messageMock2));
 
 		service.deleteMessages(list);
 
-		verify(messageRepositoryMock).deleteAllById(list);
+		verify(messageRepositoryMock).findAllById(list);
+		verify(messageMock1).setStatus(MessageStatus.DELETED);
+		verify(messageMock2).setStatus(MessageStatus.DELETED);
+		verify(messageRepositoryMock).saveAll(messagesCaptor.capture());
+		assertThat(messagesCaptor.getValue()).hasSameElementsAs(List.of(messageMock1, messageMock2));
 		verifyNoMoreInteractions(messageRepositoryMock);
 	}
 
