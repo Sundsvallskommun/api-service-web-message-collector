@@ -16,12 +16,12 @@
         family_id varchar(255),
         first_name varchar(255),
         last_name varchar(255),
-        message varchar(255),
         message_id varchar(255),
         user_id varchar(255),
         username varchar(255),
         direction enum ('INBOUND','OUTBOUND'),
         instance enum ('EXTERNAL','INTERNAL'),
+        message longtext,
         status enum ('COMPLETE','DELETED','FAILED_ATTACHMENTS','PROCESSING'),
         primary key (id)
     ) engine=InnoDB;
