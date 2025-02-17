@@ -17,6 +17,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.hibernate.Length;
 import se.sundsvall.webmessagecollector.api.model.Direction;
 import se.sundsvall.webmessagecollector.integration.opene.model.Instance;
 
@@ -42,6 +43,7 @@ public class MessageEntity {
 
 	private String externalCaseId;
 
+	@Column(name = "message", length = Length.LONG32)
 	private String message;
 
 	private String messageId;
