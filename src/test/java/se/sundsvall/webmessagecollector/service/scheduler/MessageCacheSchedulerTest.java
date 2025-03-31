@@ -11,8 +11,8 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
-import static se.sundsvall.webmessagecollector.integration.opene.model.Instance.EXTERNAL;
-import static se.sundsvall.webmessagecollector.integration.opene.model.Instance.INTERNAL;
+import static se.sundsvall.webmessagecollector.integration.db.model.Instance.EXTERNAL;
+import static se.sundsvall.webmessagecollector.integration.db.model.Instance.INTERNAL;
 
 import java.time.Duration;
 import java.util.Collections;
@@ -22,9 +22,9 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
+import se.sundsvall.webmessagecollector.configuration.OpenEProperties;
 import se.sundsvall.webmessagecollector.integration.db.model.MessageAttachmentEntity;
 import se.sundsvall.webmessagecollector.integration.db.model.MessageEntity;
-import se.sundsvall.webmessagecollector.integration.opene.configuration.OpenEProperties;
 
 @ExtendWith(MockitoExtension.class)
 class MessageCacheSchedulerTest {

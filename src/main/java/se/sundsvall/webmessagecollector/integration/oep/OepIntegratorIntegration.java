@@ -6,7 +6,7 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
-import se.sundsvall.webmessagecollector.integration.opene.model.Instance;
+import se.sundsvall.webmessagecollector.integration.db.model.Instance;
 
 @Component
 public class OepIntegratorIntegration {
@@ -25,7 +25,7 @@ public class OepIntegratorIntegration {
 	}
 
 	public WebmessageAttachmentData getAttachmentById(final String municipalityId, final Instance instance, final String flowInstanceId, final int attachmentId) {
-		LOG.info("Fetching attachment with attachmentId {} for municipalityId {} and instance {}", attachmentId, municipalityId, instance);
+		LOG.info("Fetching attachment with attachmentId {} for municipalityId {} and flowInstanceId {} and instance {}", attachmentId, municipalityId, flowInstanceId, instance);
 		return oepIntegratorClient.getAttachmentById(municipalityId, instance.name(), flowInstanceId, attachmentId);
 	}
 
