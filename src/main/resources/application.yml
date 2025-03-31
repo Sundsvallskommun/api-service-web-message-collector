@@ -8,6 +8,13 @@ spring:
     baseline-on-migrate: true
     baseline-version: 1.0
     enabled: false
+  security:
+    oauth2:
+      client:
+        registration:
+          oep-integrator:
+            authorization-grant-type: client_credentials
+            provider: oep-integrator
 
 openapi:
   name: ${spring.application.name}
