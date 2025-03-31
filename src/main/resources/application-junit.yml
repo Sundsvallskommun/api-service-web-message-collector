@@ -1,4 +1,8 @@
 integration:
+  oep-integrator:
+    connect-timeout: 15
+    read-timeout: 20
+    url: oep-integrator-url
   open-e:
     environments:
       1984:
@@ -47,3 +51,15 @@ spring:
             scripts:
               action: create
               create-target: target/database/generated-schema.sql
+  security:
+    oauth2:
+      client:
+        provider:
+          oep-integrator:
+            token-uri: http://token.url
+        registration:
+          oep-integrator:
+            authorization-grant-type: client_credentials
+            provider: oep-integrator
+            client-id: the-client-id
+            client-secret: the-client-secret
