@@ -10,15 +10,16 @@ import static se.sundsvall.webmessagecollector.TestDataFactory.createWebMessageA
 import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Answers;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import se.sundsvall.webmessagecollector.integration.opene.model.Instance;
+import se.sundsvall.webmessagecollector.integration.db.model.Instance;
 
 @ExtendWith(MockitoExtension.class)
 class OepIntegratorIntegrationTests {
 
-	@Mock
+	@Mock(answer = Answers.CALLS_REAL_METHODS)
 	private OepIntegratorClient oepIntegratorClientMock;
 
 	@InjectMocks
@@ -34,7 +35,7 @@ class OepIntegratorIntegrationTests {
 		var webMessage = createWebMessage();
 		when(oepIntegratorClientMock.getWebmessageByFamilyId(municipalityId, instanceType, familyId, fromDate, toDate)).thenReturn(List.of(webMessage));
 
-		var result = oepIntegratorIntegration.getWebmessageByFamilyId(municipalityId, Instance.fromString(instanceType), familyId, fromDate, toDate);
+		var result = oepIntegratorIntegration.getWebmessageByFamilyId(municipalityId, Instance.valueOf(instanceType), familyId, fromDate, toDate);
 
 		assertThat(result).isNotNull().containsOnly(webMessage);
 		verify(oepIntegratorClientMock).getWebmessageByFamilyId(municipalityId, instanceType, familyId, fromDate, toDate);
@@ -50,7 +51,7 @@ class OepIntegratorIntegrationTests {
 		var webmessageAttachmentData = createWebMessageAttachmentData();
 		when(oepIntegratorClientMock.getAttachmentById(municipalityId, instanceType, flowInstanceId, attachmentId)).thenReturn(webmessageAttachmentData);
 
-		var result = oepIntegratorIntegration.getAttachmentById(municipalityId, Instance.fromString(instanceType), flowInstanceId, attachmentId);
+		var result = oepIntegratorIntegration.getAttachmentById(municipalityId, Instance.valueOf(instanceType), flowInstanceId, attachmentId);
 
 		assertThat(result).isNotNull().isEqualTo(webmessageAttachmentData);
 		verify(oepIntegratorClientMock).getAttachmentById(municipalityId, instanceType, flowInstanceId, attachmentId);
@@ -68,7 +69,7 @@ class OepIntegratorIntegrationTests {
 		var webMessage = createWebMessage();
 		when(oepIntegratorClientMock.getWebmessagesByFlowInstanceId(municipalityId, instanceType, flowInstanceId, fromDate, toDate)).thenReturn(List.of(webMessage));
 
-		var result = oepIntegratorIntegration.getWebmessagesByFlowInstanceId(municipalityId, Instance.fromString(instanceType), flowInstanceId, fromDate, toDate);
+		var result = oepIntegratorIntegration.getWebmessagesByFlowInstanceId(municipalityId, Instance.valueOf(instanceType), flowInstanceId, fromDate, toDate);
 
 		assertThat(result).isNotNull().containsOnly(webMessage);
 		verify(oepIntegratorClientMock).getWebmessagesByFlowInstanceId(municipalityId, instanceType, flowInstanceId, fromDate, toDate);

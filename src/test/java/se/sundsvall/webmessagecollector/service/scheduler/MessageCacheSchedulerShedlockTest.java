@@ -26,7 +26,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Primary;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.test.context.ActiveProfiles;
-import se.sundsvall.webmessagecollector.integration.opene.model.Instance;
+import se.sundsvall.webmessagecollector.integration.db.model.Instance;
 
 @SpringBootTest(properties = {
 	"spring.flyway.enabled=true",

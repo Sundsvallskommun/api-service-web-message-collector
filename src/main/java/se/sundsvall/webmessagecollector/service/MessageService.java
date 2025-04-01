@@ -16,8 +16,8 @@ import org.zalando.problem.Status;
 import se.sundsvall.webmessagecollector.api.model.MessageDTO;
 import se.sundsvall.webmessagecollector.integration.db.MessageAttachmentRepository;
 import se.sundsvall.webmessagecollector.integration.db.MessageRepository;
+import se.sundsvall.webmessagecollector.integration.db.model.Instance;
 import se.sundsvall.webmessagecollector.integration.db.model.MessageStatus;
-import se.sundsvall.webmessagecollector.integration.opene.model.Instance;
 
 @Service
 public class MessageService {
@@ -32,7 +32,7 @@ public class MessageService {
 	}
 
 	public List<MessageDTO> getMessages(final String municipalityId, final String familyId, final String instance) {
-		return toMessageDTOs(repository.findAllByMunicipalityIdAndFamilyIdAndInstanceAndStatus(municipalityId, familyId, Instance.fromString(instance), MessageStatus.COMPLETE));
+		return toMessageDTOs(repository.findAllByMunicipalityIdAndFamilyIdAndInstanceAndStatus(municipalityId, familyId, Instance.valueOf(instance), MessageStatus.COMPLETE));
 	}
 
 	public void getMessageAttachmentStreamed(final int attachmentID, final HttpServletResponse response) {

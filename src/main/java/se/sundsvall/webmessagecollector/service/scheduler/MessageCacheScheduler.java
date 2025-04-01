@@ -2,8 +2,8 @@ package se.sundsvall.webmessagecollector.service.scheduler;
 
 import static java.util.Collections.emptyList;
 import static java.util.Optional.ofNullable;
-import static se.sundsvall.webmessagecollector.integration.opene.model.Instance.EXTERNAL;
-import static se.sundsvall.webmessagecollector.integration.opene.model.Instance.INTERNAL;
+import static se.sundsvall.webmessagecollector.integration.db.model.Instance.EXTERNAL;
+import static se.sundsvall.webmessagecollector.integration.db.model.Instance.INTERNAL;
 
 import java.time.Duration;
 import java.time.Instant;
@@ -21,9 +21,9 @@ import org.springframework.scheduling.TaskScheduler;
 import org.springframework.scheduling.support.CronTrigger;
 import org.springframework.stereotype.Component;
 import se.sundsvall.dept44.requestid.RequestId;
+import se.sundsvall.webmessagecollector.configuration.OpenEProperties;
+import se.sundsvall.webmessagecollector.integration.db.model.Instance;
 import se.sundsvall.webmessagecollector.integration.db.model.MessageEntity;
-import se.sundsvall.webmessagecollector.integration.opene.configuration.OpenEProperties;
-import se.sundsvall.webmessagecollector.integration.opene.model.Instance;
 
 @Component
 public class MessageCacheScheduler {
@@ -106,7 +106,7 @@ public class MessageCacheScheduler {
 			}
 		}
 
-		private void fetchAttachments(MessageEntity message) {
+		private void fetchAttachments(final MessageEntity message) {
 			try {
 				ofNullable(message.getAttachments()).orElse(emptyList())
 					.forEach(attachmentEntity -> messageCacheService.fetchAndSaveAttachment(message.getMunicipalityId(), message.getInstance(), attachmentEntity));

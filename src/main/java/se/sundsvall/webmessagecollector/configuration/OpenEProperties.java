@@ -1,4 +1,4 @@
-package se.sundsvall.webmessagecollector.integration.opene.configuration;
+package se.sundsvall.webmessagecollector.configuration;
 
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
