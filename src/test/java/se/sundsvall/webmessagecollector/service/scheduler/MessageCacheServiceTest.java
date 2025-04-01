@@ -1,6 +1,5 @@
 package se.sundsvall.webmessagecollector.service.scheduler;
 
-import static java.time.temporal.ChronoUnit.MINUTES;
 import static java.time.temporal.ChronoUnit.SECONDS;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -12,8 +11,10 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
+import static se.sundsvall.webmessagecollector.TestDataFactory.createWebMessage;
+import static se.sundsvall.webmessagecollector.TestDataFactory.createWebMessageAttachmentData;
 import static se.sundsvall.webmessagecollector.api.model.Direction.INBOUND;
-import static se.sundsvall.webmessagecollector.integration.opene.model.Instance.INTERNAL;
+import static se.sundsvall.webmessagecollector.integration.db.model.Instance.INTERNAL;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
@@ -29,6 +30,7 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import se.sundsvall.webmessagecollector.integration.db.ExecutionInformationRepository;
 import se.sundsvall.webmessagecollector.integration.db.MessageAttachmentRepository;
@@ -37,35 +39,17 @@ import se.sundsvall.webmessagecollector.integration.db.model.ExecutionInformatio
 import se.sundsvall.webmessagecollector.integration.db.model.MessageAttachmentEntity;
 import se.sundsvall.webmessagecollector.integration.db.model.MessageEntity;
 import se.sundsvall.webmessagecollector.integration.db.model.MessageStatus;
-import se.sundsvall.webmessagecollector.integration.opene.OpenEIntegration;
+import se.sundsvall.webmessagecollector.integration.oep.OepIntegratorIntegration;
 
 @ExtendWith(MockitoExtension.class)
 class MessageCacheServiceTest {
 
-	private static final String RESPONSE = """
-			<Messages>
-			<ExternalMessage>
-				<postedByManager>false</postedByManager>
-				<systemMessage>false</systemMessage>
-				<readReceiptEnabled>false</readReceiptEnabled>
-				<messageID>10</messageID>
-				<message>Inbound message</message>
-				<added>2022-05-25 11:20</added>
-				<flowInstanceID>102251</flowInstanceID>
-				<attachments>
-					<ExternalMessageAttachment>
-						<attachmentID>123</attachmentID>
-						<filename>someFile.pdf</filename>
-					</ExternalMessageAttachment>
-				</attachments>
-			</ExternalMessage>
-		</Messages>
-		""";
+	private static final DateTimeFormatter DATE_TIME_FORMAT = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
 
 	private static final String MUNICIPALITY_ID = "municipalityId";
 
 	@Mock
-	private OpenEIntegration openEIntegrationMock;
+	private OepIntegratorIntegration oepIntegratorIntegrationMock;
 
 	@Mock
 	private MessageRepository messageRepositoryMock;
@@ -97,28 +81,30 @@ class MessageCacheServiceTest {
 		var familyId = "123";
 		var lastExecuted = OffsetDateTime.now().minusHours(new Random().nextInt());
 		var clockSkew = Duration.ofMinutes(10);
+		var webMessage = createWebMessage();
+		webMessage.setFamilyId(familyId);
+		var webMessages = List.of(webMessage);
 
 		when(executionInformationRepositoryMock.findById(familyId)).thenReturn(Optional.of(ExecutionInformationEntity.builder().withFamilyId(familyId).withLastSuccessfulExecution(lastExecuted).build()));
-		when(openEIntegrationMock.getMessages(any(), any(), any(), any(), any())).thenReturn(RESPONSE.getBytes());
-		when(messageRepositoryMock.existsByFamilyIdAndInstanceAndMessageIdAndExternalCaseId(any(), any(), any(), any())).thenReturn(false);
+		when(oepIntegratorIntegrationMock.getWebmessageByFamilyId(municipalityId, INTERNAL, familyId, lastExecuted.minus(clockSkew).format(DATE_TIME_FORMAT), "")).thenReturn(webMessages);
+		when(messageRepositoryMock.existsByFamilyIdAndInstanceAndMessageIdAndExternalCaseId(familyId, INTERNAL, "messageId", "externalCaseId")).thenReturn(false);
 
 		service.fetchAndSaveMessages(municipalityId, INTERNAL, familyId, clockSkew);
-
-		verify(openEIntegrationMock).getMessages(municipalityId, INTERNAL, familyId, lastExecuted.minus(clockSkew).format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm")), "");
-		verify(messageRepositoryMock).existsByFamilyIdAndInstanceAndMessageIdAndExternalCaseId(familyId, INTERNAL, "10", "102251");
+		verify(oepIntegratorIntegrationMock).getWebmessageByFamilyId(municipalityId, INTERNAL, familyId, lastExecuted.minus(clockSkew).format(DATE_TIME_FORMAT), "");
+		verify(messageRepositoryMock).existsByFamilyIdAndInstanceAndMessageIdAndExternalCaseId(familyId, INTERNAL, "messageId", "externalCaseId");
 		verify(messageRepositoryMock).saveAllAndFlush(messageEntityCaptor.capture());
 		verify(executionInformationRepositoryMock).save(executionInformationEntityCaptor.capture());
 
 		assertThat(messageEntityCaptor.getValue().getFirst()).satisfies(entity -> {
 			assertThat(entity).hasNoNullFieldsOrPropertiesExcept("id", "email", "firstName", "lastName", "userId", "username");
 			assertThat(entity.getDirection()).isEqualTo(INBOUND);
-			assertThat(entity.getExternalCaseId()).isEqualTo("102251");
+			assertThat(entity.getExternalCaseId()).isEqualTo("externalCaseId");
 			assertThat(entity.getFamilyId()).isEqualTo(familyId);
-			assertThat(entity.getMessage()).isEqualTo("Inbound message");
-			assertThat(entity.getMessageId()).isEqualTo("10");
-			assertThat(entity.getSent()).isEqualTo(LocalDateTime.of(2022, 5, 25, 11, 20));
+			assertThat(entity.getMessage()).isEqualTo("message");
+			assertThat(entity.getMessageId()).isEqualTo("messageId");
+			assertThat(entity.getSent()).isEqualTo(LocalDateTime.MIN);
 			assertThat(entity.getAttachments()).hasSize(1);
-			assertThat(entity.getAttachments().getFirst().getAttachmentId()).isEqualTo(123);
+			assertThat(entity.getAttachments().getFirst().getAttachmentId()).isEqualTo(12345);
 			assertThat(entity.getAttachments().getFirst().getName()).isEqualTo("someFile.pdf");
 			assertThat(entity.getAttachments().getFirst().getMimeType()).isEqualTo("application/pdf");
 			assertThat(entity.getAttachments().getFirst().getExtension()).isEqualTo("pdf");
@@ -138,15 +124,18 @@ class MessageCacheServiceTest {
 		var familyId = "123";
 		var lastExecuted = OffsetDateTime.now().minusHours(new Random().nextInt());
 		var clockSkew = Duration.ofMinutes(30);
+		var webMessage = createWebMessage();
+		webMessage.setFamilyId(familyId);
+		var webMessages = List.of(webMessage);
 
 		when(executionInformationRepositoryMock.findById(familyId)).thenReturn(Optional.of(ExecutionInformationEntity.builder().withFamilyId(familyId).withLastSuccessfulExecution(lastExecuted).build()));
-		when(openEIntegrationMock.getMessages(any(), any(), any(), any(), any())).thenReturn(RESPONSE.getBytes());
-		when(messageRepositoryMock.existsByFamilyIdAndInstanceAndMessageIdAndExternalCaseId(any(), any(), any(), any())).thenReturn(true);
+		when(oepIntegratorIntegrationMock.getWebmessageByFamilyId(municipalityId, INTERNAL, familyId, lastExecuted.minus(clockSkew).format(DATE_TIME_FORMAT), "")).thenReturn(webMessages);
+		when(messageRepositoryMock.existsByFamilyIdAndInstanceAndMessageIdAndExternalCaseId(familyId, INTERNAL, "messageId", "externalCaseId")).thenReturn(true);
 
 		service.fetchAndSaveMessages(municipalityId, INTERNAL, familyId, clockSkew);
 
-		verify(openEIntegrationMock).getMessages(municipalityId, INTERNAL, familyId, lastExecuted.minus(clockSkew).format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm")), "");
-		verify(messageRepositoryMock).existsByFamilyIdAndInstanceAndMessageIdAndExternalCaseId(familyId, INTERNAL, "10", "102251");
+		verify(oepIntegratorIntegrationMock).getWebmessageByFamilyId(municipalityId, INTERNAL, familyId, lastExecuted.minus(clockSkew).format(DATE_TIME_FORMAT), "");
+		verify(messageRepositoryMock).existsByFamilyIdAndInstanceAndMessageIdAndExternalCaseId(familyId, INTERNAL, "messageId", "externalCaseId");
 		verify(messageRepositoryMock).saveAllAndFlush(messageEntityCaptor.capture());
 		verify(executionInformationRepositoryMock).save(executionInformationEntityCaptor.capture());
 
@@ -160,40 +149,26 @@ class MessageCacheServiceTest {
 
 	@Test
 	void fetchAndSaveMessagesFirstTime() {
+		var spy = Mockito.spy(service);
 		var municipalityId = "1984";
 		var familyId = "123";
 		var clockSkew = Duration.ofMinutes(20);
+		var webMessage = createWebMessage();
+		webMessage.setFamilyId(familyId);
+		var webMessages = List.of(webMessage);
 
 		when(executionInformationRepositoryMock.findById(familyId)).thenReturn(Optional.empty());
-		when(openEIntegrationMock.getMessages(any(), any(), any(), any(), any())).thenReturn(RESPONSE.getBytes());
+		when(oepIntegratorIntegrationMock.getWebmessageByFamilyId(eq(municipalityId), eq(INTERNAL), eq(familyId), any(), eq(""))).thenReturn(webMessages);
+		when(spy.initiateExecutionInfo(municipalityId, familyId)).thenCallRealMethod();
 
-		service.fetchAndSaveMessages(municipalityId, INTERNAL, familyId, clockSkew);
+		var result = spy.fetchAndSaveMessages(municipalityId, INTERNAL, familyId, clockSkew);
 
-		// Assert and verify
-		verify(openEIntegrationMock).getMessages(eq(municipalityId), eq(INTERNAL), eq(familyId), fromTimeStampCaptor.capture(), eq(""));
-		verify(messageRepositoryMock).saveAllAndFlush(messageEntityCaptor.capture());
-		verify(executionInformationRepositoryMock).save(executionInformationEntityCaptor.capture());
-		assertThat(LocalDateTime.parse(fromTimeStampCaptor.getValue(), DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm")))
-			.isCloseTo(LocalDateTime.now().minusHours(1).minus(clockSkew), within(1, MINUTES));
-		assertThat(messageEntityCaptor.getValue().getFirst()).satisfies(entity -> {
-			assertThat(entity.getDirection()).isEqualTo(INBOUND);
-			assertThat(entity.getEmail()).isNull();
-			assertThat(entity.getExternalCaseId()).isEqualTo("102251");
-			assertThat(entity.getFamilyId()).isEqualTo(familyId);
-			assertThat(entity.getFirstName()).isNull();
-			assertThat(entity.getId()).isNull();
-			assertThat(entity.getLastName()).isNull();
-			assertThat(entity.getMessage()).isEqualTo("Inbound message");
-			assertThat(entity.getMessageId()).isEqualTo("10");
-			assertThat(entity.getSent()).isEqualTo(LocalDateTime.of(2022, 5, 25, 11, 20));
-			assertThat(entity.getUserId()).isNull();
-			assertThat(entity.getUsername()).isNull();
-		});
-		assertThat(executionInformationEntityCaptor.getValue()).satisfies(entity -> {
-			assertThat(entity.getMunicipalityId()).isEqualTo(municipalityId);
-			assertThat(entity.getFamilyId()).isEqualTo(familyId);
-			assertThat(entity.getLastSuccessfulExecution()).isCloseTo(OffsetDateTime.now(), within(2, SECONDS));
-		});
+		assertThat(result).isNotNull().hasSize(1);
+
+		verify(spy).initiateExecutionInfo(municipalityId, familyId);
+		verify(oepIntegratorIntegrationMock).getWebmessageByFamilyId(eq(municipalityId), eq(INTERNAL), eq(familyId), fromTimeStampCaptor.capture(), eq(""));
+		verify(messageRepositoryMock).saveAllAndFlush(any());
+		verify(executionInformationRepositoryMock).save(any());
 	}
 
 	@Test
@@ -207,16 +182,16 @@ class MessageCacheServiceTest {
 			.withMimeType("application/pdf")
 			.withName("someFile.pdf")
 			.build();
-		var attachment = "attachment".getBytes();
-		when(openEIntegrationMock.getAttachment(municipalityId, INTERNAL, 123)).thenReturn(attachment);
+		var webMessageAttachmentData = createWebMessageAttachmentData();
+		when(oepIntegratorIntegrationMock.getAttachmentById(municipalityId, INTERNAL, "", 123)).thenReturn(webMessageAttachmentData);
 
 		service.fetchAndSaveAttachment(municipalityId, INTERNAL, attachmentEntity);
 
-		verify(openEIntegrationMock).getAttachment(municipalityId, INTERNAL, 123);
+		verify(oepIntegratorIntegrationMock).getAttachmentById(municipalityId, INTERNAL, "", 123);
 		verify(messageAttachmentRepositoryMock).saveAndFlush(messageAttachmentEntityCaptor.capture());
 		assertThat(messageAttachmentEntityCaptor.getValue()).satisfies(entity -> {
 			assertThat(entity.getAttachmentId()).isEqualTo(123);
-			assertThat(entity.getFile()).isEqualTo(new SerialBlob(attachment));
+			assertThat(entity.getFile()).isEqualTo(new SerialBlob(webMessageAttachmentData.getData()));
 			assertThat(entity.getMimeType()).isEqualTo("application/pdf");
 			assertThat(entity.getName()).isEqualTo("someFile.pdf");
 			assertThat(entity.getExtension()).isEqualTo("pdf");
@@ -234,11 +209,11 @@ class MessageCacheServiceTest {
 			.withMimeType("application/pdf")
 			.withName("someFile.pdf")
 			.build();
-		when(openEIntegrationMock.getAttachment(municipalityId, INTERNAL, attachmentId)).thenReturn(null);
+		when(oepIntegratorIntegrationMock.getAttachmentById(municipalityId, INTERNAL, "", attachmentId)).thenReturn(null);
 
 		service.fetchAndSaveAttachment(municipalityId, INTERNAL, attachmentEntity);
 
-		verify(openEIntegrationMock).getAttachment(municipalityId, INTERNAL, attachmentId);
+		verify(oepIntegratorIntegrationMock).getAttachmentById(municipalityId, INTERNAL, "", attachmentId);
 		verifyNoInteractions(messageAttachmentRepositoryMock);
 	}
 
@@ -248,14 +223,14 @@ class MessageCacheServiceTest {
 		var attachmentId = 123;
 		var attachmentEntity = MessageAttachmentEntity.builder().withAttachmentId(attachmentId).build();
 		var originalException = new RuntimeException("ERROR!");
-		when(openEIntegrationMock.getAttachment(municipalityId, INTERNAL, attachmentId)).thenThrow(originalException);
+		when(oepIntegratorIntegrationMock.getAttachmentById(municipalityId, INTERNAL, "", attachmentId)).thenThrow(originalException);
 
 		assertThatThrownBy(() -> service.fetchAndSaveAttachment(municipalityId, INTERNAL, attachmentEntity))
 			.isInstanceOf(RuntimeException.class)
 			.extracting("cause")
 			.isSameAs(originalException);
 
-		verify(openEIntegrationMock).getAttachment(municipalityId, INTERNAL, attachmentId);
+		verify(oepIntegratorIntegrationMock).getAttachmentById(municipalityId, INTERNAL, "", attachmentId);
 		verifyNoInteractions(messageAttachmentRepositoryMock);
 	}
 

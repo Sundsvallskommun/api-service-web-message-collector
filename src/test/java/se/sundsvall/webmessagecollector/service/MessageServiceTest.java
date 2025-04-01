@@ -32,10 +32,10 @@ import org.zalando.problem.ThrowableProblem;
 import se.sundsvall.webmessagecollector.api.model.Direction;
 import se.sundsvall.webmessagecollector.integration.db.MessageAttachmentRepository;
 import se.sundsvall.webmessagecollector.integration.db.MessageRepository;
+import se.sundsvall.webmessagecollector.integration.db.model.Instance;
 import se.sundsvall.webmessagecollector.integration.db.model.MessageAttachmentEntity;
 import se.sundsvall.webmessagecollector.integration.db.model.MessageEntity;
 import se.sundsvall.webmessagecollector.integration.db.model.MessageStatus;
-import se.sundsvall.webmessagecollector.integration.opene.model.Instance;
 
 @ExtendWith(MockitoExtension.class)
 class MessageServiceTest {
