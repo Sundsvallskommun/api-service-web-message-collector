@@ -19,7 +19,7 @@ import se.sundsvall.webmessagecollector.integration.db.model.MessageAttachmentEn
 import se.sundsvall.webmessagecollector.integration.db.model.MessageEntity;
 import se.sundsvall.webmessagecollector.integration.db.model.MessageStatus;
 import se.sundsvall.webmessagecollector.integration.oep.OepIntegratorIntegration;
-import se.sundsvall.webmessagecollector.service.MessageMapper;
+import se.sundsvall.webmessagecollector.integration.oep.OepIntegratorMapper;
 
 @Service
 public class MessageCacheService {
@@ -54,7 +54,7 @@ public class MessageCacheService {
 		var startTime = OffsetDateTime.now();
 
 		var webmessages = oepIntegratorIntegration.getWebmessageByFamilyId(municipalityId, instance, familyId, fromTimestamp, "");
-		var messages = MessageMapper.toMessageEntities(webmessages).stream()
+		var messages = OepIntegratorMapper.toMessageEntities(webmessages).stream()
 			.filter(message -> !messageRepository.existsByFamilyIdAndInstanceAndMessageIdAndExternalCaseId(message.getFamilyId(), message.getInstance(), message.getMessageId(), message.getExternalCaseId()))
 			.toList();
 		messageRepository.saveAllAndFlush(messages);
@@ -69,10 +69,11 @@ public class MessageCacheService {
 	@Transactional
 	public void fetchAndSaveAttachment(final String municipalityId, final Instance instance, final MessageAttachmentEntity attachmentEntity) {
 		try {
-			var webmessageAttachmentData = oepIntegratorIntegration.getAttachmentById(municipalityId, instance, "", attachmentEntity.getAttachmentId());
+			var response = oepIntegratorIntegration.getAttachmentStreamById(municipalityId, instance, "", attachmentEntity.getAttachmentId());
+			var inputStreamResource = response.getBody();
 
-			if (webmessageAttachmentData != null && webmessageAttachmentData.getData() != null && attachmentEntity.getFile() == null) {
-				attachmentEntity.setFile(new SerialBlob(webmessageAttachmentData.getData()));
+			if (inputStreamResource != null && attachmentEntity.getFile() == null) {
+				attachmentEntity.setFile(new SerialBlob(inputStreamResource.getInputStream().readAllBytes()));
 				messageAttachmentRepository.saveAndFlush(attachmentEntity);
 			}
 		} catch (Exception e) {
