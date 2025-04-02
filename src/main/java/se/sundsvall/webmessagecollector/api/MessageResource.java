@@ -48,7 +48,7 @@ class MessageResource {
 		this.service = service;
 	}
 
-	@GetMapping(value = "/{familyId}/{Instance}")
+	@GetMapping(value = "/{familyId}/{Instance}", produces = APPLICATION_JSON_VALUE)
 	@ApiResponse(responseCode = "200", description = "Successful Operation", content = @Content(mediaType = APPLICATION_JSON_VALUE, array = @ArraySchema(schema = @Schema(implementation = MessageDTO.class))))
 	@Operation(summary = "Get a list of messages related to a specific familyId", description = "Returns a list of messages found for the specified familyId")
 	ResponseEntity<List<MessageDTO>> getMessages(
@@ -69,9 +69,7 @@ class MessageResource {
 		return noContent().header(CONTENT_TYPE, ALL_VALUE).build();
 	}
 
-	@GetMapping(value = "/attachments/{attachmentId}", produces = {
-		ALL_VALUE, APPLICATION_PROBLEM_JSON_VALUE
-	})
+	@GetMapping(value = "/attachments/{attachmentId}", produces = ALL_VALUE)
 	@ApiResponse(responseCode = "200", description = "Successful Operation", useReturnTypeSchema = true)
 	@Operation(summary = "Get a messageAttachment", description = "Returns a messageAttachment as a stream for the specified attachmentId")
 	void getAttachment(
@@ -91,9 +89,7 @@ class MessageResource {
 		return noContent().header(CONTENT_TYPE, ALL_VALUE).build();
 	}
 
-	@GetMapping(value = "/{instance}/flow-instances/{flowInstanceId}", produces = {
-		APPLICATION_JSON_VALUE, APPLICATION_PROBLEM_JSON_VALUE
-	})
+	@GetMapping(value = "/{instance}/flow-instances/{flowInstanceId}", produces = APPLICATION_JSON_VALUE)
 	@ApiResponse(responseCode = "200", description = "Successful Operation", useReturnTypeSchema = true)
 	@Operation(summary = "Get a list of messages related to a specific flow instance id", description = "Returns a list of messages found for the specified flow instance id")
 	ResponseEntity<List<MessageDTO>> getMessagesByFlowInstanceId(
@@ -107,9 +103,7 @@ class MessageResource {
 		return ok(service.getMessagesByFlowInstanceId(municipalityId, instance.toUpperCase(), flowInstanceId, fromDateTime, toDateTime));
 	}
 
-	@GetMapping(value = "/{instance}/attachments/{attachmentId}", produces = {
-		ALL_VALUE, APPLICATION_PROBLEM_JSON_VALUE
-	})
+	@GetMapping(value = "/{instance}/attachments/{attachmentId}", produces = ALL_VALUE)
 	@ApiResponse(responseCode = "200", description = "Successful Operation", useReturnTypeSchema = true)
 	void getAttachmentById(final HttpServletResponse response,
 		@Parameter(name = "municipalityId", description = "Municipality Id", example = "2281", required = true) @PathVariable("municipalityId") @ValidMunicipalityId final String municipalityId,

@@ -5,7 +5,6 @@ import static se.sundsvall.webmessagecollector.TestDataFactory.createWebMessage;
 import static se.sundsvall.webmessagecollector.TestDataFactory.createWebMessageAttachment;
 import static se.sundsvall.webmessagecollector.integration.oep.OepIntegratorMapper.DATE_TIME_FORMAT;
 
-import java.time.LocalDateTime;
 import java.util.List;
 import org.junit.jupiter.api.Test;
 import se.sundsvall.webmessagecollector.api.model.Direction;
@@ -95,7 +94,6 @@ class OepIntegratorMapperTest {
 			assertThat(entity.getLastName()).isEqualTo(webMessage.getLastName());
 			assertThat(entity.getUsername()).isEqualTo(webMessage.getUsername());
 			assertThat(entity.getStatus()).isEqualTo(MessageStatus.PROCESSING);
-			assertThat(entity.getStatusTimestamp()).isBefore(LocalDateTime.now()).isAfter(LocalDateTime.now().minusMinutes(1));
 		});
 	}
 

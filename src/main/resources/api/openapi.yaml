@@ -7,7 +7,7 @@ info:
     url: https://opensource.org/licenses/MIT
   version: "5.1"
 servers:
-  - url: http://localhost:56384
+  - url: http://localhost:65318
     description: Generated server url
 tags:
   - name: messages
@@ -68,9 +68,6 @@ paths:
                 oneOf:
                   - $ref: "#/components/schemas/Problem"
                   - $ref: "#/components/schemas/ConstraintViolationProblem"
-                  - type: array
-                    items:
-                      $ref: "#/components/schemas/MessageDTO"
             application/json:
               schema:
                 type: array
@@ -81,11 +78,7 @@ paths:
           content:
             application/problem+json:
               schema:
-                oneOf:
-                  - type: array
-                    items:
-                      $ref: "#/components/schemas/MessageDTO"
-                  - $ref: "#/components/schemas/Problem"
+                $ref: "#/components/schemas/Problem"
             application/json:
               schema:
                 type: array
@@ -96,11 +89,7 @@ paths:
           content:
             application/problem+json:
               schema:
-                oneOf:
-                  - type: array
-                    items:
-                      $ref: "#/components/schemas/MessageDTO"
-                  - $ref: "#/components/schemas/Problem"
+                $ref: "#/components/schemas/Problem"
             application/json:
               schema:
                 type: array
@@ -110,11 +99,6 @@ paths:
           description: Successful Operation
           content:
             application/json:
-              schema:
-                type: array
-                items:
-                  $ref: "#/components/schemas/MessageDTO"
-            application/problem+json:
               schema:
                 type: array
                 items:
@@ -397,12 +381,12 @@ components:
           type: object
           additionalProperties:
             type: object
+        status:
+          $ref: "#/components/schemas/StatusType"
         title:
           type: string
         detail:
           type: string
-        status:
-          $ref: "#/components/schemas/StatusType"
     StatusType:
       type: object
       properties:
@@ -532,12 +516,12 @@ components:
           type: object
           additionalProperties:
             type: object
+        status:
+          $ref: "#/components/schemas/StatusType"
         title:
           type: string
         detail:
           type: string
-        status:
-          $ref: "#/components/schemas/StatusType"
         suppressed:
           type: array
           items:
