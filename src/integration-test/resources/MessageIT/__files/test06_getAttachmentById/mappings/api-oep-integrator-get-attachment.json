@@ -1,0 +1,13 @@
+{
+	"request": {
+		"method": "GET",
+		"urlPathPattern": "/api-oep-integrator/1984/EXTERNAL/webmessages/flow-instances/flowInstanceId/attachments/12345"
+	},
+	"response": {
+		"bodyFileName": "test06_getAttachmentById/test_image.jpg",
+		"status": 200,
+		"headers": {
+			"Content-Type": "image/jpeg"
+		}
+	}
+}

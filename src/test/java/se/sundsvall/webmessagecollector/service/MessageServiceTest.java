@@ -233,7 +233,7 @@ class MessageServiceTest {
 			.headers(httpHeaders -> httpHeaders.putAll(headers))
 			.body(inputStreamResource);
 
-		when(oepIntegratorIntegrationMock.getAttachmentStreamById(municipalityId, Instance.valueOf(instance), "", attachmentId))
+		when(oepIntegratorIntegrationMock.getAttachmentStreamById(municipalityId, Instance.valueOf(instance), "flowInstanceId", attachmentId))
 			.thenReturn(responseEntity);
 
 		service.streamAttachmentById(municipalityId, instance, attachmentId, mockHttpServletResponse);

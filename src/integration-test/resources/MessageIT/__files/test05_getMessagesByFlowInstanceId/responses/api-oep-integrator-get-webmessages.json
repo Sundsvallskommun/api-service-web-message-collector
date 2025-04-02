@@ -1,0 +1,50 @@
+[
+	{
+		"id": 1234,
+		"direction": "INBOUND",
+		"municipalityId": "1984",
+		"familyId": "666",
+		"externalCaseId": "2234",
+		"message": "Hello World",
+		"messageId": "1234",
+		"sent": "2023-02-23T17:26:23.458389",
+		"username": "username-test",
+		"firstName": "Test",
+		"lastName": "Testorsson",
+		"email": "test@testorsson.test",
+		"userId": "testId",
+		"instance": "EXTERNAL",
+		"attachments": [
+			{
+				"attachmentId": 12345,
+				"name": "test_image.png",
+				"extension": "png",
+				"mimeType": "image/png"
+			}
+		]
+	},
+	{
+		"id": 1235,
+		"direction": "INBOUND",
+		"municipalityId": "1984",
+		"familyId": "666",
+		"externalCaseId": "2235",
+		"message": "Hello World!!",
+		"messageId": "1235",
+		"sent": "2023-02-23T17:26:23.468389",
+		"username": "username-test",
+		"firstName": "Test",
+		"lastName": "Testorsson",
+		"email": "test@testorsson.test",
+		"userId": "testId",
+		"instance": "EXTERNAL",
+		"attachments": [
+			{
+				"attachmentId": 12346,
+				"name": "test-image.jpg",
+				"extension": "jpeg",
+				"mimeType": "image/jpeg"
+			}
+		]
+	}
+]
