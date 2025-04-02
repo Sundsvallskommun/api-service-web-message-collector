@@ -105,6 +105,7 @@ class MessageResource {
 
 	@GetMapping(value = "/{instance}/attachments/{attachmentId}", produces = ALL_VALUE)
 	@ApiResponse(responseCode = "200", description = "Successful Operation", useReturnTypeSchema = true)
+	@Operation(summary = "Get an attachment by id", description = "Returns an attachment as a stream for the specified attachmentId")
 	void getAttachmentById(final HttpServletResponse response,
 		@Parameter(name = "municipalityId", description = "Municipality Id", example = "2281", required = true) @PathVariable("municipalityId") @ValidMunicipalityId final String municipalityId,
 		@Parameter(name = "instance", description = "Instance to fetch messages for", example = "INTERNAL", required = true) @PathVariable("instance") final String instance,

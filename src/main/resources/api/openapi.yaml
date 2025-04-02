@@ -7,7 +7,7 @@ info:
     url: https://opensource.org/licenses/MIT
   version: "5.1"
 servers:
-  - url: http://localhost:65318
+  - url: http://localhost:50743
     description: Generated server url
 tags:
   - name: messages
@@ -107,6 +107,8 @@ paths:
     get:
       tags:
         - messages
+      summary: Get an attachment by id
+      description: Returns an attachment as a stream for the specified attachmentId
       operationId: getAttachmentById
       parameters:
         - name: municipalityId
@@ -383,9 +385,9 @@ components:
             type: object
         status:
           $ref: "#/components/schemas/StatusType"
-        title:
-          type: string
         detail:
+          type: string
+        title:
           type: string
     StatusType:
       type: object
@@ -518,9 +520,9 @@ components:
             type: object
         status:
           $ref: "#/components/schemas/StatusType"
-        title:
-          type: string
         detail:
+          type: string
+        title:
           type: string
         suppressed:
           type: array
