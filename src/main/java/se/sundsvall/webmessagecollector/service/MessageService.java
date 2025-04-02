@@ -76,7 +76,7 @@ public class MessageService {
 	}
 
 	public void streamAttachmentById(final String municipalityId, final String instance, final Integer attachmentId, final HttpServletResponse response) {
-		var responseEntity = oepIntegratorIntegration.getAttachmentStreamById(municipalityId, Instance.valueOf(instance), "flowInstanceId", attachmentId);
+		var responseEntity = oepIntegratorIntegration.getAttachmentStreamById(municipalityId, Instance.valueOf(instance), attachmentId);
 		setResponse(responseEntity, response, "Failed to stream attachment with id: " + attachmentId);
 	}
 

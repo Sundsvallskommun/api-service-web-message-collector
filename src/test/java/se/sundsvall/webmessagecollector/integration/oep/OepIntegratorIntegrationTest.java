@@ -49,14 +49,13 @@ class OepIntegratorIntegrationTest {
 	void getAttachmentStreamById() {
 		var municipalityId = "municipalityId";
 		var instanceType = "EXTERNAL";
-		var flowInstanceId = "flowInstanceId";
 		var attachmentId = 1;
 
 		var attachment = createWebMessageAttachment();
 		var attachmentStream = createAttachmentStream(attachment);
-		when(oepIntegratorClientMock.getAttachmentById(municipalityId, instanceType, flowInstanceId, attachmentId)).thenReturn(attachmentStream);
+		when(oepIntegratorClientMock.getAttachmentById(municipalityId, instanceType, attachmentId)).thenReturn(attachmentStream);
 
-		var result = oepIntegratorIntegration.getAttachmentStreamById(municipalityId, Instance.valueOf(instanceType), flowInstanceId, attachmentId);
+		var result = oepIntegratorIntegration.getAttachmentStreamById(municipalityId, Instance.valueOf(instanceType), attachmentId);
 
 		assertThat(result).isNotNull().satisfies(response -> {
 			assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
@@ -67,7 +66,7 @@ class OepIntegratorIntegrationTest {
 			assertThat(response.getHeaders()).containsEntry("Content-Disposition", List.of("attachment; filename=someFile.pdf"));
 			assertThat(response.getHeaders()).containsEntry("Content-Type", List.of("application/pdf"));
 		});
-		verify(oepIntegratorClientMock).getAttachmentById(municipalityId, instanceType, flowInstanceId, attachmentId);
+		verify(oepIntegratorClientMock).getAttachmentById(municipalityId, instanceType, attachmentId);
 		verifyNoMoreInteractions(oepIntegratorClientMock);
 	}
 
