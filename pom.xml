@@ -10,7 +10,7 @@
 	</parent>
 	<groupId>se.sundsvall</groupId>
 	<artifactId>api-service-web-message-collector</artifactId>
-	<version>5.0</version>
+	<version>5.1</version>
 	<name>web-message-collector</name>
 	<properties>
 		<generated-sources-path>${project.build.directory}/generated-sources</generated-sources-path>

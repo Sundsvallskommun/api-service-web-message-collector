@@ -1,18 +1,22 @@
 package se.sundsvall.webmessagecollector.api;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 import static org.springframework.boot.test.context.SpringBootTest.WebEnvironment.RANDOM_PORT;
 import static org.springframework.http.HttpMethod.DELETE;
+import static se.sundsvall.webmessagecollector.TestDataFactory.createMessageDTO;
 
+import jakarta.servlet.http.HttpServletResponse;
 import java.time.OffsetDateTime;
 import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.reactive.server.WebTestClient;
@@ -36,7 +40,7 @@ class MessageResourceTest {
 
 	@Test
 	void getMessages() {
-		when(serviceMock.getMessages(anyString(), anyString(), anyString())).thenReturn(List.of(MessageDTO.builder()
+		when(serviceMock.getMessages("1984", "123", "EXTERNAL")).thenReturn(List.of(MessageDTO.builder()
 			.withId(1)
 			.withMunicipalityId("someMunicipalityId")
 			.withMessageId("someMessageId")
@@ -64,8 +68,7 @@ class MessageResourceTest {
 
 		assertThat(response).isNotNull().hasSize(1)
 			.allSatisfy(message -> assertThat(message).hasNoNullFieldsOrProperties());
-
-		verify(serviceMock).getMessages(anyString(), anyString(), anyString());
+		verify(serviceMock).getMessages("1984", "123", "EXTERNAL");
 		verifyNoMoreInteractions(serviceMock);
 	}
 
@@ -91,6 +94,36 @@ class MessageResourceTest {
 			.expectBody().isEmpty();
 
 		verify(serviceMock).deleteAttachment(1);
+		verifyNoMoreInteractions(serviceMock);
+	}
+
+	@Test
+	void getMessagesByFlowInstanceId() {
+		when(serviceMock.getMessagesByFlowInstanceId("1984", "EXTERNAL", "123", null, null))
+			.thenReturn(List.of(createMessageDTO(), createMessageDTO()));
+
+		var response = webTestClient.get()
+			.uri(PATH + "/external/flow-instances/123")
+			.exchange()
+			.expectStatus().isOk()
+			.expectBodyList(MessageDTO.class)
+			.returnResult()
+			.getResponseBody();
+
+		assertThat(response).isNotNull().hasSize(2);
+		verify(serviceMock).getMessagesByFlowInstanceId("1984", "EXTERNAL", "123", null, null);
+		verifyNoMoreInteractions(serviceMock);
+	}
+
+	@Test
+	void getAttachmentById() {
+		webTestClient.get()
+			.uri(PATH + "/external/attachments/1")
+			.accept(MediaType.APPLICATION_JSON)
+			.exchange()
+			.expectStatus().isOk();
+
+		verify(serviceMock).streamAttachmentById(eq("1984"), eq("EXTERNAL"), eq(1), any(HttpServletResponse.class));
 		verifyNoMoreInteractions(serviceMock);
 	}
 }

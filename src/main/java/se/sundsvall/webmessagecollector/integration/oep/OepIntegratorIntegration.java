@@ -1,11 +1,15 @@
 package se.sundsvall.webmessagecollector.integration.oep;
 
 import generated.se.sundsvall.oepintegrator.Webmessage;
-import generated.se.sundsvall.oepintegrator.WebmessageAttachmentData;
+import java.time.LocalDateTime;
 import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.core.io.InputStreamResource;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
+import org.zalando.problem.Problem;
+import org.zalando.problem.Status;
 import se.sundsvall.webmessagecollector.integration.db.model.Instance;
 
 @Component
@@ -15,7 +19,7 @@ public class OepIntegratorIntegration {
 
 	private final OepIntegratorClient oepIntegratorClient;
 
-	public OepIntegratorIntegration(OepIntegratorClient oepIntegratorClient) {
+	public OepIntegratorIntegration(final OepIntegratorClient oepIntegratorClient) {
 		this.oepIntegratorClient = oepIntegratorClient;
 	}
 
@@ -24,14 +28,22 @@ public class OepIntegratorIntegration {
 		return oepIntegratorClient.getWebmessageByFamilyId(municipalityId, instance.name(), familyId, fromDate, toDate);
 	}
 
-	public WebmessageAttachmentData getAttachmentById(final String municipalityId, final Instance instance, final String flowInstanceId, final int attachmentId) {
+	public ResponseEntity<InputStreamResource> getAttachmentStreamById(final String municipalityId, final Instance instance, final String flowInstanceId, final Integer attachmentId) {
 		LOG.info("Fetching attachment with attachmentId {} for municipalityId {} and flowInstanceId {} and instance {}", attachmentId, municipalityId, flowInstanceId, instance);
-		return oepIntegratorClient.getAttachmentById(municipalityId, instance.name(), flowInstanceId, attachmentId);
+		ResponseEntity<InputStreamResource> responseEntity = oepIntegratorClient.getAttachmentById(municipalityId, instance.name(), flowInstanceId, attachmentId);
+		validateResponse(responseEntity);
+		return responseEntity;
 	}
 
-	public List<Webmessage> getWebmessagesByFlowInstanceId(final String municipalityId, final Instance instance, final String flowInstanceId, final String fromDate, final String toDate) {
+	public List<Webmessage> getWebmessagesByFlowInstanceId(final String municipalityId, final Instance instance, final String flowInstanceId, final LocalDateTime fromDate, final LocalDateTime toDate) {
 		LOG.info("Fetching messages for municipalityId {}, instance {}, flowInstanceId {}, fromDate {}, toDate {}", municipalityId, instance, flowInstanceId, fromDate, toDate);
 		return oepIntegratorClient.getWebmessagesByFlowInstanceId(municipalityId, instance.name(), flowInstanceId, fromDate, toDate);
+	}
+
+	void validateResponse(final ResponseEntity<InputStreamResource> response) {
+		if (!response.getStatusCode().is2xxSuccessful()) {
+			throw Problem.valueOf(Status.valueOf(response.getStatusCode().value()), "Error while streaming attachment data from Oep-Integrator");
+		}
 	}
 
 }
