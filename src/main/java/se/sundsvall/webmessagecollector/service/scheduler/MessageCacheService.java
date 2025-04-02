@@ -69,7 +69,7 @@ public class MessageCacheService {
 	@Transactional
 	public void fetchAndSaveAttachment(final String municipalityId, final Instance instance, final MessageAttachmentEntity attachmentEntity) {
 		try {
-			var response = oepIntegratorIntegration.getAttachmentStreamById(municipalityId, instance, "", attachmentEntity.getAttachmentId());
+			var response = oepIntegratorIntegration.getAttachmentStreamById(municipalityId, instance, attachmentEntity.getAttachmentId());
 			var inputStreamResource = response.getBody();
 
 			if (inputStreamResource != null && attachmentEntity.getFile() == null) {

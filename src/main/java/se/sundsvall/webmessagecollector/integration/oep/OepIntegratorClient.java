@@ -21,11 +21,10 @@ import se.sundsvall.webmessagecollector.integration.oep.configuration.OepIntegra
 @CircuitBreaker(name = CLIENT_ID)
 public interface OepIntegratorClient {
 
-	@GetMapping(path = "/{municipalityId}/{instanceType}/webmessages/flow-instances/{flowInstanceId}/attachments/{attachmentId}")
+	@GetMapping(path = "/{municipalityId}/{instanceType}/webmessages/attachments/{attachmentId}")
 	ResponseEntity<InputStreamResource> getAttachmentById(
 		@PathVariable(name = "municipalityId") final String municipalityId,
 		@PathVariable(name = "instanceType") final String instanceType,
-		@PathVariable(name = "flowInstanceId") final String flowInstanceId,
 		@PathVariable(name = "attachmentId") final Integer attachmentId);
 
 	@GetMapping(path = "/{municipalityId}/{instanceType}/webmessages/families/{familyId}")

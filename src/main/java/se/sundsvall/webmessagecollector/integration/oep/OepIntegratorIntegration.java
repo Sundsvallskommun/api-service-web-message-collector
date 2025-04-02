@@ -28,9 +28,9 @@ public class OepIntegratorIntegration {
 		return oepIntegratorClient.getWebmessageByFamilyId(municipalityId, instance.name(), familyId, fromDate, toDate);
 	}
 
-	public ResponseEntity<InputStreamResource> getAttachmentStreamById(final String municipalityId, final Instance instance, final String flowInstanceId, final Integer attachmentId) {
-		LOG.info("Fetching attachment with attachmentId {} for municipalityId {} and flowInstanceId {} and instance {}", attachmentId, municipalityId, flowInstanceId, instance);
-		ResponseEntity<InputStreamResource> responseEntity = oepIntegratorClient.getAttachmentById(municipalityId, instance.name(), flowInstanceId, attachmentId);
+	public ResponseEntity<InputStreamResource> getAttachmentStreamById(final String municipalityId, final Instance instance, final Integer attachmentId) {
+		LOG.info("Fetching attachment with attachmentId {} for municipalityId {} and instance {}", attachmentId, municipalityId, instance);
+		ResponseEntity<InputStreamResource> responseEntity = oepIntegratorClient.getAttachmentById(municipalityId, instance.name(), attachmentId);
 		validateResponse(responseEntity);
 		return responseEntity;
 	}

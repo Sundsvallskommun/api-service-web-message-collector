@@ -186,11 +186,11 @@ class MessageCacheServiceTest {
 			.build();
 		var attachment = createWebMessageAttachment();
 		var attachmentStream = createAttachmentStream(attachment);
-		when(oepIntegratorIntegrationMock.getAttachmentStreamById(municipalityId, INTERNAL, "", 123)).thenReturn(attachmentStream);
+		when(oepIntegratorIntegrationMock.getAttachmentStreamById(municipalityId, INTERNAL, 123)).thenReturn(attachmentStream);
 
 		service.fetchAndSaveAttachment(municipalityId, INTERNAL, attachmentEntity);
 
-		verify(oepIntegratorIntegrationMock).getAttachmentStreamById(municipalityId, INTERNAL, "", 123);
+		verify(oepIntegratorIntegrationMock).getAttachmentStreamById(municipalityId, INTERNAL, 123);
 		verify(messageAttachmentRepositoryMock).saveAndFlush(messageAttachmentEntityCaptor.capture());
 		assertThat(messageAttachmentEntityCaptor.getValue()).satisfies(entity -> {
 			assertThat(entity.getAttachmentId()).isEqualTo(123);
@@ -214,11 +214,11 @@ class MessageCacheServiceTest {
 			.withMimeType("application/pdf")
 			.withName("someFile.pdf")
 			.build();
-		when(oepIntegratorIntegrationMock.getAttachmentStreamById(municipalityId, INTERNAL, "", attachmentId)).thenReturn(createEmptyResponse());
+		when(oepIntegratorIntegrationMock.getAttachmentStreamById(municipalityId, INTERNAL, attachmentId)).thenReturn(createEmptyResponse());
 
 		service.fetchAndSaveAttachment(municipalityId, INTERNAL, attachmentEntity);
 
-		verify(oepIntegratorIntegrationMock).getAttachmentStreamById(municipalityId, INTERNAL, "", attachmentId);
+		verify(oepIntegratorIntegrationMock).getAttachmentStreamById(municipalityId, INTERNAL, attachmentId);
 		verifyNoInteractions(messageAttachmentRepositoryMock);
 	}
 
@@ -228,14 +228,14 @@ class MessageCacheServiceTest {
 		var attachmentId = 123;
 		var attachmentEntity = MessageAttachmentEntity.builder().withAttachmentId(attachmentId).build();
 		var originalException = new RuntimeException("ERROR!");
-		when(oepIntegratorIntegrationMock.getAttachmentStreamById(municipalityId, INTERNAL, "", attachmentId)).thenThrow(originalException);
+		when(oepIntegratorIntegrationMock.getAttachmentStreamById(municipalityId, INTERNAL, attachmentId)).thenThrow(originalException);
 
 		assertThatThrownBy(() -> service.fetchAndSaveAttachment(municipalityId, INTERNAL, attachmentEntity))
 			.isInstanceOf(RuntimeException.class)
 			.extracting("cause")
 			.isSameAs(originalException);
 
-		verify(oepIntegratorIntegrationMock).getAttachmentStreamById(municipalityId, INTERNAL, "", attachmentId);
+		verify(oepIntegratorIntegrationMock).getAttachmentStreamById(municipalityId, INTERNAL, attachmentId);
 		verifyNoInteractions(messageAttachmentRepositoryMock);
 	}
 
