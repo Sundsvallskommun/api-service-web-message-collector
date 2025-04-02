@@ -2,7 +2,7 @@ integration:
   oep-integrator:
     connect-timeout: 15
     read-timeout: 20
-    url: oep-integrator-url
+    url: http://localhost:${wiremock.server.port:}/api-oep-integrator
   open-e:
     environments:
       1984:
@@ -36,7 +36,7 @@ spring:
       client:
         provider:
           oep-integrator:
-            token-uri: http://token.url
+            token-uri: http://localhost:${wiremock.server.port:}/api-gateway/token
         registration:
           oep-integrator:
             authorization-grant-type: client_credentials
