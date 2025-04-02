@@ -11,13 +11,16 @@ import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 import static org.springframework.http.HttpHeaders.CONTENT_DISPOSITION;
 import static org.springframework.http.HttpHeaders.CONTENT_TYPE;
+import static se.sundsvall.webmessagecollector.TestDataFactory.createWebMessage;
 
 import jakarta.servlet.ServletOutputStream;
 import jakarta.servlet.http.HttpServletResponse;
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.sql.Blob;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import org.apache.commons.io.IOUtils;
 import org.junit.jupiter.api.Test;
@@ -27,6 +30,9 @@ import org.mockito.Captor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.core.io.InputStreamResource;
+import org.springframework.http.ResponseEntity;
+import org.springframework.mock.web.MockHttpServletResponse;
 import org.zalando.problem.Status;
 import org.zalando.problem.ThrowableProblem;
 import se.sundsvall.webmessagecollector.api.model.Direction;
@@ -36,24 +42,34 @@ import se.sundsvall.webmessagecollector.integration.db.model.Instance;
 import se.sundsvall.webmessagecollector.integration.db.model.MessageAttachmentEntity;
 import se.sundsvall.webmessagecollector.integration.db.model.MessageEntity;
 import se.sundsvall.webmessagecollector.integration.db.model.MessageStatus;
+import se.sundsvall.webmessagecollector.integration.oep.OepIntegratorIntegration;
 
 @ExtendWith(MockitoExtension.class)
 class MessageServiceTest {
 
 	@Mock
 	private MessageRepository messageRepositoryMock;
+
 	@Mock
 	private MessageAttachmentEntity messageAttachmentEntityMock;
+
 	@Mock
 	private MessageAttachmentRepository attachmentRepositoryMock;
+
 	@Mock
 	private HttpServletResponse servletResponseMock;
+
 	@Mock
 	private ServletOutputStream servletOutputStreamMock;
+
 	@Mock
 	private Blob blobMock;
+
+	@Mock
+	private OepIntegratorIntegration oepIntegratorIntegrationMock;
+
 	@Captor
-	ArgumentCaptor<List<MessageEntity>> messagesCaptor;
+	private ArgumentCaptor<List<MessageEntity>> messagesCaptor;
 
 	@InjectMocks
 	private MessageService service;
@@ -182,4 +198,51 @@ class MessageServiceTest {
 		verifyNoMoreInteractions(attachmentRepositoryMock);
 		verifyNoInteractions(messageRepositoryMock);
 	}
+
+	@Test
+	void getMessageByFlowInstanceId() {
+		var municipalityId = "municipalityId";
+		var instance = "EXTERNAL";
+		var flowInstanceId = "flowInstanceId";
+		var from = LocalDateTime.now();
+		var to = LocalDateTime.now();
+		var webmessage = createWebMessage();
+
+		when(oepIntegratorIntegrationMock.getWebmessagesByFlowInstanceId(municipalityId, Instance.valueOf(instance), flowInstanceId, from, to))
+			.thenReturn(List.of(webmessage));
+
+		var result = service.getMessagesByFlowInstanceId(municipalityId, instance, flowInstanceId, from, to);
+
+		assertThat(result).isNotNull().hasSize(1);
+		verify(oepIntegratorIntegrationMock).getWebmessagesByFlowInstanceId(municipalityId, Instance.valueOf(instance.toUpperCase()), flowInstanceId, from, to);
+	}
+
+	@Test
+	void streamAttachmentById() {
+		var municipalityId = "municipalityId";
+		var instance = "EXTERNAL";
+		var attachmentId = 123;
+		var mockHttpServletResponse = new MockHttpServletResponse();
+		final var headers = Map.of(
+			"Content-Type", List.of("application/pdf"),
+			"Content-Disposition", List.of("attachment; filename=case.pdf"),
+			"Content-Length", List.of("0"),
+			"Last-Modified", List.of("Wed, 21 Oct 2015 07:28:00 GMT"));
+		final var inputStreamResource = new InputStreamResource(new ByteArrayInputStream(new byte[10]));
+		final var responseEntity = ResponseEntity.ok()
+			.headers(httpHeaders -> httpHeaders.putAll(headers))
+			.body(inputStreamResource);
+
+		when(oepIntegratorIntegrationMock.getAttachmentStreamById(municipalityId, Instance.valueOf(instance), "", attachmentId))
+			.thenReturn(responseEntity);
+
+		service.streamAttachmentById(municipalityId, instance, attachmentId, mockHttpServletResponse);
+
+		assertThat(mockHttpServletResponse.getHeader("Content-Type")).isEqualTo("application/pdf");
+		assertThat(mockHttpServletResponse.getHeader("Content-Disposition")).isEqualTo("attachment; filename=case.pdf");
+		assertThat(mockHttpServletResponse.getHeader("Content-Length")).isEqualTo("0");
+		assertThat(mockHttpServletResponse.getHeader("Last-Modified")).isEqualTo("Wed, 21 Oct 2015 07:28:00 GMT");
+
+	}
+
 }

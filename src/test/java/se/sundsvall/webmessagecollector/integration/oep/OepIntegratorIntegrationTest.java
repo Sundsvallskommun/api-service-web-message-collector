@@ -4,9 +4,11 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
+import static se.sundsvall.webmessagecollector.TestDataFactory.createAttachmentStream;
 import static se.sundsvall.webmessagecollector.TestDataFactory.createWebMessage;
-import static se.sundsvall.webmessagecollector.TestDataFactory.createWebMessageAttachmentData;
+import static se.sundsvall.webmessagecollector.TestDataFactory.createWebMessageAttachment;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -14,10 +16,11 @@ import org.mockito.Answers;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.http.HttpStatus;
 import se.sundsvall.webmessagecollector.integration.db.model.Instance;
 
 @ExtendWith(MockitoExtension.class)
-class OepIntegratorIntegrationTests {
+class OepIntegratorIntegrationTest {
 
 	@Mock(answer = Answers.CALLS_REAL_METHODS)
 	private OepIntegratorClient oepIntegratorClientMock;
@@ -43,17 +46,27 @@ class OepIntegratorIntegrationTests {
 	}
 
 	@Test
-	void getAttachmentById() {
+	void getAttachmentStreamById() {
 		var municipalityId = "municipalityId";
 		var instanceType = "EXTERNAL";
 		var flowInstanceId = "flowInstanceId";
 		var attachmentId = 1;
-		var webmessageAttachmentData = createWebMessageAttachmentData();
-		when(oepIntegratorClientMock.getAttachmentById(municipalityId, instanceType, flowInstanceId, attachmentId)).thenReturn(webmessageAttachmentData);
 
-		var result = oepIntegratorIntegration.getAttachmentById(municipalityId, Instance.valueOf(instanceType), flowInstanceId, attachmentId);
+		var attachment = createWebMessageAttachment();
+		var attachmentStream = createAttachmentStream(attachment);
+		when(oepIntegratorClientMock.getAttachmentById(municipalityId, instanceType, flowInstanceId, attachmentId)).thenReturn(attachmentStream);
 
-		assertThat(result).isNotNull().isEqualTo(webmessageAttachmentData);
+		var result = oepIntegratorIntegration.getAttachmentStreamById(municipalityId, Instance.valueOf(instanceType), flowInstanceId, attachmentId);
+
+		assertThat(result).isNotNull().satisfies(response -> {
+			assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+			assertThat(response.getBody()).isNotNull();
+			assertThat(response.getBody().getInputStream().readAllBytes()).isEqualTo(new byte[] {
+				1, 2, 3
+			});
+			assertThat(response.getHeaders()).containsEntry("Content-Disposition", List.of("attachment; filename=someFile.pdf"));
+			assertThat(response.getHeaders()).containsEntry("Content-Type", List.of("application/pdf"));
+		});
 		verify(oepIntegratorClientMock).getAttachmentById(municipalityId, instanceType, flowInstanceId, attachmentId);
 		verifyNoMoreInteractions(oepIntegratorClientMock);
 	}
@@ -63,8 +76,8 @@ class OepIntegratorIntegrationTests {
 		var municipalityId = "municipalityId";
 		var instanceType = "EXTERNAL";
 		var flowInstanceId = "flowInstanceId";
-		var fromDate = "fromDate";
-		var toDate = "toDate";
+		var fromDate = LocalDateTime.MIN;
+		var toDate = LocalDateTime.MAX;
 
 		var webMessage = createWebMessage();
 		when(oepIntegratorClientMock.getWebmessagesByFlowInstanceId(municipalityId, instanceType, flowInstanceId, fromDate, toDate)).thenReturn(List.of(webMessage));
