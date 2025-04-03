@@ -1,0 +1,13 @@
+{
+	"request": {
+		"method": "GET",
+		"urlPathPattern": "/api-oep-integrator/1984/EXTERNAL/webmessages/flow-instances/12345"
+	},
+	"response": {
+		"bodyFileName": "test05_getMessagesByFlowInstanceId/responses/api-oep-integrator-get-webmessages.json",
+		"status": 200,
+		"headers": {
+			"Content-Type": "application/json"
+		}
+	}
+}

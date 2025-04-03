@@ -5,14 +5,157 @@ info:
   license:
     name: MIT License
     url: https://opensource.org/licenses/MIT
-  version: "5.0"
+  version: "5.1"
 servers:
-  - url: http://localhost:60251
+  - url: http://localhost:50743
     description: Generated server url
 tags:
   - name: messages
     description: Messages
 paths:
+  /{municipalityId}/messages/{instance}/flow-instances/{flowInstanceId}:
+    get:
+      tags:
+        - messages
+      summary: Get a list of messages related to a specific flow instance id
+      description: Returns a list of messages found for the specified flow instance
+        id
+      operationId: getMessagesByFlowInstanceId
+      parameters:
+        - name: municipalityId
+          in: path
+          description: Municipality Id
+          required: true
+          schema:
+            type: string
+          example: 2281
+        - name: instance
+          in: path
+          description: Instance to fetch messages for
+          required: true
+          schema:
+            type: string
+          example: INTERNAL
+        - name: flowInstanceId
+          in: path
+          description: Flow instance id to fetch messages for
+          required: true
+          schema:
+            type: string
+          example: 1234567890
+        - name: fromDateTime
+          in: query
+          description: The start date and time for filtering web messages (optional)
+          required: false
+          schema:
+            type: string
+            format: date-time
+          example: 2024-01-31T12:00:00
+        - name: toDateTime
+          in: query
+          description: The end date and time for filtering web messages (optional).
+          required: false
+          schema:
+            type: string
+            format: date-time
+          example: 2024-01-31T12:00:00
+      responses:
+        "400":
+          description: Bad request
+          content:
+            application/problem+json:
+              schema:
+                oneOf:
+                  - $ref: "#/components/schemas/Problem"
+                  - $ref: "#/components/schemas/ConstraintViolationProblem"
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/MessageDTO"
+        "404":
+          description: Not found
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/Problem"
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/MessageDTO"
+        "500":
+          description: Internal Server error
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/Problem"
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/MessageDTO"
+        "200":
+          description: Successful Operation
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/MessageDTO"
+  /{municipalityId}/messages/{instance}/attachments/{attachmentId}:
+    get:
+      tags:
+        - messages
+      summary: Get an attachment by id
+      description: Returns an attachment as a stream for the specified attachmentId
+      operationId: getAttachmentById
+      parameters:
+        - name: municipalityId
+          in: path
+          description: Municipality Id
+          required: true
+          schema:
+            type: string
+          example: 2281
+        - name: instance
+          in: path
+          description: Instance to fetch messages for
+          required: true
+          schema:
+            type: string
+          example: INTERNAL
+        - name: attachmentId
+          in: path
+          description: Id of the requested attachment
+          required: true
+          schema:
+            type: integer
+            format: int32
+          example: 1234567890
+      responses:
+        "400":
+          description: Bad request
+          content:
+            application/problem+json:
+              schema:
+                oneOf:
+                  - $ref: "#/components/schemas/Problem"
+                  - $ref: "#/components/schemas/ConstraintViolationProblem"
+        "404":
+          description: Not found
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/Problem"
+        "500":
+          description: Internal Server error
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/Problem"
+        "200":
+          description: Successful Operation
   /{municipalityId}/messages/{familyId}/{Instance}:
     get:
       tags:
@@ -57,6 +200,12 @@ paths:
             application/problem+json:
               schema:
                 $ref: "#/components/schemas/Problem"
+        "500":
+          description: Internal Server error
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/Problem"
         "200":
           description: Successful Operation
           content:
@@ -65,12 +214,6 @@ paths:
                 type: array
                 items:
                   $ref: "#/components/schemas/MessageDTO"
-        "500":
-          description: Internal Server error
-          content:
-            application/problem+json:
-              schema:
-                $ref: "#/components/schemas/Problem"
   /{municipalityId}/messages/attachments/{attachmentId}:
     get:
       tags:
@@ -109,14 +252,14 @@ paths:
             application/problem+json:
               schema:
                 $ref: "#/components/schemas/Problem"
-        "200":
-          description: Successful Operation
         "500":
           description: Internal Server error
           content:
             application/problem+json:
               schema:
                 $ref: "#/components/schemas/Problem"
+        "200":
+          description: Successful Operation
     delete:
       tags:
         - messages
@@ -154,14 +297,14 @@ paths:
             application/problem+json:
               schema:
                 $ref: "#/components/schemas/Problem"
-        "204":
-          description: No Content
         "500":
           description: Internal Server error
           content:
             application/problem+json:
               schema:
                 $ref: "#/components/schemas/Problem"
+        "204":
+          description: No Content
   /api-docs:
     get:
       tags:
@@ -217,14 +360,14 @@ paths:
             application/problem+json:
               schema:
                 $ref: "#/components/schemas/Problem"
-        "204":
-          description: No Content
         "500":
           description: Internal Server error
           content:
             application/problem+json:
               schema:
                 $ref: "#/components/schemas/Problem"
+        "204":
+          description: No Content
 components:
   schemas:
     Problem:
@@ -240,12 +383,12 @@ components:
           type: object
           additionalProperties:
             type: object
-        title:
-          type: string
-        detail:
-          type: string
         status:
           $ref: "#/components/schemas/StatusType"
+        detail:
+          type: string
+        title:
+          type: string
     StatusType:
       type: object
       properties:
@@ -375,12 +518,12 @@ components:
           type: object
           additionalProperties:
             type: object
-        title:
-          type: string
-        detail:
-          type: string
         status:
           $ref: "#/components/schemas/StatusType"
+        detail:
+          type: string
+        title:
+          type: string
         suppressed:
           type: array
           items:

@@ -11,8 +11,8 @@ import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabas
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.jdbc.Sql;
+import se.sundsvall.webmessagecollector.integration.db.model.Instance;
 import se.sundsvall.webmessagecollector.integration.db.model.MessageStatus;
-import se.sundsvall.webmessagecollector.integration.opene.model.Instance;
 
 @DataJpaTest
 @AutoConfigureTestDatabase(replace = NONE)

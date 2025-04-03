@@ -10,7 +10,7 @@ import se.sundsvall.webmessagecollector.api.model.MessageDTO;
 import se.sundsvall.webmessagecollector.integration.db.model.MessageAttachmentEntity;
 import se.sundsvall.webmessagecollector.integration.db.model.MessageEntity;
 
-final class MessageMapper {
+public final class MessageMapper {
 
 	private MessageMapper() {}
 

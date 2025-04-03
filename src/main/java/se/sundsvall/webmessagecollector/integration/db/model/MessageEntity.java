@@ -19,7 +19,6 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.hibernate.Length;
 import se.sundsvall.webmessagecollector.api.model.Direction;
-import se.sundsvall.webmessagecollector.integration.opene.model.Instance;
 
 @Entity
 @Table(name = "message")
