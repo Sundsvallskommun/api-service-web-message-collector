@@ -1,7 +1,6 @@
 package se.sundsvall.webmessagecollector.integration.oep;
 
 import generated.se.sundsvall.oepintegrator.Webmessage;
-import java.time.LocalDateTime;
 import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -23,7 +22,7 @@ public class OepIntegratorIntegration {
 		this.oepIntegratorClient = oepIntegratorClient;
 	}
 
-	public List<Webmessage> getWebmessageByFamilyId(final String municipalityId, final Instance instance, final String familyId, final LocalDateTime fromDateTime, final LocalDateTime toDateTime) {
+	public List<Webmessage> getWebmessageByFamilyId(final String municipalityId, final Instance instance, final String familyId, final String fromDateTime, final String toDateTime) {
 		LOG.info("Fetching messages for municipalityId {}, instance {}, familyId {}, fromDateTime {}, toDateTime {}", municipalityId, instance, familyId, fromDateTime, toDateTime);
 		return oepIntegratorClient.getWebmessageByFamilyId(municipalityId, instance.name(), familyId, fromDateTime, toDateTime);
 	}
@@ -35,7 +34,7 @@ public class OepIntegratorIntegration {
 		return responseEntity;
 	}
 
-	public List<Webmessage> getWebmessagesByFlowInstanceId(final String municipalityId, final Instance instance, final String flowInstanceId, final LocalDateTime fromDateTime, final LocalDateTime toDateTime) {
+	public List<Webmessage> getWebmessagesByFlowInstanceId(final String municipalityId, final Instance instance, final String flowInstanceId, final String fromDateTime, final String toDateTime) {
 		LOG.info("Fetching messages for municipalityId {}, instance {}, flowInstanceId {}, fromDateTime {}, toDateTime {}", municipalityId, instance, flowInstanceId, fromDateTime, toDateTime);
 		return oepIntegratorClient.getWebmessagesByFlowInstanceId(municipalityId, instance.name(), flowInstanceId, fromDateTime, toDateTime);
 	}

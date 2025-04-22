@@ -208,13 +208,13 @@ class MessageServiceTest {
 		var to = LocalDateTime.now();
 		var webmessage = createWebMessage();
 
-		when(oepIntegratorIntegrationMock.getWebmessagesByFlowInstanceId(municipalityId, Instance.valueOf(instance), flowInstanceId, from, to))
+		when(oepIntegratorIntegrationMock.getWebmessagesByFlowInstanceId(municipalityId, Instance.valueOf(instance), flowInstanceId, from.toString(), to.toString()))
 			.thenReturn(List.of(webmessage));
 
 		var result = service.getMessagesByFlowInstanceId(municipalityId, instance, flowInstanceId, from, to);
 
 		assertThat(result).isNotNull().hasSize(1);
-		verify(oepIntegratorIntegrationMock).getWebmessagesByFlowInstanceId(municipalityId, Instance.valueOf(instance.toUpperCase()), flowInstanceId, from, to);
+		verify(oepIntegratorIntegrationMock).getWebmessagesByFlowInstanceId(municipalityId, Instance.valueOf(instance.toUpperCase()), flowInstanceId, from.toString(), to.toString());
 	}
 
 	@Test

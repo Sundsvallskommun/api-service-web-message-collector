@@ -21,6 +21,7 @@ import static se.sundsvall.webmessagecollector.integration.db.model.Instance.INT
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Optional;
 import java.util.Random;
@@ -63,7 +64,7 @@ class MessageCacheServiceTest {
 	private MessageCacheService service;
 
 	@Captor
-	private ArgumentCaptor<LocalDateTime> fromTimeStampCaptor;
+	private ArgumentCaptor<String> fromTimeStampCaptor;
 
 	@Captor
 	private ArgumentCaptor<List<MessageEntity>> messageEntityCaptor;
@@ -78,18 +79,18 @@ class MessageCacheServiceTest {
 	void fetchAndSaveMessagesWithResponse() {
 		var municipalityId = "1984";
 		var familyId = "123";
-		var lastExecuted = OffsetDateTime.now().minusHours(new Random().nextInt());
+		var lastExecuted = OffsetDateTime.now().minusHours(3);
 		var clockSkew = Duration.ofMinutes(10);
 		var webMessage = createWebMessage();
 		webMessage.setFamilyId(familyId);
 		var webMessages = List.of(webMessage);
 
 		when(executionInformationRepositoryMock.findById(familyId)).thenReturn(Optional.of(ExecutionInformationEntity.builder().withFamilyId(familyId).withLastSuccessfulExecution(lastExecuted).build()));
-		when(oepIntegratorIntegrationMock.getWebmessageByFamilyId(municipalityId, INTERNAL, familyId, lastExecuted.minus(clockSkew).toLocalDateTime(), null)).thenReturn(webMessages);
+		when(oepIntegratorIntegrationMock.getWebmessageByFamilyId(municipalityId, INTERNAL, familyId, DateTimeFormatter.ISO_DATE_TIME.format(lastExecuted.minus(clockSkew)), null)).thenReturn(webMessages);
 		when(messageRepositoryMock.existsByFamilyIdAndInstanceAndMessageIdAndExternalCaseId(familyId, INTERNAL, "messageId", "externalCaseId")).thenReturn(false);
 
 		service.fetchAndSaveMessages(municipalityId, INTERNAL, familyId, clockSkew);
-		verify(oepIntegratorIntegrationMock).getWebmessageByFamilyId(municipalityId, INTERNAL, familyId, lastExecuted.minus(clockSkew).toLocalDateTime(), null);
+		verify(oepIntegratorIntegrationMock).getWebmessageByFamilyId(municipalityId, INTERNAL, familyId, DateTimeFormatter.ISO_DATE_TIME.format(lastExecuted.minus(clockSkew)), null);
 		verify(messageRepositoryMock).existsByFamilyIdAndInstanceAndMessageIdAndExternalCaseId(familyId, INTERNAL, "messageId", "externalCaseId");
 		verify(messageRepositoryMock).saveAllAndFlush(messageEntityCaptor.capture());
 		verify(executionInformationRepositoryMock).save(executionInformationEntityCaptor.capture());
@@ -128,12 +129,12 @@ class MessageCacheServiceTest {
 		var webMessages = List.of(webMessage);
 
 		when(executionInformationRepositoryMock.findById(familyId)).thenReturn(Optional.of(ExecutionInformationEntity.builder().withFamilyId(familyId).withLastSuccessfulExecution(lastExecuted).build()));
-		when(oepIntegratorIntegrationMock.getWebmessageByFamilyId(municipalityId, INTERNAL, familyId, lastExecuted.minus(clockSkew).toLocalDateTime(), null)).thenReturn(webMessages);
+		when(oepIntegratorIntegrationMock.getWebmessageByFamilyId(municipalityId, INTERNAL, familyId, DateTimeFormatter.ISO_DATE_TIME.format(lastExecuted.minus(clockSkew)), null)).thenReturn(webMessages);
 		when(messageRepositoryMock.existsByFamilyIdAndInstanceAndMessageIdAndExternalCaseId(familyId, INTERNAL, "messageId", "externalCaseId")).thenReturn(true);
 
 		service.fetchAndSaveMessages(municipalityId, INTERNAL, familyId, clockSkew);
 
-		verify(oepIntegratorIntegrationMock).getWebmessageByFamilyId(municipalityId, INTERNAL, familyId, lastExecuted.minus(clockSkew).toLocalDateTime(), null);
+		verify(oepIntegratorIntegrationMock).getWebmessageByFamilyId(municipalityId, INTERNAL, familyId, DateTimeFormatter.ISO_DATE_TIME.format(lastExecuted.minus(clockSkew)), null);
 		verify(messageRepositoryMock).existsByFamilyIdAndInstanceAndMessageIdAndExternalCaseId(familyId, INTERNAL, "messageId", "externalCaseId");
 		verify(messageRepositoryMock).saveAllAndFlush(messageEntityCaptor.capture());
 		verify(executionInformationRepositoryMock).save(executionInformationEntityCaptor.capture());
