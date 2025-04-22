@@ -35,7 +35,7 @@ public interface OepIntegratorClient {
 		@RequestParam(name = "fromDate") final String fromDate,
 		@RequestParam(name = "toDate") final String toDate);
 
-	@GetMapping(path = "/{municipalityId}/{instanceType}/webmessages/flow-instances/{flowInstanceId}")
+	@GetMapping(path = "/{municipalityId}/{instanceType}/webmessages/cases/{flowInstanceId}")
 	List<Webmessage> getWebmessagesByFlowInstanceId(
 		@PathVariable(name = "municipalityId") final String municipalityId,
 		@PathVariable(name = "instanceType") final String instanceType,
