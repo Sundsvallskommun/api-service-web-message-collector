@@ -24,7 +24,7 @@ public class OepIntegratorIntegration {
 	}
 
 	public List<Webmessage> getWebmessageByFamilyId(final String municipalityId, final Instance instance, final String familyId, final String fromDate, final String toDate) {
-		LOG.info("Fetching messages for municipalityId {}, instance {}, familyId {}, fromDate {}, toDate {}", municipalityId, instance, familyId, fromDate, toDate);
+		LOG.info("Fetching messages for municipalityId {}, instance {}, familyId {}, fromDateTime {}, toDateTime {}", municipalityId, instance, familyId, fromDate, toDate);
 		return oepIntegratorClient.getWebmessageByFamilyId(municipalityId, instance.name(), familyId, fromDate, toDate);
 	}
 
@@ -36,7 +36,7 @@ public class OepIntegratorIntegration {
 	}
 
 	public List<Webmessage> getWebmessagesByFlowInstanceId(final String municipalityId, final Instance instance, final String flowInstanceId, final LocalDateTime fromDate, final LocalDateTime toDate) {
-		LOG.info("Fetching messages for municipalityId {}, instance {}, flowInstanceId {}, fromDate {}, toDate {}", municipalityId, instance, flowInstanceId, fromDate, toDate);
+		LOG.info("Fetching messages for municipalityId {}, instance {}, flowInstanceId {}, fromDateTime {}, toDateTime {}", municipalityId, instance, flowInstanceId, fromDate, toDate);
 		return oepIntegratorClient.getWebmessagesByFlowInstanceId(municipalityId, instance.name(), flowInstanceId, fromDate, toDate);
 	}
 

@@ -10,6 +10,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import se.sundsvall.webmessagecollector.api.model.Direction;
 import se.sundsvall.webmessagecollector.integration.db.ExecutionInformationRepository;
 import se.sundsvall.webmessagecollector.integration.db.MessageAttachmentRepository;
 import se.sundsvall.webmessagecollector.integration.db.MessageRepository;
@@ -55,6 +56,7 @@ public class MessageCacheService {
 
 		var webmessages = oepIntegratorIntegration.getWebmessageByFamilyId(municipalityId, instance, familyId, fromTimestamp, "");
 		var messages = OepIntegratorMapper.toMessageEntities(webmessages).stream()
+			.filter(message -> Direction.INBOUND.equals(message.getDirection()))
 			.filter(message -> !messageRepository.existsByFamilyIdAndInstanceAndMessageIdAndExternalCaseId(message.getFamilyId(), message.getInstance(), message.getMessageId(), message.getExternalCaseId()))
 			.toList();
 		messageRepository.saveAllAndFlush(messages);
