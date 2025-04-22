@@ -21,7 +21,6 @@ import static se.sundsvall.webmessagecollector.integration.db.model.Instance.INT
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Optional;
 import java.util.Random;
@@ -46,8 +45,6 @@ import se.sundsvall.webmessagecollector.integration.oep.OepIntegratorIntegration
 @ExtendWith(MockitoExtension.class)
 class MessageCacheServiceTest {
 
-	private static final DateTimeFormatter DATE_TIME_FORMAT = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
-
 	private static final String MUNICIPALITY_ID = "municipalityId";
 
 	@Mock
@@ -66,7 +63,7 @@ class MessageCacheServiceTest {
 	private MessageCacheService service;
 
 	@Captor
-	private ArgumentCaptor<String> fromTimeStampCaptor;
+	private ArgumentCaptor<LocalDateTime> fromTimeStampCaptor;
 
 	@Captor
 	private ArgumentCaptor<List<MessageEntity>> messageEntityCaptor;
@@ -88,11 +85,11 @@ class MessageCacheServiceTest {
 		var webMessages = List.of(webMessage);
 
 		when(executionInformationRepositoryMock.findById(familyId)).thenReturn(Optional.of(ExecutionInformationEntity.builder().withFamilyId(familyId).withLastSuccessfulExecution(lastExecuted).build()));
-		when(oepIntegratorIntegrationMock.getWebmessageByFamilyId(municipalityId, INTERNAL, familyId, lastExecuted.minus(clockSkew).format(DATE_TIME_FORMAT), "")).thenReturn(webMessages);
+		when(oepIntegratorIntegrationMock.getWebmessageByFamilyId(municipalityId, INTERNAL, familyId, lastExecuted.minus(clockSkew).toLocalDateTime(), null)).thenReturn(webMessages);
 		when(messageRepositoryMock.existsByFamilyIdAndInstanceAndMessageIdAndExternalCaseId(familyId, INTERNAL, "messageId", "externalCaseId")).thenReturn(false);
 
 		service.fetchAndSaveMessages(municipalityId, INTERNAL, familyId, clockSkew);
-		verify(oepIntegratorIntegrationMock).getWebmessageByFamilyId(municipalityId, INTERNAL, familyId, lastExecuted.minus(clockSkew).format(DATE_TIME_FORMAT), "");
+		verify(oepIntegratorIntegrationMock).getWebmessageByFamilyId(municipalityId, INTERNAL, familyId, lastExecuted.minus(clockSkew).toLocalDateTime(), null);
 		verify(messageRepositoryMock).existsByFamilyIdAndInstanceAndMessageIdAndExternalCaseId(familyId, INTERNAL, "messageId", "externalCaseId");
 		verify(messageRepositoryMock).saveAllAndFlush(messageEntityCaptor.capture());
 		verify(executionInformationRepositoryMock).save(executionInformationEntityCaptor.capture());
@@ -131,12 +128,12 @@ class MessageCacheServiceTest {
 		var webMessages = List.of(webMessage);
 
 		when(executionInformationRepositoryMock.findById(familyId)).thenReturn(Optional.of(ExecutionInformationEntity.builder().withFamilyId(familyId).withLastSuccessfulExecution(lastExecuted).build()));
-		when(oepIntegratorIntegrationMock.getWebmessageByFamilyId(municipalityId, INTERNAL, familyId, lastExecuted.minus(clockSkew).format(DATE_TIME_FORMAT), "")).thenReturn(webMessages);
+		when(oepIntegratorIntegrationMock.getWebmessageByFamilyId(municipalityId, INTERNAL, familyId, lastExecuted.minus(clockSkew).toLocalDateTime(), null)).thenReturn(webMessages);
 		when(messageRepositoryMock.existsByFamilyIdAndInstanceAndMessageIdAndExternalCaseId(familyId, INTERNAL, "messageId", "externalCaseId")).thenReturn(true);
 
 		service.fetchAndSaveMessages(municipalityId, INTERNAL, familyId, clockSkew);
 
-		verify(oepIntegratorIntegrationMock).getWebmessageByFamilyId(municipalityId, INTERNAL, familyId, lastExecuted.minus(clockSkew).format(DATE_TIME_FORMAT), "");
+		verify(oepIntegratorIntegrationMock).getWebmessageByFamilyId(municipalityId, INTERNAL, familyId, lastExecuted.minus(clockSkew).toLocalDateTime(), null);
 		verify(messageRepositoryMock).existsByFamilyIdAndInstanceAndMessageIdAndExternalCaseId(familyId, INTERNAL, "messageId", "externalCaseId");
 		verify(messageRepositoryMock).saveAllAndFlush(messageEntityCaptor.capture());
 		verify(executionInformationRepositoryMock).save(executionInformationEntityCaptor.capture());
@@ -160,7 +157,7 @@ class MessageCacheServiceTest {
 		var webMessages = List.of(webMessage);
 
 		when(executionInformationRepositoryMock.findById(familyId)).thenReturn(Optional.empty());
-		when(oepIntegratorIntegrationMock.getWebmessageByFamilyId(eq(municipalityId), eq(INTERNAL), eq(familyId), any(), eq(""))).thenReturn(webMessages);
+		when(oepIntegratorIntegrationMock.getWebmessageByFamilyId(eq(municipalityId), eq(INTERNAL), eq(familyId), any(), any())).thenReturn(webMessages);
 		when(spy.initiateExecutionInfo(municipalityId, familyId)).thenCallRealMethod();
 
 		var result = spy.fetchAndSaveMessages(municipalityId, INTERNAL, familyId, clockSkew);
@@ -168,7 +165,7 @@ class MessageCacheServiceTest {
 		assertThat(result).isNotNull().hasSize(1);
 
 		verify(spy).initiateExecutionInfo(municipalityId, familyId);
-		verify(oepIntegratorIntegrationMock).getWebmessageByFamilyId(eq(municipalityId), eq(INTERNAL), eq(familyId), fromTimeStampCaptor.capture(), eq(""));
+		verify(oepIntegratorIntegrationMock).getWebmessageByFamilyId(eq(municipalityId), eq(INTERNAL), eq(familyId), fromTimeStampCaptor.capture(), any());
 		verify(messageRepositoryMock).saveAllAndFlush(any());
 		verify(executionInformationRepositoryMock).save(any());
 	}
