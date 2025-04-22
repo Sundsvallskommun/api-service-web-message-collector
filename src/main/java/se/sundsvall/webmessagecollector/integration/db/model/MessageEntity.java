@@ -5,6 +5,7 @@ import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -68,7 +69,7 @@ public class MessageEntity {
 	@Column(name = "status_timestamp", nullable = false)
 	private LocalDateTime statusTimestamp;
 
-	@OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, mappedBy = "message")
+	@OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL, orphanRemoval = true, mappedBy = "message")
 	private List<MessageAttachmentEntity> attachments;
 
 }
