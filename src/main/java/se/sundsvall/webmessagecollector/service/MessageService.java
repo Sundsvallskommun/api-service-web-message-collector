@@ -11,6 +11,7 @@ import java.io.IOException;
 import java.sql.SQLException;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StreamUtils;
 import org.zalando.problem.Problem;
@@ -71,7 +72,9 @@ public class MessageService {
 	}
 
 	public List<MessageDTO> getMessagesByFlowInstanceId(final String municipalityId, final String instance, final String flowInstanceId, final LocalDateTime from, final LocalDateTime to) {
-		var webMessages = oepIntegratorIntegration.getWebmessagesByFlowInstanceId(municipalityId, Instance.valueOf(instance), flowInstanceId, from, to);
+		var fromDateTime = Optional.ofNullable(from).map(Object::toString).orElse(null);
+		var toDateTime = Optional.ofNullable(to).map(Object::toString).orElse(null);
+		var webMessages = oepIntegratorIntegration.getWebmessagesByFlowInstanceId(municipalityId, Instance.valueOf(instance), flowInstanceId, fromDateTime, toDateTime);
 		return OepIntegratorMapper.toMessages(webMessages);
 	}
 

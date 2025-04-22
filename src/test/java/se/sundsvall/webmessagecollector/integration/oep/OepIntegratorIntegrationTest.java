@@ -9,6 +9,7 @@ import static se.sundsvall.webmessagecollector.TestDataFactory.createWebMessage;
 import static se.sundsvall.webmessagecollector.TestDataFactory.createWebMessageAttachment;
 
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -33,8 +34,8 @@ class OepIntegratorIntegrationTest {
 		var municipalityId = "municipalityId";
 		var instanceType = "INTERNAL";
 		var familyId = "familyId";
-		var fromDate = LocalDateTime.MIN;
-		var toDate = LocalDateTime.MAX;
+		var fromDate = "2000-01-01T00:00:00";
+		var toDate = "2020-01-01T00:00:00";
 		var webMessage = createWebMessage();
 		when(oepIntegratorClientMock.getWebmessageByFamilyId(municipalityId, instanceType, familyId, fromDate, toDate)).thenReturn(List.of(webMessage));
 
@@ -75,8 +76,8 @@ class OepIntegratorIntegrationTest {
 		var municipalityId = "municipalityId";
 		var instanceType = "EXTERNAL";
 		var flowInstanceId = "flowInstanceId";
-		var fromDate = LocalDateTime.MIN;
-		var toDate = LocalDateTime.MAX;
+		var fromDate = DateTimeFormatter.ISO_DATE_TIME.format(LocalDateTime.MIN);
+		var toDate = DateTimeFormatter.ISO_DATE_TIME.format(LocalDateTime.MAX);
 
 		var webMessage = createWebMessage();
 		when(oepIntegratorClientMock.getWebmessagesByFlowInstanceId(municipalityId, instanceType, flowInstanceId, fromDate, toDate)).thenReturn(List.of(webMessage));

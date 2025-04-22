@@ -4,7 +4,6 @@ import static se.sundsvall.webmessagecollector.integration.oep.configuration.Oep
 
 import generated.se.sundsvall.oepintegrator.Webmessage;
 import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
-import java.time.LocalDateTime;
 import java.util.List;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.core.io.InputStreamResource;
@@ -32,15 +31,15 @@ public interface OepIntegratorClient {
 		@PathVariable(name = "municipalityId") final String municipalityId,
 		@PathVariable(name = "instanceType") final String instanceType,
 		@PathVariable(name = "familyId") final String familyId,
-		@RequestParam(name = "fromDateTime") final LocalDateTime fromDate,
-		@RequestParam(name = "toDateTime") final LocalDateTime toDate);
+		@RequestParam(name = "fromDateTime") final String fromDate,
+		@RequestParam(name = "toDateTime") final String toDate);
 
 	@GetMapping(path = "/{municipalityId}/{instanceType}/webmessages/cases/{flowInstanceId}")
 	List<Webmessage> getWebmessagesByFlowInstanceId(
 		@PathVariable(name = "municipalityId") final String municipalityId,
 		@PathVariable(name = "instanceType") final String instanceType,
 		@PathVariable(name = "flowInstanceId") final String flowInstanceId,
-		@RequestParam(name = "fromDateTime") final LocalDateTime fromDate,
-		@RequestParam(name = "toDateTime") final LocalDateTime toDate);
+		@RequestParam(name = "fromDateTime") final String fromDate,
+		@RequestParam(name = "toDateTime") final String toDate);
 
 }

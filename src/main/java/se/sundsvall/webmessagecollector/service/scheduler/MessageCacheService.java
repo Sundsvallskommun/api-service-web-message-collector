@@ -26,7 +26,6 @@ import se.sundsvall.webmessagecollector.integration.oep.OepIntegratorMapper;
 public class MessageCacheService {
 
 	private static final Logger LOG = LoggerFactory.getLogger(MessageCacheService.class);
-	private static final DateTimeFormatter DATE_TIME_FORMAT = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
 
 	private final OepIntegratorIntegration oepIntegratorIntegration;
 	private final MessageRepository messageRepository;
@@ -50,11 +49,11 @@ public class MessageCacheService {
 		var executionInfo = executionInformationRepository.findById(familyId)
 			.orElse(initiateExecutionInfo(municipalityId, familyId));
 		// Calculate timestamp from when messages should be fetched
-		var fromTimestamp = executionInfo.getLastSuccessfulExecution().minus(clockSkew).toLocalDateTime();
+		var fromTimestamp = executionInfo.getLastSuccessfulExecution().minus(clockSkew);
 
 		var startTime = OffsetDateTime.now();
 
-		var webmessages = oepIntegratorIntegration.getWebmessageByFamilyId(municipalityId, instance, familyId, fromTimestamp, null);
+		var webmessages = oepIntegratorIntegration.getWebmessageByFamilyId(municipalityId, instance, familyId, DateTimeFormatter.ISO_DATE_TIME.format(fromTimestamp), null);
 		var messages = OepIntegratorMapper.toMessageEntities(webmessages).stream()
 			.filter(message -> Direction.INBOUND.equals(message.getDirection()))
 			.filter(message -> !messageRepository.existsByFamilyIdAndInstanceAndMessageIdAndExternalCaseId(message.getFamilyId(), message.getInstance(), message.getMessageId(), message.getExternalCaseId()))
