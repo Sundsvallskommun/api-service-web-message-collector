@@ -23,9 +23,9 @@ public class OepIntegratorIntegration {
 		this.oepIntegratorClient = oepIntegratorClient;
 	}
 
-	public List<Webmessage> getWebmessageByFamilyId(final String municipalityId, final Instance instance, final String familyId, final String fromDate, final String toDate) {
-		LOG.info("Fetching messages for municipalityId {}, instance {}, familyId {}, fromDateTime {}, toDateTime {}", municipalityId, instance, familyId, fromDate, toDate);
-		return oepIntegratorClient.getWebmessageByFamilyId(municipalityId, instance.name(), familyId, fromDate, toDate);
+	public List<Webmessage> getWebmessageByFamilyId(final String municipalityId, final Instance instance, final String familyId, final LocalDateTime fromDateTime, final LocalDateTime toDateTime) {
+		LOG.info("Fetching messages for municipalityId {}, instance {}, familyId {}, fromDateTime {}, toDateTime {}", municipalityId, instance, familyId, fromDateTime, toDateTime);
+		return oepIntegratorClient.getWebmessageByFamilyId(municipalityId, instance.name(), familyId, fromDateTime, toDateTime);
 	}
 
 	public ResponseEntity<InputStreamResource> getAttachmentStreamById(final String municipalityId, final Instance instance, final Integer attachmentId) {
@@ -35,9 +35,9 @@ public class OepIntegratorIntegration {
 		return responseEntity;
 	}
 
-	public List<Webmessage> getWebmessagesByFlowInstanceId(final String municipalityId, final Instance instance, final String flowInstanceId, final LocalDateTime fromDate, final LocalDateTime toDate) {
-		LOG.info("Fetching messages for municipalityId {}, instance {}, flowInstanceId {}, fromDateTime {}, toDateTime {}", municipalityId, instance, flowInstanceId, fromDate, toDate);
-		return oepIntegratorClient.getWebmessagesByFlowInstanceId(municipalityId, instance.name(), flowInstanceId, fromDate, toDate);
+	public List<Webmessage> getWebmessagesByFlowInstanceId(final String municipalityId, final Instance instance, final String flowInstanceId, final LocalDateTime fromDateTime, final LocalDateTime toDateTime) {
+		LOG.info("Fetching messages for municipalityId {}, instance {}, flowInstanceId {}, fromDateTime {}, toDateTime {}", municipalityId, instance, flowInstanceId, fromDateTime, toDateTime);
+		return oepIntegratorClient.getWebmessagesByFlowInstanceId(municipalityId, instance.name(), flowInstanceId, fromDateTime, toDateTime);
 	}
 
 	void validateResponse(final ResponseEntity<InputStreamResource> response) {

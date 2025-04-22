@@ -33,8 +33,8 @@ class OepIntegratorIntegrationTest {
 		var municipalityId = "municipalityId";
 		var instanceType = "INTERNAL";
 		var familyId = "familyId";
-		var fromDate = "fromDate";
-		var toDate = "toDate";
+		var fromDate = LocalDateTime.MIN;
+		var toDate = LocalDateTime.MAX;
 		var webMessage = createWebMessage();
 		when(oepIntegratorClientMock.getWebmessageByFamilyId(municipalityId, instanceType, familyId, fromDate, toDate)).thenReturn(List.of(webMessage));
 
