@@ -1,5 +1,7 @@
 package se.sundsvall.webmessagecollector.integration.oep;
 
+import static se.sundsvall.dept44.util.LogUtils.sanitizeForLogging;
+
 import generated.se.sundsvall.oepintegrator.Webmessage;
 import java.util.List;
 import org.slf4j.Logger;
@@ -23,19 +25,19 @@ public class OepIntegratorIntegration {
 	}
 
 	public List<Webmessage> getWebmessageByFamilyId(final String municipalityId, final Instance instance, final String familyId, final String fromDateTime, final String toDateTime) {
-		LOG.info("Fetching messages for municipalityId {}, instance {}, familyId {}, fromDateTime {}, toDateTime {}", municipalityId, instance, familyId, fromDateTime, toDateTime);
+		LOG.info("Fetching messages for municipalityId {}, instance {}, familyId {}, fromDateTime {}, toDateTime {}", sanitizeForLogging(municipalityId), instance, sanitizeForLogging(familyId), fromDateTime, toDateTime);
 		return oepIntegratorClient.getWebmessageByFamilyId(municipalityId, instance.name(), familyId, fromDateTime, toDateTime);
 	}
 
 	public ResponseEntity<InputStreamResource> getAttachmentStreamById(final String municipalityId, final Instance instance, final Integer attachmentId) {
-		LOG.info("Fetching attachment with attachmentId {} for municipalityId {} and instance {}", attachmentId, municipalityId, instance);
+		LOG.info("Fetching attachment with attachmentId {} for municipalityId {} and instance {}", attachmentId, sanitizeForLogging(municipalityId), instance);
 		ResponseEntity<InputStreamResource> responseEntity = oepIntegratorClient.getAttachmentById(municipalityId, instance.name(), attachmentId);
 		validateResponse(responseEntity);
 		return responseEntity;
 	}
 
 	public List<Webmessage> getWebmessagesByFlowInstanceId(final String municipalityId, final Instance instance, final String flowInstanceId, final String fromDateTime, final String toDateTime) {
-		LOG.info("Fetching messages for municipalityId {}, instance {}, flowInstanceId {}, fromDateTime {}, toDateTime {}", municipalityId, instance, flowInstanceId, fromDateTime, toDateTime);
+		LOG.info("Fetching messages for municipalityId {}, instance {}, flowInstanceId {}, fromDateTime {}, toDateTime {}", sanitizeForLogging(municipalityId), instance, sanitizeForLogging(flowInstanceId), fromDateTime, toDateTime);
 		return oepIntegratorClient.getWebmessagesByFlowInstanceId(municipalityId, instance.name(), flowInstanceId, fromDateTime, toDateTime);
 	}
 
