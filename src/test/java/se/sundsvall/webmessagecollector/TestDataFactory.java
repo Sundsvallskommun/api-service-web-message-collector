@@ -2,7 +2,6 @@ package se.sundsvall.webmessagecollector;
 
 import generated.se.sundsvall.oepintegrator.Webmessage;
 import generated.se.sundsvall.oepintegrator.WebmessageAttachment;
-import generated.se.sundsvall.oepintegrator.WebmessageAttachmentData;
 import java.io.ByteArrayInputStream;
 import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
@@ -13,7 +12,7 @@ import se.sundsvall.webmessagecollector.api.model.Direction;
 import se.sundsvall.webmessagecollector.api.model.MessageAttachment;
 import se.sundsvall.webmessagecollector.api.model.MessageDTO;
 
-public class TestDataFactory {
+public final class TestDataFactory {
 
 	public static Webmessage createWebMessage() {
 		return new Webmessage()
@@ -22,7 +21,7 @@ public class TestDataFactory {
 			.id(123)
 			.email("email")
 			.familyId("familyId")
-			.direction(Webmessage.DirectionEnum.INBOUND)
+			.direction(generated.se.sundsvall.oepintegrator.Direction.INBOUND)
 			.instance("INTERNAL")
 			.firstName("firstName")
 			.lastName("lastName")
@@ -38,9 +37,9 @@ public class TestDataFactory {
 		return ResponseEntity.ok().build();
 	}
 
-	public static ResponseEntity<InputStreamResource> createAttachmentStream(WebmessageAttachment attachment) {
-		var contentDisposition = "attachment; filename=%s".formatted(attachment.getName());
-		var contentType = attachment.getMimeType();
+	public static ResponseEntity<InputStreamResource> createAttachmentStream(final WebmessageAttachment attachment) {
+		final var contentDisposition = "attachment; filename=%s".formatted(attachment.getName());
+		final var contentType = attachment.getMimeType();
 
 		return ResponseEntity.ok()
 			.header("Content-Disposition", contentDisposition)
@@ -56,13 +55,6 @@ public class TestDataFactory {
 			.name("someFile.pdf")
 			.extension("pdf")
 			.mimeType("application/pdf");
-	}
-
-	public static WebmessageAttachmentData createWebMessageAttachmentData() {
-		return new WebmessageAttachmentData()
-			.data(new byte[] {
-				1, 2, 3
-			});
 	}
 
 	public static MessageDTO createMessageDTO() {
