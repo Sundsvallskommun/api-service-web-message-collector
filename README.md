@@ -6,7 +6,7 @@ _Collects messages from the Open-E platform and stores them in a database for su
 
 ### Prerequisites
 
-- **Java 21 or higher**
+- **Java 25 or higher**
 - **Maven**
 - **MariaDB**
 - **Git**
@@ -28,7 +28,8 @@ _Collects messages from the Open-E platform and stores them in a database for su
 
 3. **Ensure dependent services are running:**
 
-   If this microservice depends on other services, make sure they are up and accessible. See [Dependencies](#dependencies) for more details.
+   If this microservice depends on other services, make sure they are up and accessible.
+   See [Dependencies](#dependencies) for more details.
 
 4. **Build and run the application:**
 
@@ -69,7 +70,8 @@ curl -X GET http://localhost:8080/api/2281/messages
 
 ## Configuration
 
-Configuration is crucial for the application to run successfully. Ensure all necessary settings are configured in `application.yml`.
+Configuration is crucial for the application to run successfully. Ensure all necessary settings are configured in
+`application.yml`.
 
 ### Key Configuration Parameters
 
@@ -90,7 +92,8 @@ Configuration is crucial for the application to run successfully. Ensure all nec
   ```
 - **Open-E settings:**
 
-  The following YAML configuration outlines the settings for integrating with the Open-E platform. These settings are divided into different environments, each with its own scheduler and connection parameters.
+  The following YAML configuration outlines the settings for integrating with the Open-E platform. These settings are
+  divided into different environments, each with its own scheduler and connection parameters.
 
   ```yaml
   integration:
@@ -118,12 +121,15 @@ Configuration is crucial for the application to run successfully. Ensure all nec
             connect-timeout: 10
             read-timeout: 30
   ```
-- **integration.open-e.environments.2281**: This section defines the settings for municipalityId 2281. If needed you can define as many environments as you need.
+- **integration.open-e.environments.2281**: This section defines the settings for municipalityId 2281. If needed you can
+  define as many environments as you need.
   - **scheduler**:
     - **enabled**: Indicates whether the scheduler is enabled (`true`).
     - **cron**: Specifies the cron expression for scheduling tasks (`'0 */5 * * * *'`), which means every 5 minutes.
-    - **lock-at-most-for**: Defines the maximum duration for which the scheduler can hold a lock (`PT3M`), which is 3 minutes.
-      The following configuration is divided into internal and external sections, allowing you to configure the retrieval of messages from two different Open-E platform instances.
+    - **lock-at-most-for**: Defines the maximum duration for which the scheduler can hold a lock (`PT3M`), which is
+      3 minutes.
+      The following configuration is divided into internal and external sections, allowing you to configure the
+      retrieval of messages from two different Open-E platform instances.
   - **internal/external**:
     - **base-url**: The base URL for the connection (`https://someurl.se`).
     - **username**: The username for the connection (`your_username`).
@@ -134,7 +140,8 @@ Configuration is crucial for the application to run successfully. Ensure all nec
 
 ### Database Initialization
 
-The project is set up with [Flyway](https://github.com/flyway/flyway) for database migrations. Flyway is disabled by default so you will have to enable it to automatically populate the database schema upon application startup.
+The project is set up with [Flyway](https://github.com/flyway/flyway) for database migrations. Flyway is disabled by
+default so you will have to enable it to automatically populate the database schema upon application startup.
 
 ```yaml
 spring:
@@ -142,7 +149,8 @@ spring:
     enabled: true
 ```
 
-- **No additional setup is required** for database initialization, as long as the database connection settings are correctly configured.
+- **No additional setup is required** for database initialization, as long as the database connection settings are
+  correctly configured.
 
 ### Additional Notes
 
@@ -156,7 +164,8 @@ spring:
 
 ## Contributing
 
-Contributions are welcome! Please see [CONTRIBUTING.md](https://github.com/Sundsvallskommun/.github/blob/main/.github/CONTRIBUTING.md) for guidelines.
+Contributions are welcome! Please
+see [CONTRIBUTING.md](https://github.com/Sundsvallskommun/.github/blob/main/.github/CONTRIBUTING.md) for guidelines.
 
 ## License
 

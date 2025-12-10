@@ -52,8 +52,8 @@ class MessageResource {
 	@ApiResponse(responseCode = "200", description = "Successful Operation", content = @Content(mediaType = APPLICATION_JSON_VALUE, array = @ArraySchema(schema = @Schema(implementation = MessageDTO.class))))
 	@Operation(summary = "Get a list of messages related to a specific familyId", description = "Returns a list of messages found for the specified familyId")
 	ResponseEntity<List<MessageDTO>> getMessages(
-		@Parameter(name = "municipalityId", description = "Municipality Id", example = "2281", required = true) @PathVariable("municipalityId") @ValidMunicipalityId final String municipalityId,
-		@Parameter(name = "familyId", description = "FamilyId to fetch messages for", example = "123", required = true) @PathVariable("familyId") final String familyId,
+		@PathVariable @Parameter(name = "municipalityId", description = "Municipality Id", example = "2281", required = true) @ValidMunicipalityId final String municipalityId,
+		@PathVariable @Parameter(name = "familyId", description = "FamilyId to fetch messages for", example = "123", required = true) final String familyId,
 		@Parameter(name = "Instance", description = "Instance to fetch messages for", example = "INTERNAL", required = true) @PathVariable("Instance") final String instance) {
 		return ok(service.getMessages(municipalityId, familyId, instance.toUpperCase()));
 	}
@@ -62,7 +62,7 @@ class MessageResource {
 	@ApiResponse(responseCode = "204", description = "No Content", useReturnTypeSchema = true)
 	@Operation(summary = "Delete a list of messages", description = "Deletes a list of messages with the ids provided")
 	ResponseEntity<Void> deleteMessages(
-		@Parameter(name = "municipalityId", description = "Municipality Id", example = "2281", required = true) @PathVariable("municipalityId") @ValidMunicipalityId final String municipalityId,
+		@PathVariable @Parameter(name = "municipalityId", description = "Municipality Id", example = "2281", required = true) @ValidMunicipalityId final String municipalityId,
 		@RequestBody final List<Integer> ids) {
 		service.deleteMessages(ids);
 
@@ -73,8 +73,8 @@ class MessageResource {
 	@ApiResponse(responseCode = "200", description = "Successful Operation", useReturnTypeSchema = true)
 	@Operation(summary = "Get a messageAttachment", description = "Returns a messageAttachment as a stream for the specified attachmentId")
 	void getAttachment(
-		@Parameter(name = "municipalityId", description = "Municipality Id", example = "2281", required = true) @PathVariable("municipalityId") @ValidMunicipalityId final String municipalityId,
-		@Parameter(name = "attachmentId", description = "MessageId to fetch attachment for", example = "123", required = true) @PathVariable("attachmentId") final int attachmentId, final HttpServletResponse response) {
+		@PathVariable @Parameter(name = "municipalityId", description = "Municipality Id", example = "2281", required = true) @ValidMunicipalityId final String municipalityId,
+		@PathVariable @Parameter(name = "attachmentId", description = "MessageId to fetch attachment for", example = "123", required = true) final int attachmentId, final HttpServletResponse response) {
 		service.getMessageAttachmentStreamed(attachmentId, response);
 	}
 
@@ -82,8 +82,8 @@ class MessageResource {
 	@ApiResponse(responseCode = "204", description = "No Content", useReturnTypeSchema = true)
 	@Operation(summary = "Delete a messageAttachment", description = "Deletes a messageAttachment with the specified id")
 	ResponseEntity<Void> deleteAttachment(
-		@Parameter(name = "municipalityId", description = "Municipality Id", example = "2281", required = true) @PathVariable("municipalityId") @ValidMunicipalityId final String municipalityId,
-		@Parameter(name = "attachmentId", description = "Id of the attachment to delete", example = "123", required = true) @PathVariable("attachmentId") final int attachmentId) {
+		@PathVariable @Parameter(name = "municipalityId", description = "Municipality Id", example = "2281", required = true) @ValidMunicipalityId final String municipalityId,
+		@PathVariable @Parameter(name = "attachmentId", description = "Id of the attachment to delete", example = "123", required = true) final int attachmentId) {
 		service.deleteAttachment(attachmentId);
 
 		return noContent().header(CONTENT_TYPE, ALL_VALUE).build();
@@ -93,9 +93,9 @@ class MessageResource {
 	@ApiResponse(responseCode = "200", description = "Successful Operation", useReturnTypeSchema = true)
 	@Operation(summary = "Get a list of messages related to a specific flow instance id", description = "Returns a list of messages found for the specified flow instance id")
 	ResponseEntity<List<MessageDTO>> getMessagesByFlowInstanceId(
-		@Parameter(name = "municipalityId", description = "Municipality Id", example = "2281", required = true) @PathVariable("municipalityId") @ValidMunicipalityId final String municipalityId,
-		@Parameter(name = "instance", description = "Instance to fetch messages for", example = "INTERNAL", required = true) @PathVariable("instance") final String instance,
-		@Parameter(name = "flowInstanceId", description = "Flow instance id to fetch messages for", example = "1234567890", required = true) @PathVariable("flowInstanceId") final String flowInstanceId,
+		@PathVariable @Parameter(name = "municipalityId", description = "Municipality Id", example = "2281", required = true) @ValidMunicipalityId final String municipalityId,
+		@PathVariable @Parameter(name = "instance", description = "Instance to fetch messages for", example = "INTERNAL", required = true) final String instance,
+		@PathVariable @Parameter(name = "flowInstanceId", description = "Flow instance id to fetch messages for", example = "1234567890", required = true) final String flowInstanceId,
 		@Parameter(name = "fromDateTime", description = "The start date and time for filtering web messages (optional)", example = "2024-01-31T12:00:00") @RequestParam(required = false) @DateTimeFormat(
 			iso = DateTimeFormat.ISO.DATE_TIME) final LocalDateTime fromDateTime,
 		@Parameter(name = "toDateTime", description = "The end date and time for filtering web messages (optional).", example = "2024-01-31T12:00:00") @RequestParam(required = false) @DateTimeFormat(
@@ -107,9 +107,9 @@ class MessageResource {
 	@ApiResponse(responseCode = "200", description = "Successful Operation", useReturnTypeSchema = true)
 	@Operation(summary = "Get an attachment by id", description = "Returns an attachment as a stream for the specified attachmentId")
 	void getAttachmentById(final HttpServletResponse response,
-		@Parameter(name = "municipalityId", description = "Municipality Id", example = "2281", required = true) @PathVariable("municipalityId") @ValidMunicipalityId final String municipalityId,
-		@Parameter(name = "instance", description = "Instance to fetch messages for", example = "INTERNAL", required = true) @PathVariable("instance") final String instance,
-		@Parameter(name = "attachmentId", description = "Id of the requested attachment", example = "1234567890", required = true) @PathVariable("attachmentId") final Integer attachmentId) {
+		@PathVariable @Parameter(name = "municipalityId", description = "Municipality Id", example = "2281", required = true) @ValidMunicipalityId final String municipalityId,
+		@PathVariable @Parameter(name = "instance", description = "Instance to fetch messages for", example = "INTERNAL", required = true) final String instance,
+		@PathVariable @Parameter(name = "attachmentId", description = "Id of the requested attachment", example = "1234567890", required = true) final Integer attachmentId) {
 		service.streamAttachmentById(municipalityId, instance.toUpperCase(), attachmentId, response);
 	}
 }
