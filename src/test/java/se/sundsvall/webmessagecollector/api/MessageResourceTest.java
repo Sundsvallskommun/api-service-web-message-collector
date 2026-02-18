@@ -1,15 +1,5 @@
 package se.sundsvall.webmessagecollector.api;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyNoMoreInteractions;
-import static org.mockito.Mockito.when;
-import static org.springframework.boot.test.context.SpringBootTest.WebEnvironment.RANDOM_PORT;
-import static org.springframework.http.HttpMethod.DELETE;
-import static se.sundsvall.webmessagecollector.TestDataFactory.createMessageDTO;
-
 import jakarta.servlet.http.HttpServletResponse;
 import java.time.OffsetDateTime;
 import java.util.List;
@@ -25,6 +15,16 @@ import se.sundsvall.webmessagecollector.api.model.Direction;
 import se.sundsvall.webmessagecollector.api.model.MessageAttachment;
 import se.sundsvall.webmessagecollector.api.model.MessageDTO;
 import se.sundsvall.webmessagecollector.service.MessageService;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoMoreInteractions;
+import static org.mockito.Mockito.when;
+import static org.springframework.boot.test.context.SpringBootTest.WebEnvironment.RANDOM_PORT;
+import static org.springframework.http.HttpMethod.DELETE;
+import static se.sundsvall.webmessagecollector.TestDataFactory.createMessageDTO;
 
 @SpringBootTest(classes = Application.class, webEnvironment = RANDOM_PORT)
 @ActiveProfiles("junit")

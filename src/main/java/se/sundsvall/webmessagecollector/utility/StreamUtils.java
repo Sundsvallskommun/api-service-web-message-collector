@@ -1,11 +1,5 @@
 package se.sundsvall.webmessagecollector.utility;
 
-import static org.springframework.http.HttpHeaders.CONTENT_DISPOSITION;
-import static org.springframework.http.HttpHeaders.CONTENT_LENGTH;
-import static org.springframework.http.HttpHeaders.CONTENT_TYPE;
-import static org.springframework.http.HttpHeaders.LAST_MODIFIED;
-import static org.zalando.problem.Status.INTERNAL_SERVER_ERROR;
-
 import jakarta.servlet.http.HttpServletResponse;
 import java.util.List;
 import java.util.Objects;
@@ -14,6 +8,12 @@ import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.zalando.problem.Problem;
+
+import static org.springframework.http.HttpHeaders.CONTENT_DISPOSITION;
+import static org.springframework.http.HttpHeaders.CONTENT_LENGTH;
+import static org.springframework.http.HttpHeaders.CONTENT_TYPE;
+import static org.springframework.http.HttpHeaders.LAST_MODIFIED;
+import static org.zalando.problem.Status.INTERNAL_SERVER_ERROR;
 
 public final class StreamUtils {
 

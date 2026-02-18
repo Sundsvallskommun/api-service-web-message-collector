@@ -1,11 +1,5 @@
 package se.sundsvall.webmessagecollector.service;
 
-import static org.springframework.http.HttpHeaders.CONTENT_DISPOSITION;
-import static org.springframework.http.HttpHeaders.CONTENT_TYPE;
-import static org.zalando.problem.Status.INTERNAL_SERVER_ERROR;
-import static se.sundsvall.webmessagecollector.service.MessageMapper.toMessageDTOs;
-import static se.sundsvall.webmessagecollector.utility.StreamUtils.setResponse;
-
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.sql.SQLException;
@@ -23,6 +17,12 @@ import se.sundsvall.webmessagecollector.integration.db.model.Instance;
 import se.sundsvall.webmessagecollector.integration.db.model.MessageStatus;
 import se.sundsvall.webmessagecollector.integration.oep.OepIntegratorIntegration;
 import se.sundsvall.webmessagecollector.integration.oep.OepIntegratorMapper;
+
+import static org.springframework.http.HttpHeaders.CONTENT_DISPOSITION;
+import static org.springframework.http.HttpHeaders.CONTENT_TYPE;
+import static org.zalando.problem.Status.INTERNAL_SERVER_ERROR;
+import static se.sundsvall.webmessagecollector.service.MessageMapper.toMessageDTOs;
+import static se.sundsvall.webmessagecollector.utility.StreamUtils.setResponse;
 
 @Service
 public class MessageService {
