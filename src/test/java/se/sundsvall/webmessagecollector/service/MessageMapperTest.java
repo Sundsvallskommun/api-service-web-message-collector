@@ -1,13 +1,13 @@
 package se.sundsvall.webmessagecollector.service;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import org.junit.jupiter.api.Test;
 import se.sundsvall.webmessagecollector.api.model.Direction;
 import se.sundsvall.webmessagecollector.integration.db.model.MessageEntity;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 class MessageMapperTest {
 

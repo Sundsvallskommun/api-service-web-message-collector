@@ -1,18 +1,5 @@
 package se.sundsvall.webmessagecollector.service;
 
-import static java.nio.charset.StandardCharsets.UTF_8;
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyNoInteractions;
-import static org.mockito.Mockito.verifyNoMoreInteractions;
-import static org.mockito.Mockito.when;
-import static org.springframework.http.HttpHeaders.CONTENT_DISPOSITION;
-import static org.springframework.http.HttpHeaders.CONTENT_TYPE;
-import static se.sundsvall.webmessagecollector.TestDataFactory.createWebMessage;
-
 import jakarta.servlet.ServletOutputStream;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.ByteArrayInputStream;
@@ -43,6 +30,19 @@ import se.sundsvall.webmessagecollector.integration.db.model.MessageAttachmentEn
 import se.sundsvall.webmessagecollector.integration.db.model.MessageEntity;
 import se.sundsvall.webmessagecollector.integration.db.model.MessageStatus;
 import se.sundsvall.webmessagecollector.integration.oep.OepIntegratorIntegration;
+
+import static java.nio.charset.StandardCharsets.UTF_8;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
+import static org.mockito.Mockito.verifyNoMoreInteractions;
+import static org.mockito.Mockito.when;
+import static org.springframework.http.HttpHeaders.CONTENT_DISPOSITION;
+import static org.springframework.http.HttpHeaders.CONTENT_TYPE;
+import static se.sundsvall.webmessagecollector.TestDataFactory.createWebMessage;
 
 @ExtendWith(MockitoExtension.class)
 class MessageServiceTest {

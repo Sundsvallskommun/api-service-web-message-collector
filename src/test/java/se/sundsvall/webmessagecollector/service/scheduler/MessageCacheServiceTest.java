@@ -1,23 +1,5 @@
 package se.sundsvall.webmessagecollector.service.scheduler;
 
-import static java.time.temporal.ChronoUnit.SECONDS;
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.assertj.core.api.Assertions.within;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.ArgumentMatchers.same;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyNoInteractions;
-import static org.mockito.Mockito.when;
-import static se.sundsvall.webmessagecollector.TestDataFactory.createAttachmentStream;
-import static se.sundsvall.webmessagecollector.TestDataFactory.createEmptyResponse;
-import static se.sundsvall.webmessagecollector.TestDataFactory.createWebMessage;
-import static se.sundsvall.webmessagecollector.TestDataFactory.createWebMessageAttachment;
-import static se.sundsvall.webmessagecollector.api.model.Direction.INBOUND;
-import static se.sundsvall.webmessagecollector.integration.db.model.Instance.INTERNAL;
-
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
@@ -42,6 +24,24 @@ import se.sundsvall.webmessagecollector.integration.db.model.MessageAttachmentEn
 import se.sundsvall.webmessagecollector.integration.db.model.MessageEntity;
 import se.sundsvall.webmessagecollector.integration.db.model.MessageStatus;
 import se.sundsvall.webmessagecollector.integration.oep.OepIntegratorIntegration;
+
+import static java.time.temporal.ChronoUnit.SECONDS;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.assertj.core.api.Assertions.within;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.ArgumentMatchers.same;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
+import static org.mockito.Mockito.when;
+import static se.sundsvall.webmessagecollector.TestDataFactory.createAttachmentStream;
+import static se.sundsvall.webmessagecollector.TestDataFactory.createEmptyResponse;
+import static se.sundsvall.webmessagecollector.TestDataFactory.createWebMessage;
+import static se.sundsvall.webmessagecollector.TestDataFactory.createWebMessageAttachment;
+import static se.sundsvall.webmessagecollector.api.model.Direction.INBOUND;
+import static se.sundsvall.webmessagecollector.integration.db.model.Instance.INTERNAL;
 
 @ExtendWith(MockitoExtension.class)
 class MessageCacheServiceTest {

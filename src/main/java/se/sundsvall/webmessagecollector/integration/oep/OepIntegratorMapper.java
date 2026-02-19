@@ -1,7 +1,5 @@
 package se.sundsvall.webmessagecollector.integration.oep;
 
-import static java.util.Optional.ofNullable;
-
 import generated.se.sundsvall.oepintegrator.Webmessage;
 import generated.se.sundsvall.oepintegrator.WebmessageAttachment;
 import java.time.LocalDateTime;
@@ -14,6 +12,8 @@ import se.sundsvall.webmessagecollector.integration.db.model.Instance;
 import se.sundsvall.webmessagecollector.integration.db.model.MessageAttachmentEntity;
 import se.sundsvall.webmessagecollector.integration.db.model.MessageEntity;
 import se.sundsvall.webmessagecollector.integration.db.model.MessageStatus;
+
+import static java.util.Optional.ofNullable;
 
 public final class OepIntegratorMapper {
 

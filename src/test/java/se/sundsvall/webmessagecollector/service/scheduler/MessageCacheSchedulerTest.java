@@ -1,5 +1,17 @@
 package se.sundsvall.webmessagecollector.service.scheduler;
 
+import java.time.Duration;
+import java.util.Collections;
+import java.util.List;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Nested;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.junit.jupiter.MockitoExtension;
+import se.sundsvall.webmessagecollector.configuration.OpenEProperties;
+import se.sundsvall.webmessagecollector.integration.db.model.MessageAttachmentEntity;
+import se.sundsvall.webmessagecollector.integration.db.model.MessageEntity;
+
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
@@ -13,18 +25,6 @@ import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 import static se.sundsvall.webmessagecollector.integration.db.model.Instance.EXTERNAL;
 import static se.sundsvall.webmessagecollector.integration.db.model.Instance.INTERNAL;
-
-import java.time.Duration;
-import java.util.Collections;
-import java.util.List;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Nested;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.junit.jupiter.MockitoExtension;
-import se.sundsvall.webmessagecollector.configuration.OpenEProperties;
-import se.sundsvall.webmessagecollector.integration.db.model.MessageAttachmentEntity;
-import se.sundsvall.webmessagecollector.integration.db.model.MessageEntity;
 
 @ExtendWith(MockitoExtension.class)
 class MessageCacheSchedulerTest {

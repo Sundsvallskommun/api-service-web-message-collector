@@ -1,7 +1,5 @@
 package se.sundsvall.webmessagecollector.integration.oep;
 
-import static se.sundsvall.dept44.util.LogUtils.sanitizeForLogging;
-
 import generated.se.sundsvall.oepintegrator.Webmessage;
 import java.util.List;
 import org.slf4j.Logger;
@@ -12,6 +10,8 @@ import org.springframework.stereotype.Component;
 import org.zalando.problem.Problem;
 import org.zalando.problem.Status;
 import se.sundsvall.webmessagecollector.integration.db.model.Instance;
+
+import static se.sundsvall.dept44.util.LogUtils.sanitizeForLogging;
 
 @Component
 public class OepIntegratorIntegration {

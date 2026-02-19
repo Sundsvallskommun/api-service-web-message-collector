@@ -1,14 +1,14 @@
 package se.sundsvall.webmessagecollector.service;
 
-import static java.util.Collections.emptyList;
-import static java.util.Optional.ofNullable;
-
 import java.util.List;
 import java.util.Objects;
 import se.sundsvall.webmessagecollector.api.model.MessageAttachment;
 import se.sundsvall.webmessagecollector.api.model.MessageDTO;
 import se.sundsvall.webmessagecollector.integration.db.model.MessageAttachmentEntity;
 import se.sundsvall.webmessagecollector.integration.db.model.MessageEntity;
+
+import static java.util.Collections.emptyList;
+import static java.util.Optional.ofNullable;
 
 public final class MessageMapper {
 

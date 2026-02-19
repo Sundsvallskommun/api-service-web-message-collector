@@ -1,10 +1,5 @@
 package se.sundsvall.webmessagecollector.integration.oep;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static se.sundsvall.webmessagecollector.TestDataFactory.createWebMessage;
-import static se.sundsvall.webmessagecollector.TestDataFactory.createWebMessageAttachment;
-import static se.sundsvall.webmessagecollector.integration.oep.OepIntegratorMapper.DATE_TIME_FORMAT;
-
 import java.util.List;
 import org.junit.jupiter.api.Test;
 import se.sundsvall.webmessagecollector.api.model.Direction;
@@ -14,6 +9,11 @@ import se.sundsvall.webmessagecollector.integration.db.model.Instance;
 import se.sundsvall.webmessagecollector.integration.db.model.MessageAttachmentEntity;
 import se.sundsvall.webmessagecollector.integration.db.model.MessageEntity;
 import se.sundsvall.webmessagecollector.integration.db.model.MessageStatus;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static se.sundsvall.webmessagecollector.TestDataFactory.createWebMessage;
+import static se.sundsvall.webmessagecollector.TestDataFactory.createWebMessageAttachment;
+import static se.sundsvall.webmessagecollector.integration.oep.OepIntegratorMapper.DATE_TIME_FORMAT;
 
 class OepIntegratorMapperTest {
 

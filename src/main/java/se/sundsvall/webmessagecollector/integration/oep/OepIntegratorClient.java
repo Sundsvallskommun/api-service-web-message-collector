@@ -1,7 +1,5 @@
 package se.sundsvall.webmessagecollector.integration.oep;
 
-import static se.sundsvall.webmessagecollector.integration.oep.configuration.OepIntegratorConfiguration.CLIENT_ID;
-
 import generated.se.sundsvall.oepintegrator.Webmessage;
 import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
 import java.util.List;
@@ -12,6 +10,8 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
 import se.sundsvall.webmessagecollector.integration.oep.configuration.OepIntegratorConfiguration;
+
+import static se.sundsvall.webmessagecollector.integration.oep.configuration.OepIntegratorConfiguration.CLIENT_ID;
 
 @FeignClient(
 	name = CLIENT_ID,

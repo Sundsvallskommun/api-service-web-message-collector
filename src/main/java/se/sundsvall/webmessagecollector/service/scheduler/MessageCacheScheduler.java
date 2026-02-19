@@ -1,10 +1,5 @@
 package se.sundsvall.webmessagecollector.service.scheduler;
 
-import static java.util.Collections.emptyList;
-import static java.util.Optional.ofNullable;
-import static se.sundsvall.webmessagecollector.integration.db.model.Instance.EXTERNAL;
-import static se.sundsvall.webmessagecollector.integration.db.model.Instance.INTERNAL;
-
 import java.time.Duration;
 import java.time.Instant;
 import java.util.Optional;
@@ -24,6 +19,11 @@ import se.sundsvall.dept44.requestid.RequestId;
 import se.sundsvall.webmessagecollector.configuration.OpenEProperties;
 import se.sundsvall.webmessagecollector.integration.db.model.Instance;
 import se.sundsvall.webmessagecollector.integration.db.model.MessageEntity;
+
+import static java.util.Collections.emptyList;
+import static java.util.Optional.ofNullable;
+import static se.sundsvall.webmessagecollector.integration.db.model.Instance.EXTERNAL;
+import static se.sundsvall.webmessagecollector.integration.db.model.Instance.INTERNAL;
 
 @Component
 public class MessageCacheScheduler {
