@@ -5,10 +5,10 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.io.InputStreamResource;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
-import org.zalando.problem.Problem;
-import org.zalando.problem.Status;
+import se.sundsvall.dept44.problem.Problem;
 import se.sundsvall.webmessagecollector.integration.db.model.Instance;
 
 import static se.sundsvall.dept44.util.LogUtils.sanitizeForLogging;
@@ -43,7 +43,7 @@ public class OepIntegratorIntegration {
 
 	void validateResponse(final ResponseEntity<InputStreamResource> response) {
 		if (!response.getStatusCode().is2xxSuccessful()) {
-			throw Problem.valueOf(Status.valueOf(response.getStatusCode().value()), "Error while streaming attachment data from Oep-Integrator");
+			throw Problem.valueOf(HttpStatus.valueOf(response.getStatusCode().value()), "Error while streaming attachment data from Oep-Integrator");
 		}
 	}
 

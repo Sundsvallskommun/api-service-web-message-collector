@@ -9,13 +9,13 @@ import org.mockito.Answers;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.http.HttpStatus;
 import se.sundsvall.webmessagecollector.integration.db.model.Instance;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
+import static org.springframework.http.HttpStatus.OK;
 import static se.sundsvall.webmessagecollector.TestDataFactory.createAttachmentStream;
 import static se.sundsvall.webmessagecollector.TestDataFactory.createWebMessage;
 import static se.sundsvall.webmessagecollector.TestDataFactory.createWebMessageAttachment;
@@ -59,13 +59,13 @@ class OepIntegratorIntegrationTest {
 		var result = oepIntegratorIntegration.getAttachmentStreamById(municipalityId, Instance.valueOf(instanceType), attachmentId);
 
 		assertThat(result).isNotNull().satisfies(response -> {
-			assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+			assertThat(response.getStatusCode()).isEqualTo(OK);
 			assertThat(response.getBody()).isNotNull();
 			assertThat(response.getBody().getInputStream().readAllBytes()).isEqualTo(new byte[] {
 				1, 2, 3
 			});
-			assertThat(response.getHeaders()).containsEntry("Content-Disposition", List.of("attachment; filename=someFile.pdf"));
-			assertThat(response.getHeaders()).containsEntry("Content-Type", List.of("application/pdf"));
+			assertThat(response.getHeaders().getFirst("Content-Disposition")).isEqualTo("attachment; filename=someFile.pdf");
+			assertThat(response.getHeaders().getFirst("Content-Type")).isEqualTo("application/pdf");
 		});
 		verify(oepIntegratorClientMock).getAttachmentById(municipalityId, instanceType, attachmentId);
 		verifyNoMoreInteractions(oepIntegratorClientMock);

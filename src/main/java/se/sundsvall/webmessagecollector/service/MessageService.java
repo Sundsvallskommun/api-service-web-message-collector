@@ -8,8 +8,7 @@ import java.util.List;
 import java.util.Optional;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StreamUtils;
-import org.zalando.problem.Problem;
-import org.zalando.problem.Status;
+import se.sundsvall.dept44.problem.Problem;
 import se.sundsvall.webmessagecollector.api.model.MessageDTO;
 import se.sundsvall.webmessagecollector.integration.db.MessageAttachmentRepository;
 import se.sundsvall.webmessagecollector.integration.db.MessageRepository;
@@ -20,7 +19,8 @@ import se.sundsvall.webmessagecollector.integration.oep.OepIntegratorMapper;
 
 import static org.springframework.http.HttpHeaders.CONTENT_DISPOSITION;
 import static org.springframework.http.HttpHeaders.CONTENT_TYPE;
-import static org.zalando.problem.Status.INTERNAL_SERVER_ERROR;
+import static org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR;
+import static org.springframework.http.HttpStatus.NOT_FOUND;
 import static se.sundsvall.webmessagecollector.service.MessageMapper.toMessageDTOs;
 import static se.sundsvall.webmessagecollector.utility.StreamUtils.setResponse;
 
@@ -48,7 +48,7 @@ public class MessageService {
 	public void getMessageAttachmentStreamed(final int attachmentID, final HttpServletResponse response) {
 		try {
 			var attachmentEntity = attachmentRepository.findById(attachmentID)
-				.orElseThrow(() -> Problem.valueOf(Status.NOT_FOUND, "MessageAttachment not found"));
+				.orElseThrow(() -> Problem.valueOf(NOT_FOUND, "MessageAttachment not found"));
 
 			var file = attachmentEntity.getFile();
 

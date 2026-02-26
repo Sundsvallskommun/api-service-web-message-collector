@@ -1,8 +1,8 @@
 package se.sundsvall.webmessagecollector.service.scheduler;
 
 import java.util.concurrent.atomic.AtomicBoolean;
-import org.springframework.boot.actuate.health.Health;
-import org.springframework.boot.actuate.health.HealthIndicator;
+import org.springframework.boot.health.contributor.Health;
+import org.springframework.boot.health.contributor.HealthIndicator;
 import org.springframework.stereotype.Component;
 
 @Component
