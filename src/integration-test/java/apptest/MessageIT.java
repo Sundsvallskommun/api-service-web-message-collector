@@ -12,7 +12,6 @@ import com.google.gson.Gson;
 import java.io.IOException;
 import java.util.List;
 import org.junit.jupiter.api.Test;
-import org.springframework.http.HttpStatus;
 import org.springframework.test.context.jdbc.Sql;
 import se.sundsvall.dept44.test.AbstractAppTest;
 import se.sundsvall.dept44.test.annotation.wiremock.WireMockAppTestSuite;
@@ -32,7 +31,7 @@ class MessageIT extends AbstractAppTest {
 		setupCall()
 			.withServicePath("/1984/messages/123/internal")
 			.withHttpMethod(GET)
-			.withExpectedResponseStatus(HttpStatus.OK)
+			.withExpectedResponseStatus(OK)
 			.withExpectedResponse(RESPONSE_FILE)
 			.sendRequestAndVerifyResponse();
 	}

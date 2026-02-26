@@ -20,8 +20,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.ResponseEntity;
 import org.springframework.mock.web.MockHttpServletResponse;
-import org.zalando.problem.Status;
-import org.zalando.problem.ThrowableProblem;
+import se.sundsvall.dept44.problem.ThrowableProblem;
 import se.sundsvall.webmessagecollector.api.model.Direction;
 import se.sundsvall.webmessagecollector.integration.db.MessageAttachmentRepository;
 import se.sundsvall.webmessagecollector.integration.db.MessageRepository;
@@ -42,6 +41,8 @@ import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 import static org.springframework.http.HttpHeaders.CONTENT_DISPOSITION;
 import static org.springframework.http.HttpHeaders.CONTENT_TYPE;
+import static org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR;
+import static org.springframework.http.HttpStatus.NOT_FOUND;
 import static se.sundsvall.webmessagecollector.TestDataFactory.createWebMessage;
 
 @ExtendWith(MockitoExtension.class)
@@ -168,7 +169,7 @@ class MessageServiceTest {
 
 		assertThatExceptionOfType(ThrowableProblem.class)
 			.isThrownBy(() -> service.getMessageAttachmentStreamed(123, servletResponseMock))
-			.satisfies(problem -> assertThat(problem.getStatus()).isEqualTo(Status.NOT_FOUND));
+			.satisfies(problem -> assertThat(problem.getStatus()).isEqualTo(NOT_FOUND));
 
 		verify(attachmentRepositoryMock).findById(123);
 		verifyNoMoreInteractions(attachmentRepositoryMock);
@@ -182,7 +183,7 @@ class MessageServiceTest {
 
 		assertThatExceptionOfType(ThrowableProblem.class)
 			.isThrownBy(() -> service.getMessageAttachmentStreamed(123, servletResponseMock))
-			.satisfies(problem -> assertThat(problem.getStatus()).isEqualTo(Status.INTERNAL_SERVER_ERROR));
+			.satisfies(problem -> assertThat(problem.getStatus()).isEqualTo(INTERNAL_SERVER_ERROR));
 
 		verify(attachmentRepositoryMock).findById(123);
 		verify(messageAttachmentEntityMock).getFile();
