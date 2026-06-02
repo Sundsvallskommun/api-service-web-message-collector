@@ -7,7 +7,7 @@ info:
     url: https://opensource.org/licenses/MIT
   version: "5.1"
 servers:
-- url: http://localhost:55362
+- url: http://localhost:51239
   description: Generated server url
 tags:
 - name: messages
@@ -386,10 +386,10 @@ components:
             $ref: "#/components/schemas/Violation"
         title:
           type: string
-        causeAsProblem:
-          $ref: "#/components/schemas/ThrowableProblem"
         detail:
           type: string
+        causeAsProblem:
+          $ref: "#/components/schemas/ThrowableProblem"
         instance:
           type: string
           format: uri
@@ -425,7 +425,7 @@ components:
           format: int32
           description: The Id for the attachment
           examples:
-          - "1"
+          - 1
         name:
           type: string
           description: The name of the file
@@ -449,7 +449,7 @@ components:
           format: int32
           description: The webMessageCollector Id for the message
           examples:
-          - "1"
+          - 1
         direction:
           type: string
           description: If the message is inbound or outbound from the perspective
