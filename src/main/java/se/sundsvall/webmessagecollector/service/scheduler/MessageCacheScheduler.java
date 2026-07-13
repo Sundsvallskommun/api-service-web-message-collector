@@ -34,6 +34,10 @@ public class MessageCacheScheduler {
 		var executor = new DefaultLockingTaskExecutor(lockProvider);
 
 		openEProperties.environments().forEach((municipalityId, environment) -> {
+			if (!environment.scheduler().enabled()) {
+				LOG.info("Message cache scheduler is disabled for municipality {}", municipalityId);
+				return;
+			}
 			// Ensure clockSkew does not cause message duplication. Add one extra minute to be safe.
 			if (environment.scheduler().clockSkew().plusMinutes(1).toMinutes() > environment.scheduler().keepDeletedAfterLastSuccessFor().toMinutes()) {
 				throw new IllegalArgumentException("Incompatible properties! scheduler.clockSkew cannot be greater than scheduler.keepDeletedAfterLastSuccessFor");
