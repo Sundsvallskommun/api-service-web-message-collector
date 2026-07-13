@@ -7,7 +7,7 @@ integration:
     environments:
       1984:
         scheduler:
-          enabled: true
+          enabled: false
           cron: '0 */5 * * * *'
           lock-at-most-for: PT3M
         internal:
