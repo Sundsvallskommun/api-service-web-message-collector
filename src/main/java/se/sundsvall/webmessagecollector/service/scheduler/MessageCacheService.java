@@ -3,6 +3,7 @@ package se.sundsvall.webmessagecollector.service.scheduler;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
+import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 import javax.sql.rowset.serial.SerialBlob;
@@ -51,7 +52,7 @@ public class MessageCacheService {
 		// Calculate timestamp from when messages should be fetched
 		var fromTimestamp = executionInfo.getLastSuccessfulExecution().minus(clockSkew);
 
-		var startTime = OffsetDateTime.now();
+		var startTime = OffsetDateTime.now(ZoneId.systemDefault());
 
 		var webmessages = oepIntegratorIntegration.getWebmessageByFamilyId(municipalityId, instance, familyId, DateTimeFormatter.ISO_DATE_TIME.format(fromTimestamp), null);
 		var messages = OepIntegratorMapper.toMessageEntities(webmessages).stream()
@@ -86,14 +87,14 @@ public class MessageCacheService {
 	@Transactional
 	public void failedAttachments(MessageEntity message) {
 		message.setStatus(MessageStatus.FAILED_ATTACHMENTS);
-		message.setStatusTimestamp(LocalDateTime.now());
+		message.setStatusTimestamp(LocalDateTime.now(ZoneId.systemDefault()));
 		messageRepository.save(message);
 	}
 
 	@Transactional
 	public void complete(MessageEntity message) {
 		message.setStatus(MessageStatus.COMPLETE);
-		message.setStatusTimestamp(LocalDateTime.now());
+		message.setStatusTimestamp(LocalDateTime.now(ZoneId.systemDefault()));
 		messageRepository.save(message);
 	}
 
@@ -116,7 +117,7 @@ public class MessageCacheService {
 		return ExecutionInformationEntity.builder()
 			.withMunicipalityId(municipalityId)
 			.withFamilyId(familyId)
-			.withLastSuccessfulExecution(OffsetDateTime.now().minusHours(1)) // minusHours(1) is a safety for not missing any messages on the first execution run
+			.withLastSuccessfulExecution(OffsetDateTime.now(ZoneId.systemDefault()).minusHours(1)) // minusHours(1) is a safety for not missing any messages on the first execution run
 			.build();
 	}
 
