@@ -3,6 +3,7 @@ package se.sundsvall.webmessagecollector.integration.oep;
 import generated.se.sundsvall.oepintegrator.Webmessage;
 import generated.se.sundsvall.oepintegrator.WebmessageAttachment;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 import se.sundsvall.webmessagecollector.api.model.Direction;
@@ -80,7 +81,7 @@ public final class OepIntegratorMapper {
 			.withMunicipalityId(webmessage.getMunicipalityId())
 			.withSent(webmessage.getSent())
 			.withStatus(MessageStatus.PROCESSING)
-			.withStatusTimestamp(LocalDateTime.now())
+			.withStatusTimestamp(LocalDateTime.now(ZoneId.systemDefault()))
 			.withEmail(webmessage.getEmail())
 			.withFirstName(webmessage.getFirstName())
 			.withLastName(webmessage.getLastName())
